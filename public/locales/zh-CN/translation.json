@@ -1943,7 +1943,16 @@
     "indigo": "靛蓝色",
     "red": "红色",
     "teal": "青绿色",
-    "yellow": "黄色"
+    "yellow": "黄色",
+    "pastelrose": "粉彩玫瑰",
+    "pastelpeach": "粉彩桃色",
+    "pastelbutter": "奶油黄",
+    "pastelmint": "粉彩薄荷",
+    "pastelsage": "粉彩鼠尾草",
+    "pastelsky": "粉彩天蓝",
+    "pastelperi": "粉彩长春花",
+    "pastellavender": "粉彩薰衣草",
+    "pastelsand": "粉彩沙色"
   },
   "calendarImport": {
     "title": "导入日历",

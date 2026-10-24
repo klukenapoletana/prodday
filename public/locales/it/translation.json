@@ -1948,7 +1948,16 @@
     "indigo": "Indaco",
     "red": "Rosso",
     "teal": "Verde acqua",
-    "yellow": "Giallo"
+    "yellow": "Giallo",
+    "pastelrose": "Rosa pastello",
+    "pastelpeach": "Pesca pastello",
+    "pastelbutter": "Giallo burro",
+    "pastelmint": "Menta pastello",
+    "pastelsage": "Salvia pastello",
+    "pastelsky": "Azzurro pastello",
+    "pastelperi": "Pervinca pastello",
+    "pastellavender": "Lavanda pastello",
+    "pastelsand": "Sabbia pastello"
   },
   "calendarImport": {
     "title": "Importa calendario",

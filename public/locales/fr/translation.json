@@ -1946,7 +1946,16 @@
     "indigo": "Indigo",
     "red": "Rouge",
     "teal": "Turquoise",
-    "yellow": "Jaune"
+    "yellow": "Jaune",
+    "pastelrose": "Rose pastel",
+    "pastelpeach": "Pêche pastel",
+    "pastelbutter": "Jaune beurre",
+    "pastelmint": "Menthe pastel",
+    "pastelsage": "Sauge pastel",
+    "pastelsky": "Bleu ciel pastel",
+    "pastelperi": "Pervenche pastel",
+    "pastellavender": "Lavande pastel",
+    "pastelsand": "Sable pastel"
   },
   "calendarImport": {
     "title": "Importer un calendrier",

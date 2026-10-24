@@ -9,6 +9,18 @@ export const TASK_COLORS = [
   { name: 'Red',    class: 'bg-red-500' },
   { name: 'Teal',   class: 'bg-teal-500' },
   { name: 'Yellow', class: 'bg-yellow-500' },
+  // Pastel presets. Their fills are light, so the white text every task card
+  // hard-codes is retinted dark inside them (src/index.css, "Pastel task
+  // colours"); the shades themselves live in tailwind.config.js.
+  { name: 'PastelRose',     class: 'bg-pastel-rose' },
+  { name: 'PastelPeach',    class: 'bg-pastel-peach' },
+  { name: 'PastelButter',   class: 'bg-pastel-butter' },
+  { name: 'PastelMint',     class: 'bg-pastel-mint' },
+  { name: 'PastelSage',     class: 'bg-pastel-sage' },
+  { name: 'PastelSky',      class: 'bg-pastel-sky' },
+  { name: 'PastelPeri',     class: 'bg-pastel-peri' },
+  { name: 'PastelLavender', class: 'bg-pastel-lavender' },
+  { name: 'PastelSand',     class: 'bg-pastel-sand' },
 ];
 
 // Maps Tailwind CSS background-color classes to hex values for the native Android widget.
@@ -30,6 +42,10 @@ export const TAILWIND_TO_HEX = {
   'bg-rose-500': '#f43f5e', 'bg-rose-400': '#fb7185',
   'bg-sky-500': '#0ea5e9',  'bg-sky-400': '#38bdf8',
   'bg-lime-500': '#84cc16', 'bg-fuchsia-500': '#d946ef',
+  // Pastel presets: keep in step with theme.extend.colors.pastel in tailwind.config.js.
+  'bg-pastel-rose': '#f7c5cf', 'bg-pastel-peach': '#fbd4b6', 'bg-pastel-butter': '#f6e7a1',
+  'bg-pastel-mint': '#bfe6cf', 'bg-pastel-sage': '#d2e0bb', 'bg-pastel-sky': '#bddcf4',
+  'bg-pastel-peri': '#ccd1f5', 'bg-pastel-lavender': '#dfccf1', 'bg-pastel-sand': '#e7dccb',
 };
 
 // A frame's colour is one of FRAME_COLORS' pastel `-200` classes
