@@ -806,7 +806,7 @@
     "wikiNoteChanged": "Esta nota cambió en Obsidian desde que la abriste. Se ha cargado el texto más reciente, con tu texto sin guardar debajo; revísalo y guarda de nuevo.",
     "emptyWikiNotePlaceholder": "Nota vacía: empieza a escribir para crearla en tu bóveda",
     "editWikiNote": "Editar «{{name}}»",
-    "notesFormattingPlaceholder": "Añade notas... (**negrita**, *cursiva*, __subrayado__, URL, @@ para enlazar una tarea) — Mayús+Enter para previsualizar",
+    "notesFormattingPlaceholder": "Añade notas... (**negrita**, *cursiva*, __subrayado__, ~~tachado~~, URL, @@ para enlazar una tarea) — Mayús+Enter para previsualizar",
     "copyLink": "Copiar enlace",
     "linkCopied": "Enlace copiado. Pégalo en las notas de otra tarea.",
     "linkCopyFailed": "No se pudo copiar el enlace",

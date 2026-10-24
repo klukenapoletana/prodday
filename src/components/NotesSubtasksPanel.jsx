@@ -16,6 +16,7 @@ import TaskLinkPicker from './TaskLinkPicker.jsx';
 import TaskBacklinks from './TaskBacklinks.jsx';
 import { dropIndex } from '../utils/subtaskOrder.js';
 import { beginLongPressReorder } from '../utils/longPressReorder.js';
+import { indentLines } from '../utils/noteIndent.js';
 import { aiFeatureOn } from '../ai.js';
 
 /** Format an ISO timestamp as a human-readable relative or absolute string. */
@@ -433,6 +434,17 @@ const NotesSubtasksPanel = ({
         pickTask(pickerCandidates[Math.min(pickerIndex, count - 1)].task);
         return;
       }
+    }
+    // Tab and Shift+Tab indent and outdent the lines the selection touches
+    // (utils/noteIndent.js); with a modifier, Tab keeps its usual meaning.
+    if (e.key === 'Tab' && !e.altKey && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      const el = e.currentTarget;
+      const next = indentLines(localNotes, el.selectionStart, el.selectionEnd, e.shiftKey);
+      if (next.text === localNotes) return;
+      setLocalNotes(next.text);
+      requestAnimationFrame(() => { el.setSelectionRange(next.start, next.end); autoSizeTextarea(el); });
+      return;
     }
     if (e.key === 'Enter' && e.shiftKey) {
       e.preventDefault();

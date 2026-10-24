@@ -806,7 +806,7 @@
     "wikiNoteChanged": "This note changed in Obsidian since you opened it. The newer text is loaded, with your unsaved text below it; check it and save again.",
     "emptyWikiNotePlaceholder": "Empty note: start typing to create it in your vault",
     "editWikiNote": "Edit “{{name}}”",
-    "notesFormattingPlaceholder": "Add notes... (**bold**, *italic*, __underline__, URLs, @@ to link a task) — Shift+Enter for preview",
+    "notesFormattingPlaceholder": "Add notes... (**bold**, *italic*, __underline__, ~~strikethrough~~, URLs, @@ to link a task) — Shift+Enter for preview",
     "copyLink": "Copy link",
     "linkCopied": "Link copied. Paste it into another task's notes.",
     "linkCopyFailed": "Couldn't copy the link",

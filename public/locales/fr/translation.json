@@ -806,7 +806,7 @@
     "wikiNoteChanged": "Cette note a changé dans Obsidian depuis son ouverture. Le texte le plus récent est chargé, votre texte non enregistré en dessous ; vérifiez et enregistrez à nouveau.",
     "emptyWikiNotePlaceholder": "Note vide: commencez à saisir du texte pour la créer dans votre coffre",
     "editWikiNote": "Modifier « {{name}} »",
-    "notesFormattingPlaceholder": "Ajoutez des notes... (**gras**, *italique*, __souligné__, URL, @@ pour lier une tâche) — Maj+Entrée pour l’aperçu",
+    "notesFormattingPlaceholder": "Ajoutez des notes... (**gras**, *italique*, __souligné__, ~~barré~~, URL, @@ pour lier une tâche) — Maj+Entrée pour l’aperçu",
     "copyLink": "Copier le lien",
     "linkCopied": "Lien copié. Collez-le dans les notes d’une autre tâche.",
     "linkCopyFailed": "Impossible de copier le lien",
