@@ -825,7 +825,7 @@
     "wikiNoteChanged": "Ta notatka zmieniła się w Obsidian od czasu jej otwarcia. Wczytano nowszy tekst, a Twój niezapisany tekst znajduje się poniżej; sprawdź go i zapisz ponownie.",
     "emptyWikiNotePlaceholder": "Pusta notatka: zacznij pisać, aby utworzyć ją w swoim magazynie",
     "editWikiNote": "Edytuj „{{name}}”",
-    "notesFormattingPlaceholder": "Dodaj notatki... (**pogrubienie**, *kursywa*, __podkreślenie__, adresy URL, @@, aby połączyć zadanie) — Shift+Enter dla podglądu",
+    "notesFormattingPlaceholder": "Dodaj notatki... (**pogrubienie**, *kursywa*, __podkreślenie__, ~~przekreślenie~~, adresy URL, @@, aby połączyć zadanie) — Shift+Enter dla podglądu",
     "copyLink": "Kopiuj link",
     "linkCopied": "Skopiowano link. Wklej go do notatek innego zadania.",
     "linkCopyFailed": "Nie udało się skopiować linku",

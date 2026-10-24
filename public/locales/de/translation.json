@@ -806,7 +806,7 @@
     "wikiNoteChanged": "Diese Notiz wurde in Obsidian geändert, seit Sie sie geöffnet haben. Der neuere Text ist geladen, Ihr ungespeicherter Text steht darunter; prüfen Sie ihn und speichern Sie erneut.",
     "emptyWikiNotePlaceholder": "Leere Notiz – beginne zu tippen, um sie in deinem Vault zu erstellen",
     "editWikiNote": "„{{name}}“ bearbeiten",
-    "notesFormattingPlaceholder": "Notizen hinzufügen... (**fett**, *kursiv*, __unterstrichen__, URLs, @@ verlinkt eine Aufgabe) – Umschalt+Enter für Vorschau",
+    "notesFormattingPlaceholder": "Notizen hinzufügen... (**fett**, *kursiv*, __unterstrichen__, ~~durchgestrichen~~, URLs, @@ verlinkt eine Aufgabe) – Umschalt+Enter für Vorschau",
     "copyLink": "Link kopieren",
     "linkCopied": "Link kopiert. Füge ihn in die Notizen einer anderen Aufgabe ein.",
     "linkCopyFailed": "Link konnte nicht kopiert werden",

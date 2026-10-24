@@ -23,19 +23,32 @@ const peekTask = (e, id) => {
   window.dispatchEvent(new CustomEvent(PEEK_TASK_EVENT, { detail: { id } }));
 };
 
-// Render formatted text with URLs, **bold**, *italic*, __underline__, and
-// [links](dayglance://task?id=…) to other tasks
+// Leading indentation as a level: a tab or two spaces is one step. The line is
+// drawn with padding rather than its own spaces, so a wrapped line keeps the
+// same left edge as its first line.
+const INDENT_EM = 1.25;
+export const splitIndent = (line) => {
+  const lead = line.match(/^[ \t]*/)[0];
+  let cols = 0;
+  for (const ch of lead) cols += ch === '\t' ? 2 : 1;
+  return { level: Math.floor(cols / 2), rest: line.slice(lead.length) };
+};
+const indentStyle = (level) => (level > 0 ? { paddingLeft: `${level * INDENT_EM}em` } : undefined);
+
+// Render formatted text with URLs, **bold**, *italic*, __underline__,
+// ~~strikethrough~~, indented lines and [links](dayglance://task?id=…) to
+// other tasks
 export const renderFormattedText = (text) => {
   if (!text) return null;
 
   let gk = 0; // global key counter
 
-  // Inline formatting: `code`, **bold**, *italic*, __underline__, URLs
+  // Inline formatting: `code`, **bold**, *italic*, __underline__, ~~strike~~, URLs
   const renderInline = (str) => {
     if (!str) return null;
     const parts = [];
     let last = 0;
-    const re = /(`([^`]+)`)|\[([^\]\n]+)\]\(dayglance:\/\/task\?id=([^)\s]+)\)|\*\*(.+?)\*\*|\*(.+?)\*|__(.+?)__|(https?:\/\/[^\s<>"{}|\\^`[\]]+)/g;
+    const re = /(`([^`]+)`)|\[([^\]\n]+)\]\(dayglance:\/\/task\?id=([^)\s]+)\)|\*\*(.+?)\*\*|\*(.+?)\*|__(.+?)__|(https?:\/\/[^\s<>"{}|\\^`[\]]+)|~~(.+?)~~/g;
     let m;
     while ((m = re.exec(str)) !== null) {
       if (m.index > last) parts.push(str.slice(last, m.index));
@@ -64,6 +77,9 @@ export const renderFormattedText = (text) => {
             onClick={(e) => e.stopPropagation()}
           >{m[8]}</a>
         );
+      } else if (m[9]) {
+        // Strikethrough may wrap the other inline marks: ~~**done**~~.
+        parts.push(<s key={gk++}>{renderInline(m[9])}</s>);
       }
       last = m.index + m[0].length;
     }
@@ -106,12 +122,15 @@ export const renderFormattedText = (text) => {
         continue;
       }
 
+      const { level, rest } = splitIndent(line);
+      const indent = indentStyle(level);
+
       // Checkbox: - [ ] or - [x]
-      const ckm = line.match(/^\s*- \[([ xX])\]\s+(.+)$/);
+      const ckm = rest.match(/^- \[([ xX])\]\s+(.+)$/);
       if (ckm) {
         const checked = ckm[1] !== ' ';
         out.push(
-          <div key={gk++} className="flex items-start gap-1.5 py-px">
+          <div key={gk++} className="flex items-start gap-1.5 py-px" style={indent}>
             <span className={`inline-flex items-center justify-center w-3.5 h-3.5 mt-[3px] rounded-sm border flex-shrink-0 text-[10px] leading-none ${checked ? 'bg-purple-500/30 border-purple-400' : 'border-current opacity-40'}`}>
               {checked && '✓'}
             </span>
@@ -122,10 +141,10 @@ export const renderFormattedText = (text) => {
       }
 
       // Bullet: - or * followed by space and text
-      const bm = line.match(/^\s*[-*]\s+(.+)$/);
+      const bm = rest.match(/^[-*]\s+(.+)$/);
       if (bm) {
         out.push(
-          <div key={gk++} className="flex items-start gap-1.5 py-px">
+          <div key={gk++} className="flex items-start gap-1.5 py-px" style={indent}>
             <span className="mt-[7px] w-1 h-1 rounded-full bg-current opacity-40 flex-shrink-0" />
             <span>{renderInline(bm[1])}</span>
           </div>
@@ -140,7 +159,7 @@ export const renderFormattedText = (text) => {
       }
 
       // Regular text line
-      out.push(<div key={gk++}>{renderInline(line)}</div>);
+      out.push(<div key={gk++} style={indent}>{renderInline(rest)}</div>);
     }
   }
 
