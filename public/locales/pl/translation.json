@@ -2033,7 +2033,16 @@
     "indigo": "Indygo",
     "red": "Czerwony",
     "teal": "Morski",
-    "yellow": "Żółty"
+    "yellow": "Żółty",
+    "pastelrose": "Pastelowy róż",
+    "pastelpeach": "Pastelowa brzoskwinia",
+    "pastelbutter": "Maślany żółty",
+    "pastelmint": "Pastelowa mięta",
+    "pastelsage": "Pastelowa szałwia",
+    "pastelsky": "Pastelowy błękit",
+    "pastelperi": "Pastelowy barwinek",
+    "pastellavender": "Pastelowa lawenda",
+    "pastelsand": "Pastelowy piasek"
   },
   "calendarImport": {
     "title": "Importuj kalendarz",

@@ -1946,7 +1946,16 @@
     "indigo": "Indigo",
     "red": "Red",
     "teal": "Teal",
-    "yellow": "Yellow"
+    "yellow": "Yellow",
+    "pastelrose": "Pastel rose",
+    "pastelpeach": "Pastel peach",
+    "pastelbutter": "Pastel butter",
+    "pastelmint": "Pastel mint",
+    "pastelsage": "Pastel sage",
+    "pastelsky": "Pastel sky",
+    "pastelperi": "Pastel periwinkle",
+    "pastellavender": "Pastel lavender",
+    "pastelsand": "Pastel sand"
   },
   "calendarImport": {
     "title": "Import Calendar",

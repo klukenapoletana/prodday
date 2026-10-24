@@ -1946,7 +1946,16 @@
     "indigo": "Índigo",
     "red": "Vermelho",
     "teal": "Turquesa",
-    "yellow": "Amarelo"
+    "yellow": "Amarelo",
+    "pastelrose": "Rosa pastel",
+    "pastelpeach": "Pêssego pastel",
+    "pastelbutter": "Amarelo manteiga",
+    "pastelmint": "Menta pastel",
+    "pastelsage": "Salva pastel",
+    "pastelsky": "Azul-céu pastel",
+    "pastelperi": "Pervinca pastel",
+    "pastellavender": "Lavanda pastel",
+    "pastelsand": "Areia pastel"
   },
   "calendarImport": {
     "title": "Importar calendário",

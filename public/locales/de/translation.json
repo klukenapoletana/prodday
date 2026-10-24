@@ -1946,7 +1946,16 @@
     "indigo": "Indigo",
     "red": "Rot",
     "teal": "Türkis",
-    "yellow": "Gelb"
+    "yellow": "Gelb",
+    "pastelrose": "Pastellrosa",
+    "pastelpeach": "Pastellpfirsich",
+    "pastelbutter": "Pastellgelb",
+    "pastelmint": "Pastellminze",
+    "pastelsage": "Pastellsalbei",
+    "pastelsky": "Pastellblau",
+    "pastelperi": "Pastellflieder",
+    "pastellavender": "Pastelllavendel",
+    "pastelsand": "Pastellsand"
   },
   "calendarImport": {
     "title": "Kalender importieren",

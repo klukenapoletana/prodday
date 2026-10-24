@@ -15,6 +15,19 @@ export default {
       colors: {
         // dayGLANCE brand orange (the "GLANCE" in the wordmark).
         brand: '#fe8b00',
+        // Pastel task-colour presets (TASK_COLORS in src/utils/colorUtils.js,
+        // which also carries the same hex values for the widgets).
+        pastel: {
+          rose: '#f7c5cf',
+          peach: '#fbd4b6',
+          butter: '#f6e7a1',
+          mint: '#bfe6cf',
+          sage: '#d2e0bb',
+          sky: '#bddcf4',
+          peri: '#ccd1f5',
+          lavender: '#dfccf1',
+          sand: '#e7dccb',
+        },
       },
     },
   },
