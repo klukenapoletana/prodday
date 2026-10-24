@@ -263,3 +263,9 @@ body.using-pointer a:focus-visible {
     border-color: rgb(31 41 55 / 0.15);
   }
 }
+
+/* Scroll wheels (components/WheelPicker.jsx) show no scrollbar; the snapping
+   column is the control. Firefox and current Chromium read scrollbar-width. */
+[data-wheel-picker]::-webkit-scrollbar {
+  display: none;
+}
