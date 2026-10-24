@@ -287,35 +287,46 @@ const MobileNewTaskModal = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.date')}</label>
-                    {(() => {
-                      const isRecurringEdit = mobileEditingTask && typeof mobileEditingTask.id === 'string' && mobileEditingTask.id.startsWith('recurring-');
-                      const dateDisabled = newTask.keepUnscheduled || (isRecurringEdit && (mobileEditingTask.recurrenceType === 'daily' || newTask.recurrence?.type === 'daily'));
-                      return (
-                        <button
-                          type="button"
-                          onClick={() => !dateDisabled && setShowDatePicker(true)}
-                          disabled={dateDisabled}
-                          className={`w-full px-3 py-2 border ${borderClass} rounded-lg text-left text-sm ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'} ${dateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                          {newTask.date ? formatLocalizedDate(new Date(newTask.date + 'T12:00:00'), { month: 'short', day: 'numeric' }) : t('goals.selectDate')}
-                        </button>
-                      );
-                    })()}
+                  {/* Date, time and all-day share a row, so the duration wheels get the full width */}
+                  <div className="col-span-2 grid grid-cols-[1fr_1fr_auto] gap-3">
+                    <div>
+                      <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.date')}</label>
+                      {(() => {
+                        const isRecurringEdit = mobileEditingTask && typeof mobileEditingTask.id === 'string' && mobileEditingTask.id.startsWith('recurring-');
+                        const dateDisabled = newTask.keepUnscheduled || (isRecurringEdit && (mobileEditingTask.recurrenceType === 'daily' || newTask.recurrence?.type === 'daily'));
+                        return (
+                          <button
+                            type="button"
+                            onClick={() => !dateDisabled && setShowDatePicker(true)}
+                            disabled={dateDisabled}
+                            className={`w-full px-3 py-2 border ${borderClass} rounded-lg text-left text-sm ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'} ${dateDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          >
+                            {newTask.date ? formatLocalizedDate(new Date(newTask.date + 'T12:00:00'), { month: 'short', day: 'numeric' }) : t('goals.selectDate')}
+                          </button>
+                        );
+                      })()}
+                    </div>
+                    <div>
+                      <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.time')}</label>
+                      <button
+                        type="button"
+                        onClick={() => !newTask.isAllDay && !newTask.keepUnscheduled && setShowTimePicker(true)}
+                        disabled={newTask.isAllDay || newTask.keepUnscheduled}
+                        className={`w-full px-3 py-2 border ${borderClass} rounded-lg text-left text-sm ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'} ${newTask.isAllDay || newTask.keepUnscheduled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        {newTask.isAllDay ? t('task.allDay') : formatTime(newTask.startTime)}
+                      </button>
+                    </div>
+                    <div>
+                      <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.allDay')}</label>
+                      <label className={`flex items-center justify-center h-10 ${newTask.keepUnscheduled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`} role="checkbox" aria-checked={!!newTask.isAllDay} aria-label={t('task.allDay')} onClick={(e) => { e.preventDefault(); !newTask.keepUnscheduled && setNewTask(prev => ({ ...prev, isAllDay: !prev.isAllDay })); }}>
+                        <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-colors ${newTask.isAllDay ? 'bg-blue-600 border-blue-600' : darkMode ? 'border-gray-500' : 'border-stone-300'}`}>
+                          {newTask.isAllDay && <Check size={14} className="text-white" strokeWidth={3} />}
+                        </div>
+                      </label>
+                    </div>
                   </div>
-                  <div>
-                    <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.time')}</label>
-                    <button
-                      type="button"
-                      onClick={() => !newTask.isAllDay && !newTask.keepUnscheduled && setShowTimePicker(true)}
-                      disabled={newTask.isAllDay || newTask.keepUnscheduled}
-                      className={`w-full px-3 py-2 border ${borderClass} rounded-lg text-left ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'} ${newTask.isAllDay || newTask.keepUnscheduled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                      {newTask.isAllDay ? t('task.allDay') : formatTime(newTask.startTime)}
-                    </button>
-                  </div>
-                  <div>
+                  <div className="col-span-2">
                     <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.duration')}</label>
                     <DurationField
                       value={newTask.duration}
@@ -323,15 +334,6 @@ const MobileNewTaskModal = () => {
                       disabled={newTask.isAllDay || newTask.keepUnscheduled}
                       darkMode={darkMode}
                     />
-                  </div>
-                  <div>
-                    <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.allDay')}</label>
-                    <label className={`flex items-center h-10 ${newTask.keepUnscheduled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`} onClick={(e) => { e.preventDefault(); !newTask.keepUnscheduled && setNewTask(prev => ({ ...prev, isAllDay: !prev.isAllDay })); }}>
-                      <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-colors ${newTask.isAllDay ? 'bg-blue-600 border-blue-600' : darkMode ? 'border-gray-500' : 'border-stone-300'}`}>
-                        {newTask.isAllDay && <Check size={14} className="text-white" strokeWidth={3} />}
-                      </div>
-                      <span className={`ml-2 text-sm ${textPrimary}`}>{t('task.allDay')}</span>
-                    </label>
                   </div>
                   {/* Shows only when the task stays unscheduled (a project
                       task kept in the inbox) and never for a series: a
@@ -565,30 +567,41 @@ const MobileNewTaskModal = () => {
                 </div>
               </div>
 
-              {/* Date / Time / Duration / All Day */}
+              {/* Date / Time / All Day, then Duration */}
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.date')}</label>
-                  <button
-                    type="button"
-                    onClick={() => setShowDatePicker(true)}
-                    className={`w-full px-3 py-2 border ${borderClass} rounded-lg text-left text-sm ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'}`}
-                  >
-                    {newTask.date ? formatLocalizedDate(new Date(newTask.date + 'T12:00:00'), { month: 'short', day: 'numeric' }) : t('goals.selectDate')}
-                  </button>
+                {/* Date, time and all-day share a row, so the duration wheels get the full width */}
+                <div className="col-span-2 grid grid-cols-[1fr_1fr_auto] gap-3">
+                  <div>
+                    <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.date')}</label>
+                    <button
+                      type="button"
+                      onClick={() => setShowDatePicker(true)}
+                      className={`w-full px-3 py-2 border ${borderClass} rounded-lg text-left text-sm ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'}`}
+                    >
+                      {newTask.date ? formatLocalizedDate(new Date(newTask.date + 'T12:00:00'), { month: 'short', day: 'numeric' }) : t('goals.selectDate')}
+                    </button>
+                  </div>
+                  <div>
+                    <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.time')}</label>
+                    <button
+                      type="button"
+                      onClick={() => !newTask.isAllDay && setShowTimePicker(true)}
+                      disabled={newTask.isAllDay}
+                      className={`w-full px-3 py-2 border ${borderClass} rounded-lg text-left text-sm ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'} ${newTask.isAllDay ? 'opacity-50' : ''}`}
+                    >
+                      {newTask.isAllDay ? t('task.allDay') : formatTime(newTask.startTime)}
+                    </button>
+                  </div>
+                  <div>
+                    <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.allDay')}</label>
+                    <label className="flex items-center justify-center h-10 cursor-pointer" role="checkbox" aria-checked={!!newTask.isAllDay} aria-label={t('task.allDay')} onClick={(e) => { e.preventDefault(); setNewTask(prev => ({ ...prev, isAllDay: !prev.isAllDay })); }}>
+                      <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-colors ${newTask.isAllDay ? 'bg-blue-600 border-blue-600' : darkMode ? 'border-gray-500' : 'border-stone-300'}`}>
+                        {newTask.isAllDay && <Check size={14} className="text-white" strokeWidth={3} />}
+                      </div>
+                    </label>
+                  </div>
                 </div>
-                <div>
-                  <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.time')}</label>
-                  <button
-                    type="button"
-                    onClick={() => !newTask.isAllDay && setShowTimePicker(true)}
-                    disabled={newTask.isAllDay}
-                    className={`w-full px-3 py-2 border ${borderClass} rounded-lg text-left text-sm ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'} ${newTask.isAllDay ? 'opacity-50' : ''}`}
-                  >
-                    {newTask.isAllDay ? t('task.allDay') : formatTime(newTask.startTime)}
-                  </button>
-                </div>
-                <div>
+                <div className="col-span-2">
                   <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.duration')}</label>
                   <DurationField
                     value={newTask.duration}
@@ -596,15 +609,6 @@ const MobileNewTaskModal = () => {
                     disabled={newTask.isAllDay}
                     darkMode={darkMode}
                   />
-                </div>
-                <div>
-                  <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.allDay')}</label>
-                  <label className="flex items-center h-10 cursor-pointer" onClick={(e) => { e.preventDefault(); setNewTask(prev => ({ ...prev, isAllDay: !prev.isAllDay })); }}>
-                    <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-colors ${newTask.isAllDay ? 'bg-blue-600 border-blue-600' : darkMode ? 'border-gray-500' : 'border-stone-300'}`}>
-                      {newTask.isAllDay && <Check size={14} className="text-white" strokeWidth={3} />}
-                    </div>
-                    <span className={`ml-2 text-sm ${textPrimary}`}>{t('task.allDay')}</span>
-                  </label>
                 </div>
               </div>
 
