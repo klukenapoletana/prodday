@@ -15,7 +15,7 @@
         android:shortcutLongLabel="@string/shortcut_voice_long">
         <intent
             android:action="com.dayglance.app.ACTION_VOICE_INPUT"
-            android:targetPackage="com.dayglance.app"
+            android:targetPackage="io.github.klukenapoletana.prodday"
             android:targetClass="com.dayglance.app.MainActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
@@ -32,7 +32,7 @@
         android:shortcutLongLabel="@string/shortcut_add_inbox_task_long">
         <intent
             android:action="com.dayglance.app.ACTION_ADD_INBOX_TASK"
-            android:targetPackage="com.dayglance.app"
+            android:targetPackage="io.github.klukenapoletana.prodday"
             android:targetClass="com.dayglance.app.MainActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
@@ -49,7 +49,7 @@
         android:shortcutLongLabel="@string/shortcut_add_task_long">
         <intent
             android:action="com.dayglance.app.ACTION_ADD_TASK"
-            android:targetPackage="com.dayglance.app"
+            android:targetPackage="io.github.klukenapoletana.prodday"
             android:targetClass="com.dayglance.app.MainActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>

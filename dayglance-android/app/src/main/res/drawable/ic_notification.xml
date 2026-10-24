@@ -4,8 +4,16 @@
     android:viewportWidth="24"
     android:viewportHeight="24"
     android:tint="@android:color/white">
-  <!-- calendar outline with header bar -->
+  <!-- the launcher glyph (progress ring with a check), scaled to the status bar -->
   <path
-      android:fillColor="@android:color/white"
-      android:pathData="M20,3H19V1H17V3H7V1H5V3H4C2.9,3 2,3.9 2,5V21C2,22.1 2.9,23 4,23H20C21.1,23 22,22.1 22,21V5C22,3.9 21.1,3 20,3ZM20,21H4V8H20V21ZM4,6V5H20V6H4ZM6,10H11V15H6V10Z"/>
+      android:pathData="M12,3.1 A8.9,8.9 0 1,1 3.1,12"
+      android:strokeColor="@android:color/white"
+      android:strokeWidth="2"
+      android:strokeLineCap="round" />
+  <path
+      android:pathData="M8.16,12.2 L10.79,14.83 L16.05,9.37"
+      android:strokeColor="@android:color/white"
+      android:strokeWidth="2"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round" />
 </vector>

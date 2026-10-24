@@ -17,7 +17,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.dayglance.app"
+        applicationId = "io.github.klukenapoletana.prodday"
         minSdk = 26  // Android 8.0 — required for Health Connect
         targetSdk = 36
         // Overridable per-build from the command line (build-and-install.sh

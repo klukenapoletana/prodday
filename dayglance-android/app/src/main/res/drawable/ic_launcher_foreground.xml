@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Adaptive icon foreground: white icon with transparent padding baked into
-     the PNG (icon artwork at 60% of canvas, centered). No XML insets needed. -->
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/ic_launcher_fg"
-    android:gravity="fill" />
+<!-- prodday launcher glyph: a white progress ring with a check, thin rounded
+     strokes on a transparent background (minimal line-icon style). Drawn in
+     the 108dp adaptive-icon canvas, inside the 66dp safe zone. Also the splash
+     screen icon. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:pathData="M54,32 A22,22 0 1,1 32,54"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.6"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M44.5,54.5 L51,61 L64,47.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
