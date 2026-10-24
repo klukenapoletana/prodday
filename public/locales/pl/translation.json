@@ -797,6 +797,7 @@
     },
     "theme": "Motyw",
     "themeSystem": "Systemowy",
+    "themeOled": "OLED",
     "glanceWebdavLog": "Dziennik zdarzeń WebDAV",
     "aiNeedsKey": "Dodaj powyżej klucz API, aby je włączyć.",
     "binAutoEmpty": "Automatycznie opróżniaj kosz",

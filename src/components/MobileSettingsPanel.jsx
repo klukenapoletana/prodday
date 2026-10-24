@@ -170,7 +170,7 @@ const MobileSettingsPanel = () => {
         <span className={`text-xs font-medium ${textPrimary}`}>{soundEnabled ? t('settings.soundOn') : t('settings.soundOff')}</span>
       </button>
       {/* Row 2: Dark/Light | Frames | Goals */}
-      {/* Theme: cycles Light → Dark → System and shows the current one
+      {/* Theme: cycles Light → Dark → OLED → System and shows the current one
           (docs/settings-redesign.md, Mobile). The grid keeps its nine tiles. */}
       <button
         onClick={() => setThemePref(nextThemePref(themePref))}
@@ -179,6 +179,7 @@ const MobileSettingsPanel = () => {
       >
         {themePref === 'system'
           ? <Monitor size={24} className={textSecondary} />
+          : themePref === 'oled' ? <Moon size={24} className="text-white" fill="currentColor" />
           : themePref === 'dark' ? <Moon size={24} className="text-indigo-400" /> : <Sun size={24} className="text-amber-400" />}
         <span className={`text-xs font-medium ${textPrimary}`}>{themeLabel(t, themePref)}</span>
       </button>

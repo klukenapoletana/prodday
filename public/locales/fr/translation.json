@@ -778,6 +778,7 @@
     },
     "theme": "Thème",
     "themeSystem": "Système",
+    "themeOled": "OLED",
     "glanceWebdavLog": "Journal d'événements WebDAV",
     "aiNeedsKey": "Ajoutez une clé API ci-dessus pour les activer.",
     "binAutoEmpty": "Vider la corbeille automatiquement",

@@ -185,7 +185,7 @@ const FrameEditor = ({ frame, onSave, onDelete, onCancel, allTags, darkMode, tex
               key={c.class}
               onClick={() => setColor(c.class)}
               className={`w-7 h-7 rounded-full ${c.class} ${color === c.class ? 'ring-2 ring-blue-500 ring-offset-2' : ''} transition-all`}
-              style={darkMode ? { ringOffsetColor: '#1f2937' } : {}}
+              style={darkMode ? { ringOffsetColor: 'rgb(var(--gray-800))' } : {}}
               title={colorLabels[c.name] ?? c.name}
               aria-label={colorLabels[c.name] ?? c.name}
             />

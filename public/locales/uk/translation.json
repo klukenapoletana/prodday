@@ -801,6 +801,7 @@
     },
     "theme": "Тема",
     "themeSystem": "Системна",
+    "themeOled": "OLED",
     "glanceWebdavLog": "Журнал подій WebDAV",
     "aiNeedsKey": "Додайте ключ API вище, щоб увімкнути їх.",
     "binAutoEmpty": "Автоматично очищати кошик",
