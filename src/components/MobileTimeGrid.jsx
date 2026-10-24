@@ -10,6 +10,7 @@ import { useDayPlannerCtx } from '../context/DayPlannerContext.jsx';
 import DayWindowMarkers from './DayWindowMarkers.jsx';
 import { useSyncCtx } from '../context/SyncContext.jsx';
 import { useFeaturesCtx } from '../context/FeaturesContext.jsx';
+import { snapMinutes } from '../utils/dragUtils.js';
 import { getHGBarsForDate } from '../hooks/useHyperGlance.js';
 import HyperGlanceBar from './HyperGlanceBar.jsx';
 import PastDoCard from './jobo/PastDoCard.jsx';
@@ -116,7 +117,7 @@ const MobileTimeGrid = ({ barsMode = false, barsOverlay = null, onLaneTap, planO
               const scrollTop = calendarRef.current.scrollTop;
               const headerHeight = timeGridRef.current.offsetTop;
               const y = Math.max(0, e.clientY - rect.top + scrollTop - headerHeight);
-              const minutes = Math.round(positionToMinutes(y) / 15) * 15;
+              const minutes = snapMinutes(positionToMinutes(y));
               setTimelineContextMenu({ x: e.clientX, y: e.clientY, dateStr: dateToString(date), timeMinutes: minutes });
             }}
           ></div>

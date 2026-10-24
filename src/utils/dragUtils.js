@@ -5,8 +5,17 @@
 // helpers, because their hour heights are derived from a CSS variable
 // and not from measured DOM rows.
 
-// Round a minute value to the nearest 15-minute increment.
-export const snapMinutesToQuarter = (minutes) => Math.round(minutes / 15) * 15;
+// The grid a task snaps to when it is dragged, resized or added by click or
+// tap on a timeline, and the shortest a resize can make it. Typed durations
+// are not bound to it (DurationField). Routines, frames, hyperGLANCE sessions
+// and JOBO keep their own quarter-hour grid.
+export const SNAP_MINUTES = 5;
+
+// Round a minute value to the nearest SNAP_MINUTES increment.
+export const snapMinutes = (minutes) => Math.round(minutes / SNAP_MINUTES) * SNAP_MINUTES;
+
+// The last start a snapped task can take on a day (23:55 on a 5-minute grid).
+export const LAST_SNAPPED_START = 24 * 60 - SNAP_MINUTES;
 
 // Format a minute-of-day count (0..1439) as a "HH:MM" 24-hour string.
 export const minutesToTimeStr = (minutes) => {
@@ -18,8 +27,8 @@ export const minutesToTimeStr = (minutes) => {
 
 // Given a pointer event, the DOM element that represents a column's
 // content area, the column's starting minute (e.g. 08:00 -> 480), and the
-// column's pixel-per-hour height, return the snapped 15-minute time
-// string for the cursor's Y position within that column.
+// column's pixel-per-hour height, return the snapped time
+// string for the cursor's Y position within that column, on the SNAP_MINUTES grid.
 //
 // minMinute / maxMinute clamp the result to the column's legal range so
 // you can't drop beyond the displayed hours. taskDuration shrinks the max
@@ -35,7 +44,7 @@ export const columnTimeFromEvent = (e, colEl, {
   const rect = colEl.getBoundingClientRect();
   const y = e.clientY - rect.top;
   const raw = startMinute + (y / hourHeight) * 60;
-  const snapped = snapMinutesToQuarter(raw);
+  const snapped = snapMinutes(raw);
   const hardMax = maxMinute - taskDuration;
   const clamped = Math.max(minMinute, Math.min(hardMax, snapped));
   return minutesToTimeStr(clamped);

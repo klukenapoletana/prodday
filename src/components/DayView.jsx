@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { formatHourLabel } from '../utils/timeFormatting.jsx';
 import { dateToString } from '../utils/taskUtils.js';
-import { columnTimeFromEvent } from '../utils/dragUtils.js';
+import { columnTimeFromEvent, snapMinutes } from '../utils/dragUtils.js';
 import TimelineTaskCardContent from './TimelineTaskCardContent.jsx';
 import PastDoCard from './jobo/PastDoCard.jsx';
 import DayWindowMarkers from './DayWindowMarkers.jsx';
@@ -233,7 +233,7 @@ export const DayViewColumn = ({ col, colIdx, hourHeight, planOnly = false, zoom 
                   e.preventDefault();
                   const rect = e.currentTarget.getBoundingClientRect();
                   const fraction = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-                  const minutes = hour * 60 + Math.round(fraction * 60 / 15) * 15;
+                  const minutes = hour * 60 + snapMinutes(fraction * 60);
                   setTimelineContextMenu({ x: e.clientX, y: e.clientY, dateStr: col.dateStr, timeMinutes: minutes });
                 }}
               />

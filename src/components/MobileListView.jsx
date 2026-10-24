@@ -14,6 +14,7 @@ import { renderTitle, isLinkOnlyTask, hasNotesOrSubtasks, isObsidianNoteOnlyTask
 import { dateToString, stripWikilinksAndTags } from '../utils/taskUtils.js';
 import { taskColorToHex } from '../utils/colorUtils.js';
 import { formatDuration } from '../utils/formatDuration.js';
+import { SNAP_MINUTES, snapMinutes } from '../utils/dragUtils.js';
 import { triggerHaptic } from '../native.js';
 import { useDayPlannerCtx } from '../context/DayPlannerContext.jsx';
 import { useFeaturesCtx } from '../context/FeaturesContext.jsx';
@@ -932,8 +933,8 @@ const MobileListView = ({ hideInboxHandle = false }) => {
   }, [scheduledRoutines, timeToMinutes]);
 
   const getSnapMin = useCallback((rawMin, durMin, ignoreRoutineId = null) => {
-    const base = Math.round(rawMin / 15) * 15;
-    for (let d = 0; d <= 24 * 60; d += 15) {
+    const base = snapMinutes(rawMin);
+    for (let d = 0; d <= 24 * 60; d += SNAP_MINUTES) {
       const fwd = base + d;
       if (fwd >= 0 && fwd + durMin <= 24 * 60 && !isBlockedByRoutine(fwd, durMin, ignoreRoutineId)) return fwd;
       if (d > 0) {
@@ -1113,7 +1114,7 @@ const MobileListView = ({ hideInboxHandle = false }) => {
       const isDraggingRoutine = state.item._kind === 'routine';
       // Routines can overlap other routines — skip snap-away and conflict check
       const snapped = isDraggingRoutine
-        ? Math.round(rawMin / 15) * 15
+        ? snapMinutes(rawMin)
         : getSnapMin(rawMin, durMin, state.ignoreRoutineId);
       setDragTargetMin(snapped);
       setDragBlocked(!isDraggingRoutine && isBlockedByRoutine(snapped, durMin, state.ignoreRoutineId));

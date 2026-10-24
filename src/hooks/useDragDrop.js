@@ -3,6 +3,7 @@ import { dateToString } from '../utils/taskUtils.js';
 import { TASK_COLORS } from '../utils/colorUtils.js';
 import { nativeUpdateEvent, triggerHaptic } from '../native.js';
 import { describeObstacle } from '../utils/dayOccupancy.js';
+import { SNAP_MINUTES, LAST_SNAPPED_START, snapMinutes } from '../utils/dragUtils.js';
 
 // Pure utilities used by position helpers
 const timeToMinutes = (time) => {
@@ -781,8 +782,8 @@ export default function useDragDrop({
 
     const handleMouseMove = (moveEvent) => {
       const deltaY = moveEvent.clientY - startY;
-      const deltaMinutes = Math.round((deltaY / 80) * 60 / 15) * 15;
-      const newDuration = Math.max(15, startDuration + deltaMinutes);
+      const deltaMinutes = snapMinutes((deltaY / 80) * 60);
+      const newDuration = Math.max(SNAP_MINUTES, startDuration + deltaMinutes);
       finalDuration = newDuration;
 
       if (isRecurringTask && recurringInfo) {
@@ -851,8 +852,8 @@ export default function useDragDrop({
     const handleTouchMove = (moveEvent) => {
       moveEvent.preventDefault();
       const deltaY = moveEvent.touches[0].clientY - startY;
-      const deltaMinutes = Math.round((deltaY / 80) * 60 / 15) * 15;
-      const newDuration = Math.max(15, startDuration + deltaMinutes);
+      const deltaMinutes = snapMinutes((deltaY / 80) * 60);
+      const newDuration = Math.max(SNAP_MINUTES, startDuration + deltaMinutes);
       finalDuration = newDuration;
 
       if (isRecurringTask && recurringInfo) {
@@ -1057,8 +1058,8 @@ export default function useDragDrop({
       const headerHeight = timeGridRef.current.offsetTop;
       const y = Math.max(0, touch.clientY - calendarRect.top + scrollTop - headerHeight);
       const totalMinutes = positionToMinutes(y);
-      const roundedMinutes = Math.round(totalMinutes / 15) * 15;
-      const clampedMinutes = Math.max(0, Math.min(23 * 60 + 45, roundedMinutes));
+      const roundedMinutes = snapMinutes(totalMinutes);
+      const clampedMinutes = Math.max(0, Math.min(LAST_SNAPPED_START, roundedMinutes));
       const hrs = Math.floor(clampedMinutes / 60);
       const mins = clampedMinutes % 60;
       mobileDragPreviewTimeRef.current = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
@@ -1072,8 +1073,8 @@ export default function useDragDrop({
     const deltaMinutes = (deltaPixels / getHourHeight()) * 60;
     const originalMinutes = timeToMinutes(mobileDragOriginalTask.current.startTime);
     const newMinutes = originalMinutes + deltaMinutes;
-    const roundedMinutes = Math.round(newMinutes / 15) * 15;
-    const clampedMinutes = Math.max(0, Math.min(23 * 60 + 45, roundedMinutes));
+    const roundedMinutes = snapMinutes(newMinutes);
+    const clampedMinutes = Math.max(0, Math.min(LAST_SNAPPED_START, roundedMinutes));
     const hrs = Math.floor(clampedMinutes / 60);
     const mins = clampedMinutes % 60;
     const timeStr = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
