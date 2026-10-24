@@ -30,7 +30,7 @@ const MobileNewTaskModal = () => {
     mobileEditingNativeEvent, setMobileEditingNativeEvent,
     selectedDate,
     cardBg, borderClass, textPrimary, textSecondary, darkMode, hoverBg, colors,
-    durationOptions, formatTime,
+    formatTime,
     showNewTaskDeadlinePicker, setShowNewTaskDeadlinePicker,
     showRecurrencePicker, setShowRecurrencePicker,
     setShowDatePicker, setShowTimePicker, setShowRecurrenceEndDatePicker,
@@ -281,8 +281,7 @@ const MobileNewTaskModal = () => {
                     <DurationField
                       value={newTask.duration}
                       onChange={(duration) => setNewTask(prev => ({ ...prev, duration }))}
-                      options={durationOptions}
-                      className={`w-full px-3 py-2 border ${borderClass} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-stone-900'}`}
+                      darkMode={darkMode}
                     />
                   </div>
                 </div>
@@ -321,9 +320,8 @@ const MobileNewTaskModal = () => {
                     <DurationField
                       value={newTask.duration}
                       onChange={(duration) => setNewTask(prev => ({ ...prev, duration }))}
-                      options={durationOptions}
                       disabled={newTask.isAllDay || newTask.keepUnscheduled}
-                      className={`w-full px-3 py-2 border ${borderClass} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'} ${newTask.isAllDay || newTask.keepUnscheduled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      darkMode={darkMode}
                     />
                   </div>
                   <div>
@@ -595,9 +593,8 @@ const MobileNewTaskModal = () => {
                   <DurationField
                     value={newTask.duration}
                     onChange={(duration) => setNewTask(prev => ({ ...prev, duration }))}
-                    options={durationOptions}
                     disabled={newTask.isAllDay}
-                    className={`w-full px-3 py-2 border ${borderClass} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'} ${newTask.isAllDay ? 'opacity-50' : ''}`}
+                    darkMode={darkMode}
                   />
                 </div>
                 <div>
