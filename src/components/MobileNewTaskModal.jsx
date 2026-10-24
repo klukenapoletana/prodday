@@ -6,6 +6,7 @@ import { useFeaturesCtx } from '../context/FeaturesContext.jsx';
 import { useSyncCtx } from '../context/SyncContext.jsx';
 import { SOURCE_APPS } from '../native.js';
 import LastGlanceBadge from './LastGlanceBadge.jsx';
+import DurationField from './DurationField.jsx';
 import QuickAddChips from './QuickAddChips.jsx';
 import TaskProjectField from './TaskProjectField.jsx';
 import RecurrencePicker from './RecurrencePicker.jsx';
@@ -277,15 +278,12 @@ const MobileNewTaskModal = () => {
                   </>)}
                   <div className="col-span-2">
                     <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.duration')}</label>
-                    <select
+                    <DurationField
                       value={newTask.duration}
-                      onChange={(e) => setNewTask({ ...newTask, duration: parseInt(e.target.value) })}
+                      onChange={(duration) => setNewTask(prev => ({ ...prev, duration }))}
+                      options={durationOptions}
                       className={`w-full px-3 py-2 border ${borderClass} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-stone-900'}`}
-                    >
-                      {durationOptions.map(minutes => (
-                        <option key={minutes} value={minutes}>{t('common.minutesShort', { count: minutes })}</option>
-                      ))}
-                    </select>
+                    />
                   </div>
                 </div>
               ) : (
@@ -320,16 +318,13 @@ const MobileNewTaskModal = () => {
                   </div>
                   <div>
                     <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.duration')}</label>
-                    <select
+                    <DurationField
                       value={newTask.duration}
-                      onChange={(e) => setNewTask({ ...newTask, duration: parseInt(e.target.value) })}
+                      onChange={(duration) => setNewTask(prev => ({ ...prev, duration }))}
+                      options={durationOptions}
                       disabled={newTask.isAllDay || newTask.keepUnscheduled}
                       className={`w-full px-3 py-2 border ${borderClass} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'} ${newTask.isAllDay || newTask.keepUnscheduled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                      {durationOptions.map(minutes => (
-                        <option key={minutes} value={minutes}>{t('common.minutesShort', { count: minutes })}</option>
-                      ))}
-                    </select>
+                    />
                   </div>
                   <div>
                     <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.allDay')}</label>
@@ -597,16 +592,13 @@ const MobileNewTaskModal = () => {
                 </div>
                 <div>
                   <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.duration')}</label>
-                  <select
+                  <DurationField
                     value={newTask.duration}
-                    onChange={(e) => setNewTask({ ...newTask, duration: parseInt(e.target.value) })}
+                    onChange={(duration) => setNewTask(prev => ({ ...prev, duration }))}
+                    options={durationOptions}
                     disabled={newTask.isAllDay}
                     className={`w-full px-3 py-2 border ${borderClass} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'} ${newTask.isAllDay ? 'opacity-50' : ''}`}
-                  >
-                    {durationOptions.map(minutes => (
-                      <option key={minutes} value={minutes}>{t('common.minutesShort', { count: minutes })}</option>
-                    ))}
-                  </select>
+                  />
                 </div>
                 <div>
                   <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.allDay')}</label>

@@ -7,7 +7,7 @@ import * as Icons from 'lucide-react';
 import { Zap } from 'lucide-react';
 import { dateToString } from '../utils/taskUtils.js';
 import { splitChipTitleTag } from '../utils/textFormatting.jsx';
-import { columnTimeFromEvent } from '../utils/dragUtils.js';
+import { columnTimeFromEvent, snapMinutes } from '../utils/dragUtils.js';
 import TimelineTaskCardContent from './TimelineTaskCardContent.jsx';
 import { PastDoDetails, pastDoChipStyle, pastDoColor } from './jobo/PastDoCard.jsx';
 import { useDayPlannerCtx } from '../context/DayPlannerContext.jsx';
@@ -204,7 +204,7 @@ const WeekViewColumn = ({ date, dateStr, colIdx, hourHeight, zoom = 1, startHour
               e.preventDefault();
               const rect = e.currentTarget.getBoundingClientRect();
               const fraction = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-              const minutes = hour * 60 + Math.round(fraction * 60 / 15) * 15;
+              const minutes = hour * 60 + snapMinutes(fraction * 60);
               setTimelineContextMenu({ x: e.clientX, y: e.clientY, dateStr, timeMinutes: minutes });
             }}
           >

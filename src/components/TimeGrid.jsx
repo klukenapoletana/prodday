@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import PastDoCard from './jobo/PastDoCard.jsx';
 import useTimelineZoom from '../hooks/useTimelineZoom.js';
 import { SCROLLING_HOUR_PX } from '../utils/timelineZoom.js';
+import { snapMinutes } from '../utils/dragUtils.js';
 import { cardDoubleClickHandler } from '../utils/cardDoubleClick.js';
 
 const TimeGrid = () => {
@@ -138,7 +139,7 @@ const TimeGrid = () => {
               const scrollTop = calendarRef.current.scrollTop;
               const headerHeight = timeGridRef.current.offsetTop;
               const y = Math.max(0, e.clientY - rect.top + scrollTop - headerHeight);
-              const minutes = Math.round(positionToMinutes(y) / 15) * 15;
+              const minutes = snapMinutes(positionToMinutes(y));
               setTimelineContextMenu({ x: e.clientX, y: e.clientY, dateStr: dateToString(date), timeMinutes: minutes });
             }}
           ></div>
