@@ -49,6 +49,32 @@ export default function useDragDrop({
   expandedRecurringTasksRef, moveToInboxRef, openMobileEditTaskRef, openMobileEditNativeEventRef,
 }) {
   const [draggedTask, setDraggedTask] = useState(null);
+  // The "move to" sheet a right swipe opens (components/MoveToAreaSheet.jsx):
+  // { taskId, from: 'timeline' | 'inbox' | 'notes' }, offering the two other
+  // areas. Null when closed.
+  const [moveMenu, setMoveMenu] = useState(null);
+
+  // Schedule an Inbox entry or a note: the editor, in its scheduling form, for
+  // this entry (the save moves it, keeping its id, notes and subtasks).
+  const scheduleUnscheduledTask = (taskId) => {
+    const task = unscheduledTasks.find(t => t.id === taskId);
+    if (!task) return;
+    // Track which inbox task we're scheduling (removed on submit, restored on cancel)
+    swipeSchedulingInboxTaskId.current = taskId;
+    setMobileEditingTask(null);
+    setNewTask({
+      title: task.title,
+      startTime: getNextQuarterHour(),
+      duration: task.duration || 30,
+      date: dateToString(selectedDate),
+      isAllDay: false,
+      color: task.color || TASK_COLORS[0].class,
+      recurrence: null,
+      // The modal's notes panel edits this task, not a new draft.
+      schedulingFromInboxId: taskId,
+    });
+    setShowAddTask(true);
+  };
 
   // An "after completion" series has one open occurrence; moving it to another
   // day moves the series there rather than detaching a one-off copy
@@ -458,7 +484,7 @@ export default function useDragDrop({
     });
     if (dragSource === 'inbox') {
       setUnscheduledTasks(prev => prev.filter(t => t.id !== draggedTask.id));
-      const { priority, deadline, ...taskWithoutPriorityAndDeadline } = draggedTask;
+      const { priority, deadline, isNote: _note, ...taskWithoutPriorityAndDeadline } = draggedTask;
       setTasks(prev => [...prev, {
         ...taskWithoutPriorityAndDeadline,
         startTime,
@@ -601,7 +627,7 @@ export default function useDragDrop({
     });
     if (dragSource === 'inbox') {
       setUnscheduledTasks(prev => prev.filter(t => t.id !== draggedTask.id));
-      const { priority, deadline, ...taskWithoutPriorityAndDeadline } = draggedTask;
+      const { priority, deadline, isNote: _note, ...taskWithoutPriorityAndDeadline } = draggedTask;
       setTasks(prev => [...prev, {
         ...taskWithoutPriorityAndDeadline,
         startTime: '00:00',
@@ -1541,6 +1567,8 @@ export default function useDragDrop({
       el.style.transition = 'transform 200ms ease-out';
       setTimeout(() => {
         if (direction === 'right') {
+          // Right swipe = move: a sheet offering the two other areas
+          // (Inbox, timeline, notes). A series and a deadline keep their own.
           if (taskType === 'timeline') {
             const swipedTask = tasks.find(t => t.id === taskId);
             if (swipedTask?._native) {
@@ -1549,42 +1577,26 @@ export default function useDragDrop({
               // Recurring: trigger delete popup
               moveToRecycleBinRef.current(taskId);
             } else {
-              moveToInboxRef.current(taskId);
+              setMoveMenu({ taskId, from: 'timeline' });
             }
           } else if (taskType === 'allday') {
             if (isRecurring) {
               // Recurring: trigger delete popup
               moveToRecycleBinRef.current(taskId);
             } else {
-              moveToInboxRef.current(taskId);
+              setMoveMenu({ taskId, from: 'timeline' });
             }
           } else if (taskType === 'deadline') {
             // Clear deadline — moves back to regular inbox
             clearDeadlineRef.current(taskId);
-          } else if (taskType === 'inbox') {
-            // Schedule: open edit modal as scheduled task
-            const task = unscheduledTasks.find(t => t.id === taskId);
-            if (task) {
-              // Track which inbox task we're scheduling (removed on submit, restored on cancel)
-              swipeSchedulingInboxTaskId.current = taskId;
-              setMobileEditingTask(null);
-              setNewTask({
-                title: task.title,
-                startTime: getNextQuarterHour(),
-                duration: task.duration || 30,
-                date: dateToString(selectedDate),
-                isAllDay: false,
-                color: task.color || TASK_COLORS[0].class,
-                recurrence: null,
-                // The modal's notes panel edits this task, not a new draft.
-                schedulingFromInboxId: taskId,
-              });
-              setShowAddTask(true);
+          } else if (taskType === 'inbox' || taskType === 'note') {
+            if (unscheduledTasks.some(t => t.id === taskId)) {
+              setMoveMenu({ taskId, from: taskType === 'note' ? 'notes' : 'inbox' });
             }
           }
         } else {
           // Left swipe = edit
-          const isInbox = taskType === 'inbox' || taskType === 'deadline';
+          const isInbox = taskType === 'inbox' || taskType === 'deadline' || taskType === 'note';
           const task = isInbox
             ? unscheduledTasks.find(t => t.id === taskId)
             : tasks.find(t => t.id === taskId) || (
@@ -1625,6 +1637,7 @@ export default function useDragDrop({
   return {
     // state
     draggedTask, setDraggedTask,
+    moveMenu, setMoveMenu, scheduleUnscheduledTask,
     dragSource, setDragSource,
     dragPreviewTime, setDragPreviewTime,
     dragPreviewDate, setDragPreviewDate,

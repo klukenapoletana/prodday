@@ -1,5 +1,6 @@
 import { cleanTitle } from '../utils/suggestionParser.js';
 import { toInboxCopy } from '../utils/inboxMove.js';
+import { isNote, toNote, fromNote } from '../utils/notes.js';
 import { stripBucketId } from '../utils/bucketList.js';
 import { stripSpans } from '../utils/quickAddParser.js';
 import { dateToString, extractTags, formatDeadlineDate, completionTimestamp, stripWikilinks } from '../utils/taskUtils.js';
@@ -211,7 +212,11 @@ export default function useTaskActions({
       // made from (null when the save moved an existing Inbox task instead,
       // or made a series: see the link below).
       let createdId = null;
-      if (toInbox) {
+      if (toInbox && newTask.isNote) {
+        // A new note (utils/notes.js): an Inbox row the Inbox leaves out.
+        createdId = taskId;
+        setUnscheduledTasks(prev => [...prev, toNote(task)]);
+      } else if (toInbox) {
         createdId = taskId;
         const inboxTask = { ...task, priority: newTask.priority ?? 0 };
         if (newTask.deadline) {
@@ -263,7 +268,7 @@ export default function useTaskActions({
           const { conflicted, adjustedStartTime, conflictingEvent } = newTask.isAllDay
             ? { conflicted: false, adjustedStartTime: requestedStartTime, conflictingEvent: null }
             : getAdjustedTimeForImportedConflicts(inboxTask.id, requestedStartTime, newTask.duration, taskDate);
-          const { priority, deadline, ...preserved } = inboxTask;
+          const { priority, deadline, isNote: _note, ...preserved } = inboxTask;
           setTasks(prev => [...prev, withReminders({
             ...preserved,
             title: savedTitle,
@@ -388,6 +393,22 @@ export default function useTaskActions({
       date: dateToString(selectedDate),
       isAllDay: false,
       openInInbox: true,
+      deadline: null,
+      priority: 0
+    });
+    setShowAddTask(true);
+  };
+
+  // A new note (the Notes tab's +): the Inbox form, saved as a note.
+  const openNewNote = () => {
+    setNewTask({
+      title: '',
+      startTime: getNextQuarterHour(),
+      duration: 30,
+      date: dateToString(selectedDate),
+      isAllDay: false,
+      openInInbox: true,
+      isNote: true,
       deadline: null,
       priority: 0
     });
@@ -681,6 +702,34 @@ export default function useTaskActions({
     }
   };
 
+  // ── Notes area (utils/notes.js) ─────────────────────────────────────────
+  // A scheduled task or an Inbox entry becomes a note, a note goes back to
+  // the Inbox. Scheduling a note goes through the Inbox's own schedule path.
+  const moveToNotes = (id) => {
+    if (typeof id === 'string' && id.startsWith('recurring-')) return;
+    const scheduled = tasks.find(t => t.id === id);
+    const unscheduled = unscheduledTasks.find(t => t.id === id);
+    if (scheduled?.imported || (!scheduled && !unscheduled) || isNote(unscheduled)) return;
+    const said = pushUndo({ key: 'toNotes', taskId: id });
+    if (scheduled) {
+      setTasks(prev => prev.filter(t => t.id !== id));
+      setUnscheduledTasks(prev => [...prev, toNote(toInboxCopy(scheduled))]);
+    } else {
+      setUnscheduledTasks(prev => prev.map(t => (t.id === id ? toNote(t) : t)));
+    }
+    playUISound('slide');
+    setUndoToast({ message: said, actionable: true });
+  };
+
+  const moveNoteToInbox = (id) => {
+    const note = unscheduledTasks.find(t => t.id === id);
+    if (!isNote(note)) return;
+    const said = pushUndo({ key: 'toInbox', taskId: id });
+    setUnscheduledTasks(prev => prev.map(t => (t.id === id ? fromNote(t) : t)));
+    playUISound('slide');
+    setUndoToast({ message: said, actionable: true });
+  };
+
   // ── Subtask management ───────────────────────────────────────────────────
 
   const addSubtask = (taskId, title, isInbox, extraFields = {}) => {
@@ -877,7 +926,7 @@ export default function useTaskActions({
       // from an overdue Inbox deadline card, where the deadline is the reason
       // the card is on screen at all).
       const said = task.deadline ? pushUndo({ key: 'scheduledDroppedDeadline', taskId }) : null;
-      const { priority, deadline, ...preserved } = stripBucketId(task);
+      const { priority, deadline, isNote: _note, ...preserved } = stripBucketId(task);
       setUnscheduledTasks(prev => prev.filter(t => t.id !== taskId));
       setTasks(prev => [...prev, { ...preserved, startTime: nextSlotTime, date: todayStr, isAllDay: false }]);
       if (said) setUndoToast({ message: said, actionable: true });
@@ -1035,6 +1084,7 @@ export default function useTaskActions({
     openNewTaskForm,
     openNewAllDayTask,
     openNewInboxTask,
+    openNewNote,
     // Update
     changeTaskColor,
     setTaskEnergy,
@@ -1047,6 +1097,8 @@ export default function useTaskActions({
     // Move
     postponeTask,
     moveToInbox,
+    moveToNotes,
+    moveNoteToInbox,
     // Subtasks
     addSubtask,
     toggleSubtask,

@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  AlertCircle, Calendar, Check, FileText, GripVertical, Inbox, RefreshCw,
+  AlertCircle, ArrowRightLeft, Calendar, Check, FileText, GripVertical, Inbox, RefreshCw,
   Settings, SkipForward, Trash2,
 } from 'lucide-react';
 import { renderTitle, hasNotesOrSubtasks, isLinkOnlyTask, openNoteAction, NoteIcon } from '../utils/textFormatting.jsx';
@@ -87,7 +87,7 @@ const MobileAllDaySection = () => {
                           {typeof task.id === 'string' && task.id.startsWith('recurring-') ? (
                             <><Trash2 size={14} className="mr-1" />{t('common.delete')}</>
                           ) : (
-                            <><Inbox size={14} className="mr-1" />{t('settings.inbox')}</>
+                            <><ArrowRightLeft size={14} className="mr-1" />{t('notes.move')}</>
                           )}
                         </div>
                         <div data-swipe-strip="left" style={{ display: 'none', left: '8px' }} className={`absolute inset-0 ${darkMode ? 'bg-amber-900/80 text-amber-300' : 'bg-amber-100 text-amber-600'} rounded-lg flex items-center justify-end pr-3 text-xs font-medium`}>

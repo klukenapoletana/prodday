@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Check, Clock, FileText, GripVertical, Inbox, MoreHorizontal, RefreshCw,
+  ArrowRightLeft, Check, Clock, FileText, GripVertical, Inbox, MoreHorizontal, RefreshCw,
   Settings, SkipForward, Trash2,
 } from 'lucide-react';
 import { isNativeAndroid } from '../native.js';
@@ -479,7 +479,7 @@ const MobileTimeGrid = ({ barsMode = false, barsOverlay = null, onLaneTap, planO
                         {typeof task.id === 'string' && task.id.startsWith('recurring-') ? (
                           <><Trash2 size={14} className="mr-1" />{t('common.delete')}</>
                         ) : (
-                          <><Inbox size={14} className="mr-1" />{t('settings.inbox')}</>
+                          <><ArrowRightLeft size={14} className="mr-1" />{t('notes.move')}</>
                         )}
                       </div>
                     )}

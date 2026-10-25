@@ -16,7 +16,9 @@
 // re-stamps the copy.
 export function toInboxCopy(task, now = new Date().toISOString()) {
   const clearedTime = task?.importSource === 'obsidian' && task.startTime ? String(task.startTime) : null;
-  const { obsidianClearedTime: _prior, ...rest } = task || {};
+  // A task sent to the Inbox is an Inbox task: a note flag it kept from an
+  // earlier life (utils/notes.js) would send it to the Notes area instead.
+  const { obsidianClearedTime: _prior, isNote: _note, ...rest } = task || {};
   return {
     ...rest,
     startTime: null,

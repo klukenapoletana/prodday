@@ -1,5 +1,5 @@
 import React, { memo, useMemo } from 'react';
-import { AlertCircle, Archive, Calendar, Check, Settings, Telescope } from 'lucide-react';
+import { AlertCircle, Archive, ArrowRightLeft, Calendar, Check, Settings, Telescope } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { renderTitle, hasNotesOrSubtasks, isLinkOnlyTask, openNoteAction, NoteIcon } from '../utils/textFormatting.jsx';
 import { dateToString, extractWikilinks, formatDeadlineDate } from '../utils/taskUtils.js';
@@ -40,7 +40,7 @@ function TouchInboxTaskRow({
       <div className={`relative rounded-lg ${(deadlinePickerOpen || (inlineNotes && notesOpen)) ? '' : 'overflow-hidden'}`}>
         {/* Swipe action strips */}
         <div data-swipe-strip="right" style={{ display: 'none' }} className={`absolute inset-0 ${darkMode ? 'bg-green-900/80 text-green-300' : 'bg-green-100 text-green-600'} rounded-lg flex items-center pl-3 text-xs font-medium`}>
-          <Calendar size={14} className="mr-1" />{t('common.schedule')}
+          <ArrowRightLeft size={14} className="mr-1" />{t('notes.move')}
         </div>
         <div data-swipe-strip="left" style={{ display: 'none' }} className={`absolute inset-0 ${darkMode ? 'bg-amber-900/80 text-amber-300' : 'bg-amber-100 text-amber-600'} rounded-lg flex items-center justify-end pr-3 text-xs font-medium`}>
           {t('common.edit')}<Settings size={14} className="ml-1" />

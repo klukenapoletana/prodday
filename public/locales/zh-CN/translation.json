@@ -2810,7 +2810,8 @@
       "tagRenamed": "已将 #{{from}} 重命名为 #{{to}}",
       "tagMerged": "已将 #{{from}} 合并到 #{{to}}",
       "tagRemoved": "已移除 #{{from}}",
-      "subtasksReordered": "已调整“{{title}}”的子任务顺序"
+      "subtasksReordered": "已调整“{{title}}”的子任务顺序",
+      "toNotes": "已将“{{title}}”移至笔记"
     }
   },
   "taskReminders": {
@@ -2838,5 +2839,15 @@
     "minutesShort_other": "{{count}} 分钟",
     "hoursShort_other": "{{count}} 小时",
     "daysShort_other": "{{count}} 天"
+  },
+  "notes": {
+    "title": "笔记",
+    "move": "移动",
+    "moveTo": "移动到",
+    "newNote": "新建笔记",
+    "editNote": "编辑笔记",
+    "addNote": "添加到笔记",
+    "empty": "还没有笔记",
+    "emptyHint": "想法、清单和所有没有日期的内容。滑动一下，笔记就能变成任务。"
   }
 }

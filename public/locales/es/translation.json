@@ -2837,7 +2837,8 @@
       "tagRenamed": "#{{from}} renombrada a #{{to}}",
       "tagMerged": "#{{from}} combinada con #{{to}}",
       "tagRemoved": "#{{from}} quitada",
-      "subtasksReordered": "Subtareas de «{{title}}» reordenadas"
+      "subtasksReordered": "Subtareas de «{{title}}» reordenadas",
+      "toNotes": "Se movió «{{title}}» a notas"
     }
   },
   "taskReminders": {
@@ -2879,5 +2880,15 @@
     "daysShort_one": "{{count}} día",
     "daysShort_many": "{{count}} días",
     "daysShort_other": "{{count}} días"
+  },
+  "notes": {
+    "title": "Notas",
+    "move": "Mover",
+    "moveTo": "Mover a",
+    "newNote": "Nueva nota",
+    "editNote": "Editar nota",
+    "addNote": "Añadir a notas",
+    "empty": "Aún no hay notas",
+    "emptyHint": "Ideas, listas y todo lo que no tiene fecha. Con un deslizamiento, una nota se convierte en tarea."
   }
 }

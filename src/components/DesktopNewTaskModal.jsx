@@ -130,7 +130,7 @@ const DesktopNewTaskModal = () => {
             }}
           >
             <h3 className={`font-semibold ${textPrimary} mb-4 text-lg`}>
-              {mobileEditingTask ? t('task.editTask') : newTask.openInInbox ? t('task.newInbox') : t('task.newScheduled')}
+              {newTask.isNote ? (mobileEditingTask ? t('notes.editNote') : t('notes.newNote')) : mobileEditingTask ? t('task.editTask') : newTask.openInInbox ? t('task.newInbox') : t('task.newScheduled')}
             </h3>
             <div className="space-y-4">
               {/* Source attribution — shown when editing a task created via lastGLANCE */}
@@ -559,10 +559,10 @@ const DesktopNewTaskModal = () => {
                   type="submit"
                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  {mobileEditingTask ? t('task.saveChanges') : newTask.openInInbox ? (newTask.projectId ? t('task.addToProject') : t('task.addToInbox')) : newTask.projectId && newTask.keepUnscheduled ? t('task.addToProject') : newTask.projectId ? t('task.addToProjectAndSchedule') : t('task.addToSchedule')}
+                  {mobileEditingTask ? t('task.saveChanges') : newTask.isNote ? t('notes.addNote') : newTask.openInInbox ? (newTask.projectId ? t('task.addToProject') : t('task.addToInbox')) : newTask.projectId && newTask.keepUnscheduled ? t('task.addToProject') : newTask.projectId ? t('task.addToProjectAndSchedule') : t('task.addToSchedule')}
                 </button>
                 {/* Send-to-Bucket for inbox tasks — parity with the mobile editor */}
-                {mobileEditingTask && mobileEditIsInbox && !mobileEditingTask.bucketId && (
+                {mobileEditingTask && mobileEditIsInbox && !mobileEditingTask.bucketId && !mobileEditingTask.isNote && (
                   <button
                     type="button"
                     onClick={() => {

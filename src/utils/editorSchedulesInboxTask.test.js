@@ -12,7 +12,7 @@ const save = app.slice(app.indexOf('const saveMobileEditTaskFrom = '), app.index
 describe('the editor scheduling an unscheduled task', () => {
   it('leaves priority and deadline behind', () => {
     const branch = save.slice(save.indexOf('Task was unscheduled (e.g. a project task)'));
-    expect(branch).toContain('const { priority: _priority, deadline: _deadline, ...scheduledFields } = existing || {};');
+    expect(branch).toContain('const { priority: _priority, deadline: _deadline, isNote: _note, ...scheduledFields } = existing || {};');
     expect(branch).toMatch(/setTasks\(prev => \[\.\.\.prev, (withReminders\()?\{\s*\.\.\.scheduledFields,/);
     expect(branch).not.toContain('...(existing || {})');
   });

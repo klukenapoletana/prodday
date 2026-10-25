@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Eye, GitBranch, Inbox, Settings } from 'lucide-react';
+import { Calendar, Eye, GitBranch, Inbox, Settings, StickyNote } from 'lucide-react';
 import { isNativeAndroid } from '../native.js';
 import { useDayPlannerCtx } from '../context/DayPlannerContext.jsx';
 import { useFeaturesCtx } from '../context/FeaturesContext.jsx';
@@ -32,7 +32,7 @@ const MobileTabBar = () => {
   const hasOverdueGoal = activeGoals.some(overdue) || (goalsProjectsEnabled && (projects || []).some(p =>
     p.status !== 'archived' && !p.archived && isVisibleForUser(p) && overdue(p)));
 
-  const tabCount = 4 + (goalsProjectsEnabled ? 1 : 0);
+  const tabCount = 5 + (goalsProjectsEnabled ? 1 : 0);
   const showLabels = tabCount <= 5;
   const iconSize = showLabels ? 20 : 22;
 
@@ -101,6 +101,18 @@ const MobileTabBar = () => {
             )}
           </div>
           {showLabels && <span className="text-[10px] font-medium">{t('settings.inbox')}</span>}
+        </button>
+        {/* The Notes area (utils/notes.js), beside the Inbox. */}
+        <button
+          onClick={() => {
+            setMobileActiveTab('notes');
+            setMobileSettingsView('main');
+          }}
+          data-tab="notes"
+          className={`flex flex-col items-center justify-center ${showLabels ? 'gap-0.5' : ''} flex-1 h-full ${mobileActiveTab === 'notes' ? 'text-blue-500' : textSecondary}`}
+        >
+          <StickyNote size={iconSize} />
+          {showLabels && <span className="text-[10px] font-medium">{t('notes.title')}</span>}
         </button>
         {goalsProjectsEnabled && (
         <button

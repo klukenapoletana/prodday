@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useReducer, useRef } from 'react';
 import {
-  Check, Clock, GripVertical, Inbox, MapPin, MoreHorizontal, Pencil,
+  ArrowRightLeft, Check, Clock, GripVertical, Inbox, MapPin, MoreHorizontal, Pencil,
   RefreshCw, Settings, SkipForward, Trash2,
 } from 'lucide-react';
 import { isNativeAndroid, nativeUpdateEvent } from '../native.js';
@@ -519,7 +519,7 @@ const TimeGrid = () => {
                       {isRecurringTask ? (
                         <><Trash2 size={14} className="mr-1" />{t('common.delete')}</>
                       ) : (
-                        <><Inbox size={14} className="mr-1" />{t('settings.inbox')}</>
+                        <><ArrowRightLeft size={14} className="mr-1" />{t('notes.move')}</>
                       )}
                     </div>
                     <div data-swipe-strip="left" style={{ display: 'none' }} className={`absolute inset-0 ${darkMode ? 'bg-amber-900/80 text-amber-300' : 'bg-amber-100 text-amber-600'} rounded-lg flex items-center justify-end pr-3 text-xs font-medium`}>
