@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, SlidersHorizontal } from 'lucide-react';
 import { useDayPlannerCtx } from '../context/DayPlannerContext.jsx';
 import NotesSubtasksPanel from './NotesSubtasksPanel.jsx';
+import AttachmentsField from './AttachmentsField.jsx';
+import { attachmentsOf } from '../utils/attachments.js';
 import useKeyboardInset from '../hooks/useKeyboardInset.js';
 import useBackClose from '../hooks/useBackClose.js';
 import { revealCaret } from '../utils/textareaCaret.js';
@@ -22,6 +24,7 @@ const MobileNoteEditor = ({ note, onClose }) => {
   const {
     renameNote, openMobileEditTask,
     updateTaskNotes, addSubtask, toggleSubtask, deleteSubtask, updateSubtaskTitle,
+    updateTaskAttachments,
     darkMode, textPrimary, textSecondary,
   } = useDayPlannerCtx();
   const keyboard = useKeyboardInset();
@@ -118,6 +121,15 @@ const MobileNoteEditor = ({ note, onClose }) => {
           fullPage
           formatBarTarget={barTarget}
         />
+        <div className="mt-4 px-1">
+          <AttachmentsField
+            attachments={attachmentsOf(note)}
+            onChange={(list) => updateTaskAttachments(note.id, list, true)}
+            darkMode={darkMode}
+            textSecondary={textSecondary}
+            borderClass={darkMode ? 'border-gray-600' : 'border-stone-300'}
+          />
+        </div>
       </div>
 
       <div ref={setBarTarget} />

@@ -907,6 +907,21 @@ export const nativeShareFile = (filename, content) => {
   }
 };
 
+/**
+ * Opens an attachment's bytes (base64) with the app Android picks for its
+ * type (NativeBridge.openFile). Null when the bridge has no such method (web,
+ * desktop, an older Android shell); the caller then opens it its own way.
+ */
+export const nativeOpenFile = (filename, base64, mimeType) => {
+  const bridge = nativeBridge();
+  if (!bridge?.openFile) return null;
+  try {
+    return JSON.parse(bridge.openFile(filename, base64, mimeType || ''));
+  } catch {
+    return null;
+  }
+};
+
 // ── Haptics ─────────────────────────────────────────────────────────────────
 
 // Web vibration durations (ms) used only for the PWA / desktop fallback.

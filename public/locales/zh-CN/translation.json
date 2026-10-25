@@ -2871,5 +2871,15 @@
     "indent": "增加缩进",
     "outdent": "减少缩进",
     "codeblock": "代码块"
+  },
+  "attachments": {
+    "title": "附件",
+    "photo": "照片",
+    "file": "文件",
+    "remove": "移除“{{name}}”",
+    "unavailable": "不可用",
+    "tooLarge": "文件过大（最大 {{size}}）",
+    "unsupported": "仅支持图片、PDF 和音频",
+    "openFailed": "无法打开"
   }
 }

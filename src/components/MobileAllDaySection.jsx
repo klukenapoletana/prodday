@@ -4,6 +4,8 @@ import {
   Settings, SkipForward, Trash2,
 } from 'lucide-react';
 import { renderTitle, hasNotesOrSubtasks, isLinkOnlyTask, openNoteAction, NoteIcon } from '../utils/textFormatting.jsx';
+import AttachmentBadge from './AttachmentBadge.jsx';
+import { attachmentsOf } from '../utils/attachments.js';
 import { dateToString, extractWikilinks, formatDeadlineDate } from '../utils/taskUtils.js';
 import DeadlinePickerPopover from './DeadlinePickerPopover.jsx';
 import { useDayPlannerCtx } from '../context/DayPlannerContext.jsx';
@@ -176,9 +178,10 @@ const MobileAllDaySection = () => {
                                 setExpandedNotesTaskId(prev => prev === task.id ? null : task.id);
                               }
                             }}
-                            className={`notes-toggle-button hover:bg-white/20 rounded p-1 transition-colors flex-shrink-0 ${hasNotesOrSubtasks(task) ? '' : 'opacity-40'}`}
+                            className={`notes-toggle-button hover:bg-white/20 rounded p-1 transition-colors flex-shrink-0 ${hasNotesOrSubtasks(task) || attachmentsOf(task).length > 0 ? '' : 'opacity-40'}`}
                           >
                             <NoteIcon task={task} size={14} />
+                            <AttachmentBadge task={task} className="ml-0.5" />
                           </button>
                           {task.recurrenceType !== 'daily' && (
                           <button
@@ -315,9 +318,10 @@ const MobileAllDaySection = () => {
                           setExpandedNotesTaskId(prev => prev === task.id ? null : task.id);
                         }
                       }}
-                      className={`notes-toggle-button hover:bg-white/20 rounded p-1 transition-colors flex-shrink-0 ${hasNotesOrSubtasks(task) ? '' : 'opacity-40'}`}
+                      className={`notes-toggle-button hover:bg-white/20 rounded p-1 transition-colors flex-shrink-0 ${hasNotesOrSubtasks(task) || attachmentsOf(task).length > 0 ? '' : 'opacity-40'}`}
                     >
                       <NoteIcon task={task} size={14} />
+                      <AttachmentBadge task={task} className="ml-0.5" />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); postponeDeadlineTask(task.id); }}

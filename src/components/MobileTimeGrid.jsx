@@ -5,6 +5,8 @@ import {
 } from 'lucide-react';
 import { isNativeAndroid } from '../native.js';
 import { renderTitle, hasNotesOrSubtasks, isLinkOnlyTask, openNoteAction, NoteIcon, isTaskLinkOnlyTask } from '../utils/textFormatting.jsx';
+import AttachmentBadge from './AttachmentBadge.jsx';
+import { attachmentsOf } from '../utils/attachments.js';
 import { dateToString, extractWikilinks } from '../utils/taskUtils.js';
 import { useDayPlannerCtx } from '../context/DayPlannerContext.jsx';
 import DayWindowMarkers from './DayWindowMarkers.jsx';
@@ -424,9 +426,10 @@ const MobileTimeGrid = ({ barsMode = false, barsOverlay = null, onLaneTap, planO
                       setExpandedNotesTaskId(prev => prev === task.id ? null : task.id);
                     }
                   }}
-                  className={`notes-toggle-button hover:bg-white/20 rounded p-1 transition-colors ${inMenu ? 'flex items-center gap-2 w-full' : ''} ${hasNotesOrSubtasks(task) || extractWikilinks(task.title).length > 0 ? '' : 'opacity-40'}`}
+                  className={`notes-toggle-button hover:bg-white/20 rounded p-1 transition-colors ${inMenu ? 'flex items-center gap-2 w-full' : 'inline-flex items-center whitespace-nowrap'} ${hasNotesOrSubtasks(task) || attachmentsOf(task).length > 0 || extractWikilinks(task.title).length > 0 ? '' : 'opacity-40'}`}
                 >
                   <NoteIcon task={task} size={14} />
+                  <AttachmentBadge task={task} className="ml-0.5" />
                   {inMenu && <span className="text-xs">{isTaskLinkOnlyTask(task) ? t('task.openLinkedTask') : isLinkOnlyTask(task) ? t('task.openLink') : t('task.notes')}</span>}
                 </button>
                 {task.recurrenceType !== 'daily' && (

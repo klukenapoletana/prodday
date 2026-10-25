@@ -205,6 +205,7 @@ import useTaskActions from './hooks/useTaskActions.js';
 import useElectronBridge from './hooks/useElectronBridge.js';
 import useMcpBridge from './hooks/useMcpBridge.js';
 import useRecycleBin from './hooks/useRecycleBin.js';
+import useAttachmentSync from './hooks/useAttachmentSync.js';
 import useReminderEngine from './hooks/useReminderEngine.js';
 import useReminders from './hooks/useReminders.js';
 import useMobileEdit from './hooks/useMobileEdit.js';
@@ -1563,6 +1564,8 @@ const DayPlanner = () => {
   });
   // A daily sample of local-storage use and a warning before it is full (#2141).
   useStorageProjection({ dataLoaded, isTrayMode, setUndoToast, t });
+  // Attachment files: uploads, and deleting the ones nothing refers to.
+  useAttachmentSync({ tasks, unscheduledTasks, recurringTasks, recycleBin, dataLoaded, disabled: isTrayMode });
 
   // AI configuration, voice input, and weekly review state
   const {
@@ -6432,6 +6435,7 @@ const DayPlanner = () => {
     changeTaskColor,
     setTaskEnergy,
     updateTaskNotes,
+    updateTaskAttachments,
     updateRecurringTemplate,
     updateRecurrencePattern,
     updateRecurrenceEndCondition,
@@ -7861,7 +7865,7 @@ const DayPlanner = () => {
     moveToRecycleBin, moveToInbox, moveToNotes, moveNoteToInbox, renameNote, togglePinNote, openNewNote, undeleteTask,
     setDeadline, clearDeadline, postponeTask, postponeDeadlineTask,
     cyclePriority, changeTaskColor,
-    toggleSubtask, addSubtask, deleteSubtask, updateSubtaskTitle, moveSubtask, updateTaskNotes,
+    toggleSubtask, addSubtask, deleteSubtask, updateSubtaskTitle, moveSubtask, updateTaskNotes, updateTaskAttachments,
     startEditingTask, saveTaskTitle, cancelEditingTask,
     applySuggestionForEdit, handleEditKeyDown, handleEditInputChange,
     handleNewTaskInputChange, handleNewTaskInputKeyDown, applySuggestionForNewTask,
