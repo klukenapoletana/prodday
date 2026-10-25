@@ -87,6 +87,7 @@ import { resolveGoalsLink, areaFilterHides } from './utils/goalsLink.js';
 import { HABIT_ICONS, HABIT_ICON_NAMES, HABIT_COLORS } from './constants/habits.js';
 import { FRAME_COLORS } from './constants/frames.js';
 import { isEveryDay, getOccurrencesInRange, getRecurrencePresets, reanchorCompletionSeries } from './utils/recurrenceEngine.js';
+import { remindersOf, withReminders } from './utils/taskReminders.js';
 import { getPartialTag, getFilteredTags, applyTagCompletion, getPartialDate, getPartialTime, getPartialDeadline, getPartialPriority, getPartialDuration, getDateCandidates, parseFlexibleDate, getTimeCandidates, parseFlexibleTime, completeShortcutText, cleanTitle, removeFromTitle } from './utils/suggestionParser.js';
 import ClockTimePicker from './components/ClockTimePicker.jsx';
 import { HabitRing, MiniHabitRing } from './components/HabitRing.jsx';
@@ -3729,10 +3730,13 @@ const DayPlanner = () => {
         date: dateToString(selectedDate),
         isAllDay: false,
         projectId: task.projectId || null,
+        reminders: remindersOf(task),
       });
     } else {
-      // Load recurrence from recurring template if editing a recurring task
+      // Load recurrence from recurring template if editing a recurring task.
+      // Reminders are series-level too: they live on the template.
       let recurrence = null;
+      let reminders = remindersOf(task);
       if (typeof task.id === 'string' && task.id.startsWith('recurring-')) {
         const parsed = parseRecurringId(task.id);
         if (parsed) {
@@ -3740,6 +3744,7 @@ const DayPlanner = () => {
           if (template?.recurrence) {
             recurrence = { ...template.recurrence };
           }
+          reminders = remindersOf(template);
         }
       }
       setNewTask({
@@ -3756,6 +3761,7 @@ const DayPlanner = () => {
         // modal is the flavor that shows the deadline field, so the draft has
         // to carry the current value (a scheduled task's own edit ignores it).
         deadline: task.deadline || null,
+        reminders,
       });
     }
     setShowAddTask(true);
@@ -3944,6 +3950,14 @@ const DayPlanner = () => {
   };
   const saveMobileEditTaskFrom = (newTask, scope) => {
     if (!mobileEditingTask || !newTask.title.trim()) return;
+    // A series' reminders are series-level, like its pattern: an edit of any
+    // occurrence writes them to the template, and only a real change restamps it.
+    const withSeriesReminders = (template) => {
+      const next = withReminders(template, newTask.reminders);
+      if (next === template) return template;
+      return JSON.stringify(next.reminders ?? null) === JSON.stringify(template.reminders ?? null)
+        ? template : { ...next, lastModified: new Date().toISOString() };
+    };
     const taskId = mobileEditingTask.id;
     // An unscheduled task that this save puts on the clock (the last branch
     // below: "Unscheduled" switched off on a project task) loses its
@@ -3957,7 +3971,7 @@ const DayPlanner = () => {
     const dropsDeadline = movesInboxToClock && !!unscheduledTasks.find(t => t.id === taskId)?.deadline;
     pushUndo({ key: dropsDeadline ? 'scheduledDroppedDeadline' : 'edited', taskId, title: cleanTitle(newTask.title) });
     if (mobileEditIsInbox) {
-      setUnscheduledTasks(prev => prev.map(t => t.id === taskId ? {
+      setUnscheduledTasks(prev => prev.map(t => t.id === taskId ? withReminders({
         ...t,
         title: cleanTitle(newTask.title),
         duration: newTask.duration,
@@ -3970,7 +3984,7 @@ const DayPlanner = () => {
         projectId: t.bucketId ? undefined : (newTask.projectId || undefined),
         assignedUserSyncIds: mobileEditingTask.assignedUserSyncIds ?? t.assignedUserSyncIds,
         transitionId: crypto.randomUUID(),
-      } : t));
+      }, newTask.reminders) : t));
     } else if (typeof taskId === 'string' && taskId.startsWith('recurring-')) {
       const parsed = parseRecurringId(taskId);
       if (parsed) {
@@ -3993,7 +4007,7 @@ const DayPlanner = () => {
             ...(mobileEditingTask.assignedUserSyncIds?.length ? { assignedUserSyncIds: mobileEditingTask.assignedUserSyncIds } : {}),
             ...carryCreatedAt(template),
           };
-          setTasks(prev => [...prev, regularTask]);
+          setTasks(prev => [...prev, withReminders(regularTask, newTask.reminders)]);
           recordDeletedTaskTombstone(parsed.templateId);
           setRecurringTasks(prev => prev.filter(t => t.id !== parsed.templateId));
         } else {
@@ -4005,7 +4019,7 @@ const DayPlanner = () => {
           const reanchored = dateChanged && editedTemplate
             && reanchorCompletionSeries(editedTemplate, parsed.dateStr, newTask.date);
           if (reanchored) {
-            setRecurringTasks(prev => prev.map(t => t.id !== parsed.templateId ? t : applyRecurringInstanceEdit(reanchored, {
+            setRecurringTasks(prev => prev.map(t => t.id !== parsed.templateId ? t : withSeriesReminders(applyRecurringInstanceEdit(reanchored, {
               dateStr: newTask.date,
               edit: recurringInstanceEditFrom(newTask),
               scope: scope || 'this',
@@ -4013,7 +4027,7 @@ const DayPlanner = () => {
               recurrence: newTask.recurrence,
               now: new Date().toISOString(),
               defaultColor: colors[0].class,
-            })));
+            }))));
           } else if (dateChanged && !isDaily) {
             // Date changed for a non-daily recurring instance:
             // skip the original occurrence and create a one-off task on the new date
@@ -4028,7 +4042,7 @@ const DayPlanner = () => {
                 lastModified: new Date().toISOString()
               };
             }));
-            setTasks(prev => [...prev, {
+            setTasks(prev => [...prev, withReminders({
               id: crypto.randomUUID(),
               title: cleanTitle(newTask.title),
               startTime: newTask.isAllDay ? '00:00' : newTask.startTime,
@@ -4042,10 +4056,10 @@ const DayPlanner = () => {
               projectId: newTask.projectId || undefined,
               assignedUserSyncIds: mobileEditingTask.assignedUserSyncIds,
               ...carryCreatedAt(recurringTasks.find(r => r.id === parsed.templateId)),
-            }]);
+            }, newTask.reminders)]);
           } else {
             // Scope picked in RecurringEditModal; nothing scoped changed when unset.
-            setRecurringTasks(prev => prev.map(t => t.id !== parsed.templateId ? t : applyRecurringInstanceEdit(t, {
+            setRecurringTasks(prev => prev.map(t => t.id !== parsed.templateId ? t : withSeriesReminders(applyRecurringInstanceEdit(t, {
               dateStr: parsed.dateStr,
               edit: recurringInstanceEditFrom(newTask),
               scope: scope || 'this',
@@ -4054,7 +4068,7 @@ const DayPlanner = () => {
               recurrence: newTask.recurrence,
               now: new Date().toISOString(),
               defaultColor: colors[0].class,
-            })));
+            }))));
           }
         }
       }
@@ -4090,7 +4104,7 @@ const DayPlanner = () => {
       recordDeletedTaskTombstone(taskId);
       setTasks(prev => prev.filter(t => t.id !== taskId));
       setUnscheduledTasks(prev => prev.filter(t => t.id !== taskId));
-      setRecurringTasks(prev => [...prev, template]);
+      setRecurringTasks(prev => [...prev, withReminders(template, newTask.reminders)]);
     } else if (newTask.keepUnscheduled && newTask.projectId) {
       // Keep/make this an unscheduled project task
       const inScheduled = tasks.find(t => t.id === taskId);
@@ -4101,7 +4115,7 @@ const DayPlanner = () => {
         // the move when the remote still has the task in the scheduled list.
         const { date: _d, startTime: _s, isAllDay: _a, lastModified: _m, ...rest } = inScheduled;
         setTasks(prev => prev.filter(t => t.id !== taskId));
-        setUnscheduledTasks(prev => [...prev, {
+        setUnscheduledTasks(prev => [...prev, withReminders({
           ...rest,
           title: cleanTitle(newTask.title),
           duration: newTask.duration,
@@ -4112,10 +4126,10 @@ const DayPlanner = () => {
           // the field for this flavor (utils/pendingProject.js).
           deadline: newTask.deadline || null,
           assignedUserSyncIds: mobileEditingTask.assignedUserSyncIds ?? rest.assignedUserSyncIds,
-        }]);
+        }, newTask.reminders)]);
       } else {
         // Already unscheduled, just update
-        setUnscheduledTasks(prev => prev.map(t => t.id === taskId ? {
+        setUnscheduledTasks(prev => prev.map(t => t.id === taskId ? withReminders({
           ...t,
           title: cleanTitle(newTask.title),
           duration: newTask.duration,
@@ -4124,12 +4138,12 @@ const DayPlanner = () => {
           deadline: newTask.deadline || null,
           assignedUserSyncIds: mobileEditingTask.assignedUserSyncIds ?? t.assignedUserSyncIds,
           transitionId: crypto.randomUUID(),
-        } : t));
+        }, newTask.reminders) : t));
       }
     } else {
       const inScheduled = tasks.find(t => t.id === taskId);
       if (inScheduled) {
-        setTasks(prev => prev.map(t => t.id === taskId ? {
+        setTasks(prev => prev.map(t => t.id === taskId ? withReminders({
           ...t,
           title: cleanTitle(newTask.title),
           startTime: newTask.isAllDay ? '00:00' : newTask.startTime,
@@ -4140,7 +4154,7 @@ const DayPlanner = () => {
           projectId: newTask.projectId || undefined,
           assignedUserSyncIds: mobileEditingTask.assignedUserSyncIds ?? t.assignedUserSyncIds,
           transitionId: crypto.randomUUID(),
-        } : t));
+        }, newTask.reminders) : t));
       } else {
         // Task was unscheduled (e.g. a project task) — move it to the scheduled
         // list. Priority and deadline are inbox-only, so they stay behind, as
@@ -4148,7 +4162,7 @@ const DayPlanner = () => {
         const existing = unscheduledTasks.find(t => t.id === taskId);
         const { priority: _priority, deadline: _deadline, ...scheduledFields } = existing || {};
         setUnscheduledTasks(prev => prev.filter(t => t.id !== taskId));
-        setTasks(prev => [...prev, {
+        setTasks(prev => [...prev, withReminders({
           ...scheduledFields,
           id: taskId,
           title: cleanTitle(newTask.title),
@@ -4159,7 +4173,7 @@ const DayPlanner = () => {
           color: newTask.color || colors[0].class,
           projectId: newTask.projectId || undefined,
           assignedUserSyncIds: mobileEditingTask.assignedUserSyncIds ?? existing?.assignedUserSyncIds,
-        }]);
+        }, newTask.reminders)]);
       }
     }
     setShowAddTask(false);
@@ -5911,6 +5925,8 @@ const DayPlanner = () => {
     reminderSettings,
     tasks,
     expandedRecurringTasks,
+    recurringTasks,
+    unscheduledTasks,
     hgSessions: hgSessionsForReminders,
     isVisibleForUser,
     playUISound,
@@ -5953,7 +5969,8 @@ const DayPlanner = () => {
         });
         setShowAddTask(true);
       } else if (pending.action === 'complete' && pending.taskId) {
-        toggleComplete(pending.taskId);
+        // A reminder set on an Inbox task carries its id too (utils/taskReminders.js).
+        toggleComplete(pending.taskId, unscheduledTasks.some(t => String(t.id) === String(pending.taskId)));
       } else if (pending.action === 'focus-pause') {
         setFocusTimerRunning(false);
       } else if (pending.action === 'focus-resume') {

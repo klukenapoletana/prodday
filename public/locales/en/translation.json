@@ -1513,7 +1513,9 @@
     "taskCount_one": "{{count}} task",
     "taskCount_other": "{{count}} tasks",
     "snoozeMinutes": "Snooze {{count}} min",
-    "title": "Reminders"
+    "title": "Reminders",
+    "custom": "Reminder",
+    "customAt": "Starts at {{time}}"
   },
   "frames": {
     "title": "GTD Frames",
@@ -2825,5 +2827,38 @@
       "tagRemoved": "Removed #{{from}}",
       "subtasksReordered": "Reordered the subtasks of \"{{title}}\""
     }
+  },
+  "taskReminders": {
+    "title": "Reminders",
+    "addReminder": "Reminder",
+    "add": "Add",
+    "remove": "Remove reminder",
+    "tab_before": "Before start",
+    "tab_day": "On the day",
+    "tab_at": "Date & time",
+    "atStart": "At start",
+    "custom": "Custom",
+    "unit_minutes": "minutes",
+    "unit_hours": "hours",
+    "unit_days": "days",
+    "sameDay": "Same day",
+    "time": "Time",
+    "date": "Date",
+    "onDayAt": "On the day at {{time}}",
+    "minutesBefore_one": "{{count}} min before",
+    "minutesBefore_other": "{{count}} min before",
+    "hoursBefore_one": "{{count}} hour before",
+    "hoursBefore_other": "{{count}} hours before",
+    "daysBefore_one": "{{count}} day before",
+    "daysBefore_other": "{{count}} days before",
+    "daysBeforeAt_one": "{{count}} day before at {{time}}",
+    "daysBeforeAt_other": "{{count}} days before at {{time}}",
+    "presetStart": "Start",
+    "minutesShort_one": "{{count}} min",
+    "minutesShort_other": "{{count}} min",
+    "hoursShort_one": "{{count}} hour",
+    "hoursShort_other": "{{count}} hours",
+    "daysShort_one": "{{count}} day",
+    "daysShort_other": "{{count}} days"
   }
 }

@@ -15,6 +15,7 @@ import RecurrencePicker from './RecurrencePicker.jsx';
 import LastGlanceBadge from './LastGlanceBadge.jsx';
 import TaskDeadlineField from './TaskDeadlineField.jsx';
 import TaskModalNotes from './TaskModalNotes.jsx';
+import TaskRemindersField from './TaskRemindersField.jsx';
 import TaskMetadataLine from './TaskMetadataLine.jsx';
 import { extractTags, getRecurrenceLabel } from '../utils/taskUtils.js';
 import { formatLocalizedDate } from '../utils/localeFormatting.js';
@@ -548,6 +549,8 @@ const DesktopNewTaskModal = () => {
               {/* Notes & subtasks, behind a button: the task's own, or a new
                   task's draft saved with it (components/TaskModalNotes.jsx).
                   The only surface for a Bucket List item's. */}
+              {/* Reminders set on this task (utils/taskReminders.js). */}
+              <TaskRemindersField />
               <TaskModalNotes newTask={newTask} setNewTask={setNewTask} editingTask={mobileEditingTask} />
               {/* When it was created and completed (#2135); editing only. */}
               {mobileEditingTask && <TaskMetadataLine task={mobileEditingTask} />}

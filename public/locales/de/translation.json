@@ -1513,7 +1513,9 @@
     "taskCount_one": "{{count}} Aufgabe",
     "taskCount_other": "{{count}} Aufgaben",
     "snoozeMinutes": "In {{count}} Min. erneut erinnern",
-    "title": "Erinnerungen"
+    "title": "Erinnerungen",
+    "custom": "Erinnerung",
+    "customAt": "Beginnt um {{time}}"
   },
   "frames": {
     "title": "GTD-Rahmen",
@@ -2825,5 +2827,38 @@
       "tagRemoved": "#{{from}} entfernt",
       "subtasksReordered": "Unteraufgaben von „{{title}}“ neu geordnet"
     }
+  },
+  "taskReminders": {
+    "title": "Erinnerungen",
+    "addReminder": "Erinnerung",
+    "add": "Hinzufügen",
+    "remove": "Erinnerung entfernen",
+    "tab_before": "Vor Beginn",
+    "tab_day": "Am Tag",
+    "tab_at": "Zeitpunkt",
+    "atStart": "Zum Beginn",
+    "custom": "Eigene",
+    "unit_minutes": "Minuten",
+    "unit_hours": "Stunden",
+    "unit_days": "Tage",
+    "sameDay": "Am Tag",
+    "time": "Uhrzeit",
+    "date": "Datum",
+    "onDayAt": "Am Tag um {{time}}",
+    "minutesBefore_one": "{{count}} Min. vorher",
+    "minutesBefore_other": "{{count}} Min. vorher",
+    "hoursBefore_one": "{{count}} Std. vorher",
+    "hoursBefore_other": "{{count}} Std. vorher",
+    "daysBefore_one": "{{count}} Tag vorher",
+    "daysBefore_other": "{{count}} Tage vorher",
+    "daysBeforeAt_one": "{{count}} Tag vorher um {{time}}",
+    "daysBeforeAt_other": "{{count}} Tage vorher um {{time}}",
+    "presetStart": "Beginn",
+    "minutesShort_one": "{{count}} Min.",
+    "minutesShort_other": "{{count}} Min.",
+    "hoursShort_one": "{{count}} Std.",
+    "hoursShort_other": "{{count}} Std.",
+    "daysShort_one": "{{count}} Tag",
+    "daysShort_other": "{{count}} Tage"
   }
 }

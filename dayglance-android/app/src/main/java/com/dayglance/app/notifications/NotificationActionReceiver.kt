@@ -43,8 +43,9 @@ class NotificationActionReceiver : BroadcastReceiver() {
         val taskId = intent.getStringExtra(EXTRA_TASK_ID) ?: ""
 
         // Store the snooze request so JS can shift the task start time by 15 minutes
-        // when the app next comes to the foreground.
-        if (taskId.isNotEmpty()) {
+        // when the app next comes to the foreground. A reminder the user set on
+        // the task ("custom") only comes back: the task stays where it is.
+        if (taskId.isNotEmpty() && intent.getStringExtra(EXTRA_TYPE) != "custom") {
             SharedDataStore(context).pendingSnoozeTaskId = taskId
         }
 

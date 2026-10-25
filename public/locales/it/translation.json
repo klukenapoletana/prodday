@@ -1527,7 +1527,9 @@
     "taskCount_one": "{{count}} attività",
     "taskCount_other": "{{count}} attività",
     "snoozeMinutes": "Rimanda di {{count}} min",
-    "title": "Promemoria"
+    "title": "Promemoria",
+    "custom": "Promemoria",
+    "customAt": "Inizia alle {{time}}"
   },
   "frames": {
     "title": "Blocchi GTD",
@@ -2839,5 +2841,45 @@
       "tagRemoved": "#{{from}} rimosso",
       "subtasksReordered": "Sottoattività di «{{title}}» riordinate"
     }
+  },
+  "taskReminders": {
+    "title": "Promemoria",
+    "addReminder": "Promemoria",
+    "add": "Aggiungi",
+    "remove": "Rimuovi promemoria",
+    "tab_before": "Prima dell’inizio",
+    "tab_day": "Il giorno",
+    "tab_at": "Data e ora",
+    "atStart": "All’inizio",
+    "custom": "Personalizzato",
+    "unit_minutes": "minuti",
+    "unit_hours": "ore",
+    "unit_days": "giorni",
+    "sameDay": "Lo stesso giorno",
+    "time": "Ora",
+    "date": "Data",
+    "onDayAt": "Il giorno alle {{time}}",
+    "minutesBefore_one": "{{count}} min prima",
+    "minutesBefore_many": "{{count}} min prima",
+    "minutesBefore_other": "{{count}} min prima",
+    "hoursBefore_one": "{{count}} ora prima",
+    "hoursBefore_many": "{{count}} ore prima",
+    "hoursBefore_other": "{{count}} ore prima",
+    "daysBefore_one": "{{count}} giorno prima",
+    "daysBefore_many": "{{count}} giorni prima",
+    "daysBefore_other": "{{count}} giorni prima",
+    "daysBeforeAt_one": "{{count}} giorno prima alle {{time}}",
+    "daysBeforeAt_many": "{{count}} giorni prima alle {{time}}",
+    "daysBeforeAt_other": "{{count}} giorni prima alle {{time}}",
+    "presetStart": "Inizio",
+    "minutesShort_one": "{{count}} min",
+    "minutesShort_many": "{{count}} min",
+    "minutesShort_other": "{{count}} min",
+    "hoursShort_one": "{{count}} ora",
+    "hoursShort_many": "{{count}} ore",
+    "hoursShort_other": "{{count}} ore",
+    "daysShort_one": "{{count}} giorno",
+    "daysShort_many": "{{count}} giorni",
+    "daysShort_other": "{{count}} giorni"
   }
 }
