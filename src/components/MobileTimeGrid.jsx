@@ -296,20 +296,24 @@ const MobileTimeGrid = ({ barsMode = false, barsOverlay = null, onLaneTap, planO
             </div>
           )}
 
-          {/* Mobile drag time preview */}
+          {/* Mobile drag time preview — drawn IN FRONT of the dragged card
+              (z-50 over its z-40): the card stays put while the line moves, so
+              behind it the line vanished over the card's own span. The outline
+              keeps it readable over a blue card. */}
           {mobileDragPreviewTime && mobileDragPreviewTime !== 'all-day' && (!mobileDragPreviewDate || mobileDragPreviewDate === dateStr) && (() => {
             const dragMinutes = timeToMinutes(mobileDragPreviewTime);
             const dragTop = Math.round(minutesToPosition(dragMinutes));
             return (
               <div
-                className="absolute left-0 right-0 pointer-events-none z-20"
+                className="absolute left-0 right-0 pointer-events-none z-50"
                 style={{ top: `${dragTop}px` }}
+                data-drag-preview-line
               >
                 <div className="relative">
-                  <div className={`absolute bottom-0.5 right-0 px-1.5 py-0.5 rounded text-[10px] font-bold ${darkMode ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white'}`}>
+                  <div className={`absolute bottom-0.5 right-0 px-1.5 py-0.5 rounded text-[10px] font-bold ${darkMode ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white'}`} style={{ boxShadow: `0 0 0 1px ${darkMode ? 'rgba(17,24,39,0.9)' : 'rgba(255,255,255,0.9)'}` }}>
                     {formatTime(mobileDragPreviewTime)}
                   </div>
-                  <div className="h-0.5 bg-blue-500"></div>
+                  <div className="h-0.5 bg-blue-500" style={{ boxShadow: `0 0 0 1px ${darkMode ? 'rgba(17,24,39,0.9)' : 'rgba(255,255,255,0.9)'}` }}></div>
                 </div>
               </div>
             );
