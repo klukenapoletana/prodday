@@ -31,6 +31,7 @@ import { ICS_CALENDARS_KEY, loadIcsCalendars, stripIcsCalendarCredentials, apply
 import { normalizeBucketConfig } from '../utils/bucketList.js';
 import { dailyNotesSyncable, writeDailyNotes } from '../utils/dailyNotesStore.js';
 import { sanitizeMergedRoutineCompletions, startOfTodayIso } from './useRoutines.js';
+import { savedColorsForSync, applyRemoteSavedColors } from './useSavedColors.js';
 
 /** Every key the hook reads, by kind. */
 export const SYNC_ENGINE_DATA_DEPS = Object.freeze({
@@ -97,6 +98,7 @@ export default function useSyncEngineData(deps) {
     // its tombstone) is kept. See utils/dropResurrectedTasks.js.
     let payloadDeletedTaskIds = {};
     try { payloadDeletedTaskIds = JSON.parse(localStorage.getItem('day-planner-deleted-task-ids') || '{}'); } catch { payloadDeletedTaskIds = {}; }
+    const savedColors = savedColorsForSync();
     return {
       version: 2,
       lastModified: new Date().toISOString(),
@@ -121,6 +123,11 @@ export default function useSyncEngineData(deps) {
         // meta; its URL travels in syncUrl above (see injectPrimaryStub).
         icsCalendars: injectPrimaryStub(stripIcsCalendarCredentials(icsCalendars), primaryCalendarMeta, !!syncUrl),
         icsCalendarsUpdatedAt: localStorage.getItem('day-planner-ics-calendars-updated-at') || null,
+        // Colours saved from the colour wheel: whole-list LWW by the sibling
+        // customColorsUpdatedAt on both tiers, like icsCalendars (stamped by
+        // every edit in hooks/useSavedColors.js; per-user in multi-user).
+        customColors: savedColors.colors,
+        customColorsUpdatedAt: savedColors.updatedAt,
         calendarConfigByUser,
         // taskCalendarAuth is intentionally excluded from the top level — credentials
         // ride per-user inside calendarConfigByUser (only when opted in and encrypted),
@@ -412,6 +419,10 @@ export default function useSyncEngineData(deps) {
       if (remotePrimaryMeta) localStorage.setItem(PRIMARY_CAL_META_KEY, JSON.stringify(remotePrimaryMeta));
       if (data.icsCalendarsUpdatedAt) localStorage.setItem('day-planner-ics-calendars-updated-at', data.icsCalendarsUpdatedAt);
     }
+    // Saved wheel colours: the list the merge settled on, with its own stamp
+    // (a no-op when nothing changed). In multi-user the merge kept the local
+    // list, so this rewrites what is already here.
+    if (data.customColors !== undefined) applyRemoteSavedColors(data.customColors, data.customColorsUpdatedAt);
     // taskCalendarAuth is not applied from the top level — credentials are device-local
     // unless they arrive per-user inside calendarConfigByUser (applied below).
     if (data.completedTaskUids) localStorage.setItem('day-planner-task-completed-uids', JSON.stringify(data.completedTaskUids));
