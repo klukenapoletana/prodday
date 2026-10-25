@@ -939,6 +939,35 @@ export const nativePeekQuickAddEntries = () => {
   }
 };
 
+/**
+ * Files shared to the app from other apps, waiting to become notes
+ * (data/SharedFilesInbox.kt): [{ batchId, text, subject, files: [{ id, name, mime, size }], skipped }].
+ */
+export const nativePeekSharedFiles = () => {
+  const bridge = nativeBridge();
+  if (!bridge?.peekSharedFiles) return [];
+  try {
+    const list = JSON.parse(bridge.peekSharedFiles() || '[]');
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+};
+
+/** `length` bytes of a shared file from `offset`, as base64 ('' past the end). */
+export const nativeReadSharedFileChunk = (id, offset, length) => {
+  const bridge = nativeBridge();
+  if (!bridge?.readSharedFileChunk) return '';
+  try { return bridge.readSharedFileChunk(id, offset, length) || ''; } catch { return ''; }
+};
+
+/** Drop these shares, and the device's copies of their files. */
+export const nativeAckSharedFiles = (batchIds) => {
+  const bridge = nativeBridge();
+  if (!bridge?.ackSharedFiles || !batchIds?.length) return;
+  try { bridge.ackSharedFiles(JSON.stringify(batchIds)); } catch { /* read again next time */ }
+};
+
 /** Drop the Quick add entries with these ids from the device's queue. */
 export const nativeAckQuickAddEntries = (ids) => {
   const bridge = nativeBridge();

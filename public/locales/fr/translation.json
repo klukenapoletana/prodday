@@ -2922,5 +2922,11 @@
     "tooLarge": "Trop volumineux (max. {{size}})",
     "unsupported": "Images, PDF et audio uniquement",
     "openFailed": "Impossible d’ouvrir"
+  },
+  "share": {
+    "untitled": "Partagé",
+    "skipped_one": "{{count}} fichier ignoré (trop volumineux ou non pris en charge)",
+    "skipped_many": "{{count}} fichiers ignorés (trop volumineux ou non pris en charge)",
+    "skipped_other": "{{count}} fichiers ignorés (trop volumineux ou non pris en charge)"
   }
 }

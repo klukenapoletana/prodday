@@ -50,6 +50,7 @@ import com.dayglance.app.bridge.ObsidianBridge
 import com.dayglance.app.bridge.SpeechBridge
 import com.dayglance.app.sse.VaultSseClient
 import com.dayglance.app.data.HealthRepository
+import com.dayglance.app.data.SharedFilesInbox
 import com.dayglance.app.data.SharedDataStore
 import com.dayglance.app.databinding.ActivityMainBinding
 
@@ -207,7 +208,10 @@ class MainActivity : AppCompatActivity() {
             ACTION_ADD_TASK       -> store.pendingAddTask = true
             ACTION_ADD_INBOX_TASK -> store.pendingAddInboxTask = true
             ACTION_COMPLETE_TASK  -> storeCompleteFromNotification(intent, store)
-            Intent.ACTION_SEND    -> storeShareIntent(intent, store)
+            // Files shared from another app become a note (SharedFilesInbox);
+            // a plain text share stays an Inbox entry, as before.
+            Intent.ACTION_SEND    -> if (!SharedFilesInbox.store(this, intent)) storeShareIntent(intent, store)
+            Intent.ACTION_SEND_MULTIPLE -> SharedFilesInbox.store(this, intent)
             // Cold start via an app.dayglance.* Activity intent (app was killed):
             // onNewIntent is NOT called for the launching intent, so without this the
             // action's payload — the target tab for OPEN, the task for COMPLETE, etc. —
@@ -824,7 +828,21 @@ class MainActivity : AppCompatActivity() {
             ACTION_ADD_TASK       -> store.pendingAddTask = true
             ACTION_ADD_INBOX_TASK -> store.pendingAddInboxTask = true
             ACTION_COMPLETE_TASK  -> storeCompleteFromNotification(intent, store)
-            Intent.ACTION_SEND    -> storeShareIntent(intent, store)
+            Intent.ACTION_SEND, Intent.ACTION_SEND_MULTIPLE -> {
+                // Files become a note: the app is running, so it is told at once
+                // (src/hooks/useSharedFilesToNotes.js). Text goes the old way.
+                if (SharedFilesInbox.store(this, intent)) {
+                    webView.post {
+                        webView.evaluateJavascript(
+                            "(function(){ if (window.__prodCheckSharedFiles) window.__prodCheckSharedFiles(); })();",
+                            null
+                        )
+                    }
+                    return
+                }
+                if (intent.action == Intent.ACTION_SEND_MULTIPLE) return
+                storeShareIntent(intent, store)
+            }
             "app.dayglance.CREATE",
             "app.dayglance.COMPLETE",
             "app.dayglance.OPEN",

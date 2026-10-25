@@ -3056,5 +3056,12 @@
     "tooLarge": "Za duży (maks. {{size}})",
     "unsupported": "Tylko obrazy, pliki PDF i audio",
     "openFailed": "Nie udało się otworzyć"
+  },
+  "share": {
+    "untitled": "Udostępnione",
+    "skipped_one": "Pominięto {{count}} plik (za duży lub nieobsługiwany)",
+    "skipped_few": "Pominięto {{count}} pliki (za duże lub nieobsługiwane)",
+    "skipped_many": "Pominięto {{count}} plików (za duże lub nieobsługiwane)",
+    "skipped_other": "Pominięto {{count}} pliku (za duży lub nieobsługiwany)"
   }
 }

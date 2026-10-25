@@ -2881,5 +2881,9 @@
     "tooLarge": "文件过大（最大 {{size}}）",
     "unsupported": "仅支持图片、PDF 和音频",
     "openFailed": "无法打开"
+  },
+  "share": {
+    "untitled": "共享",
+    "skipped_other": "已跳过 {{count}} 个文件（过大或不受支持）"
   }
 }
