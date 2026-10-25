@@ -70,7 +70,7 @@ export default function useAboutTopic() {
               </div>
           )}
           <p className={`text-sm ${textSecondary}`} data-about-version>
-            {typeof __APP_VERSION__ !== 'undefined' ? `dayGLANCE v${__APP_VERSION__}` : 'dayGLANCE'}
+            {typeof __APP_VERSION__ !== 'undefined' ? `prodday v${__APP_VERSION__}` : 'prodday'}
             {typeof __BUILD_TIMESTAMP__ !== 'undefined' ? ` · ${new Date(__BUILD_TIMESTAMP__).toLocaleString()}` : ''}
           </p>
           <HelpLinks textSecondary={textSecondary} />

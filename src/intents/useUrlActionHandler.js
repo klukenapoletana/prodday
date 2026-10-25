@@ -87,7 +87,7 @@ export function useUrlActionHandler({ contextRef, setUndoToast }) {
     if (action === 'query' || action === ACTIONS.QUERY) {
       // Web query is no-op + UI — just navigate to the glance tab and show a hint
       contextRef.current?.navigate?.('glance');
-      setUndoToastRef.current?.({ message: 'Query: open dayGLANCE to see your task counts', actionable: false });
+      setUndoToastRef.current?.({ message: 'Query: open prodday to see your task counts', actionable: false });
       return;
     }
 

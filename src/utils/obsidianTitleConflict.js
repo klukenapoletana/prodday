@@ -83,5 +83,5 @@ export function appendTitleConflictNote(notes, dgTitle, dateIso) {
 
 /** The fire-and-forget toast text (neutral, never red, never latched). */
 export function titleConflictNoticeText(vaultTitle) {
-  return `Title conflict: Obsidian's edit "${stripWikilinks(vaultTitle)}" won. Your dayGLANCE rename is saved in the task's notes.`;
+  return `Title conflict: Obsidian's edit "${stripWikilinks(vaultTitle)}" won. Your prodday rename is saved in the task's notes.`;
 }

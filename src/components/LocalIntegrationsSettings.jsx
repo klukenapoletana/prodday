@@ -31,11 +31,11 @@ const MCP_SETUP_GUIDE_URL = 'https://github.com/glance-apps/mcp-bridge';
 // cannot see or control what they do; this falls outside dayGLANCE's
 // encryption / no-server-access guarantees.
 export const MCP_BASE_CONSENT = {
-  title: 'Allow other apps to read your dayGLANCE data?',
+  title: 'Allow other apps to read your prodday data?',
   paragraphs: [
-    'This lets other applications running on this computer, typically an AI assistant such as Claude Desktop, read your dayGLANCE data: your schedule, tasks, goals, and projects.',
-    'AI assistants usually send what they read to their AI provider over the internet as part of your conversations. Once another app has read your data, dayGLANCE cannot see or control what it does with it.',
-    'This is outside dayGLANCE’s encryption and no-server-access guarantees: dayGLANCE itself still never uploads your data anywhere, but an app you connect might.',
+    'This lets other applications running on this computer, typically an AI assistant such as Claude Desktop, read your prodday data: your schedule, tasks, goals, and projects.',
+    'AI assistants usually send what they read to their AI provider over the internet as part of your conversations. Once another app has read your data, prodday cannot see or control what it does with it.',
+    'This is outside prodday’s encryption and no-server-access guarantees: prodday itself still never uploads your data anywhere, but an app you connect might.',
     'Only apps on this computer that present your access token (shown in settings after enabling) can connect.',
   ],
   accept: 'I understand, enable read access',
@@ -47,10 +47,10 @@ export const MCP_BASE_CONSENT = {
 export const MCP_CALENDAR_CONSENT = {
   title: 'Also share device calendar events?',
   paragraphs: [
-    'This adds events from your device’s calendar accounts (work, school, shared family calendars) to what connected apps can read, not just data you created in dayGLANCE.',
+    'This adds events from your device’s calendar accounts (work, school, shared family calendars) to what connected apps can read, not just data you created in prodday.',
     'Calendar events often contain other people’s information: event titles, attendee names and emails, and details of meetings other people invited you to. You did not create that information, and those people have not agreed to share it with an AI assistant or any other app.',
-    'Connected apps can read these events exactly like your dayGLANCE data, and typically send them to an AI provider over the internet.',
-    'Leave this off to share only the data you created in dayGLANCE yourself.',
+    'Connected apps can read these events exactly like your prodday data, and typically send them to an AI provider over the internet.',
+    'Leave this off to share only the data you created in prodday yourself.',
   ],
   accept: 'I understand, include calendar events',
 };
@@ -72,8 +72,8 @@ const READ_TIER_OPTIONS = [
   },
   {
     tier: 'dayglance',
-    label: 'dayGLANCE data only',
-    description: 'Schedule, tasks, goals, and projects you created in dayGLANCE. Device calendar events are excluded.',
+    label: 'prodday data only',
+    description: 'Schedule, tasks, goals, and projects you created in prodday. Device calendar events are excluded.',
   },
   {
     tier: 'dayglance_calendar',
@@ -525,7 +525,7 @@ const LocalIntegrationsSettings = ({ variant }) => {
                 </div>
                 <p className={`text-xs ${textSecondary} mt-1`}>
                   {t('settings.mcpEndpoint', { defaultValue: 'Endpoint' })}: <code className={`px-1 py-0.5 rounded ${darkMode ? 'bg-gray-700' : 'bg-stone-200'}`}>http://127.0.0.1:{ports.mcpEffective ?? ports.mcpDefault}/mcp</code>
-                  {'. '}{t('settings.mcpPortHint', { defaultValue: 'Leave the port empty for the default. dayGLANCE never picks a different port by itself.' })}
+                  {'. '}{t('settings.mcpPortHint', { defaultValue: 'Leave the port empty for the default. prodday never picks a different port by itself.' })}
                 </p>
               </div>
 
@@ -560,7 +560,7 @@ const LocalIntegrationsSettings = ({ variant }) => {
                     }}
                     disabled={setupBusy}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium disabled:opacity-50 ${darkMode ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-stone-200 text-stone-700 hover:bg-stone-300'} transition-colors`}
-                    title={t('settings.mcpSetupClaudeTitle', { defaultValue: "Adds a dayGLANCE entry to Claude Desktop's configuration, pointing at the bridge bundled with this app. Everything else in the file is preserved, and a backup is made first." })}
+                    title={t('settings.mcpSetupClaudeTitle', { defaultValue: "Adds a prodday entry to Claude Desktop's configuration, pointing at the bridge bundled with this app. Everything else in the file is preserved, and a backup is made first." })}
                   >
                     {setupBusy
                       ? t('settings.mcpSettingUp', { defaultValue: 'Setting up' })
@@ -570,7 +570,7 @@ const LocalIntegrationsSettings = ({ variant }) => {
                     <p className={`text-xs ${textSecondary} mt-1`}>
                       {setupResult.action === 'created'
                         ? t('settings.mcpSetupCreated', { defaultValue: 'Claude Desktop configuration created.' })
-                        : t('settings.mcpSetupAdded', { defaultValue: 'dayGLANCE entry added. Everything else in the file was preserved.' })}
+                        : t('settings.mcpSetupAdded', { defaultValue: 'prodday entry added. Everything else in the file was preserved.' })}
                       {setupResult.backupPath ? ` ${t('settings.mcpSetupBackup', { defaultValue: 'A backup of the previous file was saved next to it.' })}` : ''}
                       {' '}{t('settings.mcpSetupRestart', { defaultValue: 'Restart Claude Desktop to connect.' })}
                     </p>
@@ -579,13 +579,13 @@ const LocalIntegrationsSettings = ({ variant }) => {
                     <div className={`text-xs ${textSecondary} mt-1 space-y-1`}>
                       <p className="text-amber-500">
                         {setupResult.reason === 'unparseable'
-                          ? t('settings.mcpSetupUnparseable', { defaultValue: 'Your Claude Desktop configuration file could not be parsed, so dayGLANCE did not touch it. To finish setup by hand, fix or empty the file, or paste this entry into it:' })
+                          ? t('settings.mcpSetupUnparseable', { defaultValue: 'Your Claude Desktop configuration file could not be parsed, so prodday did not touch it. To finish setup by hand, fix or empty the file, or paste this entry into it:' })
                           : setupResult.reason === 'bridge_missing'
                             /* No manual entry offered here on purpose: it would name the
                                same missing file. Send them to the published bridge instead. */
                             ? t('settings.mcpSetupBridgeMissing', { defaultValue: 'This build did not ship the bridge, so nothing was written. Install the bridge yourself with "npx -y @glance-apps/mcp-bridge", then follow the setup guide to point Claude Desktop at it. Please report this build as broken.' })
                             : setupResult.reason === 'unavailable'
-                              ? t('settings.mcpSetupUnavailable', { defaultValue: 'dayGLANCE could not run setup at all, so nothing was written. This is a fault in the app rather than in your configuration. Restart dayGLANCE, and if it persists, set the bridge up by hand with "npx -y @glance-apps/mcp-bridge" and please report the build.' })
+                              ? t('settings.mcpSetupUnavailable', { defaultValue: 'prodday could not run setup at all, so nothing was written. This is a fault in the app rather than in your configuration. Restart prodday, and if it persists, set the bridge up by hand with "npx -y @glance-apps/mcp-bridge" and please report the build.' })
                               : t('settings.mcpSetupWriteFailed', { defaultValue: 'The configuration could not be written automatically. To finish setup by hand, paste this entry into your Claude Desktop configuration file:' })}
                       </p>
                       {setupResult.reason === 'bridge_missing' && (

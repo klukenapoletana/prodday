@@ -76,7 +76,7 @@ export function shouldSuppressRetirementHeal(entityId, successor = null, nowMs =
     `LATCHED for this session: this device stops healing and stops tracking the row (the vault row ` +
     `itself is untouched; nothing is deleted). The retirement and the successor's tombstone ` +
     `contradict each other — if the task is missing, restore it by editing it in Obsidian or ` +
-    `re-creating it in dayGLANCE; reloading the app re-arms the breaker.`
+    `re-creating it in prodday; reloading the app re-arms the breaker.`
   );
   return true;
 }

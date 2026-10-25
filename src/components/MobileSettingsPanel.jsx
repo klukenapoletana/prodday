@@ -305,7 +305,7 @@ const MobileSettingsPanel = () => {
         <p onClick={() => setDevTapCount(c => c + 1)} className={`text-xs ${textSecondary} text-center pt-1`}>
           {/* Only two plans exist on every platform: annual and lifetime
               (dayglance_pro_lifetime / com.dayglance.pro.lifetime). */}
-          dayGLANCE Pro · {subProductId?.includes('lifetime') ? t('subscription.lifetime') : t('subscription.annual')}
+          prodday Pro · {subProductId?.includes('lifetime') ? t('subscription.lifetime') : t('subscription.annual')}
         </p>
       )}
     </div>

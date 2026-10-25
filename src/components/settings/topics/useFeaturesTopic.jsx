@@ -171,7 +171,7 @@ export default function useFeaturesTopic({ intentForm }) {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between gap-3">
                     <p className={`${textSecondary} text-xs`}>
-                      {t('settings.multiUserDescription', { defaultValue: 'Share dayGLANCE with your household. Tasks can be assigned to specific people; unassigned tasks are visible to everyone.' })}
+                      {t('settings.multiUserDescription', { defaultValue: 'Share prodday with your household. Tasks can be assigned to specific people; unassigned tasks are visible to everyone.' })}
                     </p>
                     {multiUserRosterSyncable && (
                       <button

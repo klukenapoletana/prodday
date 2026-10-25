@@ -32,7 +32,7 @@ class IntentReceiver : BroadcastReceiver() {
             Log.w(
                 "IntentReceiver",
                 "Dropped $action: Automation intents are disabled. " +
-                    "Enable them in dayGLANCE Settings to allow automation.",
+                    "Enable them in prodday Settings to allow automation.",
             )
             return
         }

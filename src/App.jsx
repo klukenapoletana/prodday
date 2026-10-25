@@ -9296,8 +9296,8 @@ const DayPlanner = () => {
                     {storagePersistDenied && (
                       <p className={`text-xs ${darkMode ? 'text-amber-400/90' : 'text-amber-700'} mb-1.5`}>
                         Your browser declined the request. Browsers usually only grant persistent
-                        storage once dayGLANCE is installed to your home screen. Open the browser
-                        menu and choose “Add to Home screen” / “Install app”, then reopen dayGLANCE
+                        storage once prodday is installed to your home screen. Open the browser
+                        menu and choose “Add to Home screen” / “Install app”, then reopen prodday
                         from the home-screen icon.
                       </p>
                     )}
@@ -9325,7 +9325,7 @@ const DayPlanner = () => {
                 )}
                 <div className={`flex items-center justify-between`}>
                   <p className={`text-xs ${textSecondary}`}>
-                    {typeof __APP_VERSION__ !== 'undefined' ? `v${__APP_VERSION__}` : 'dayGLANCE'}
+                    {typeof __APP_VERSION__ !== 'undefined' ? `v${__APP_VERSION__}` : 'prodday'}
                     {typeof __BUILD_TIMESTAMP__ !== 'undefined' ? ` · ${new Date(__BUILD_TIMESTAMP__).toLocaleString()}` : ''}
                   </p>
                   <button

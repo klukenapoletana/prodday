@@ -40,19 +40,19 @@ describe('NotesSubtasksPanel: local notes on a linked task', () => {
     const html = await render(linkedTask('stranded text'), { onLoadWikiNote: async () => ({ text: '' }), onSaveWikiNote: noop });
     expect(html).toContain('Projects/dayGLANCE/NEXT- Prepare');
     expect(html).toContain('data-local-notes="beside-linked"');
-    expect(html).toContain('Notes in dayGLANCE');
+    expect(html).toContain('Notes in prodday');
     expect(html).toContain('stranded text');
   });
   it('plugin shape, no local notes: the linked-note editor alone', async () => {
     const html = await render(linkedTask(''), { onLoadWikiNote: async () => ({ text: '' }), onSaveWikiNote: noop });
     expect(html).not.toContain('data-local-notes');
-    expect(html).not.toContain('Notes in dayGLANCE');
+    expect(html).not.toContain('Notes in prodday');
   });
   it('without the linked-note loader: the local block alone, plainly labelled', async () => {
     const html = await render(linkedTask('stranded text'));
     expect(html).toContain('data-local-notes="only"');
     expect(html).toContain('stranded text');
-    expect(html).not.toContain('Notes in dayGLANCE');
+    expect(html).not.toContain('Notes in prodday');
   });
 });
 

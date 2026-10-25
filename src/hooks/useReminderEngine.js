@@ -132,11 +132,11 @@ export default function useReminderEngine({
           playUISound('reminder');
           if (reminderSettings.browserNotifications && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
             if (window.electronAPI?.isElectron) {
-              try { new Notification('dayGLANCE', { body: i18n.t('reminders.weeklyReview') }); } catch {}
+              try { new Notification('prodday', { body: i18n.t('reminders.weeklyReview') }); } catch {}
             } else {
               try {
                 navigator.serviceWorker?.ready.then(reg => {
-                  reg.showNotification('dayGLANCE', { body: i18n.t('reminders.weeklyReview'), icon: '/icon-192.png', tag: 'weekly-review' });
+                  reg.showNotification('prodday', { body: i18n.t('reminders.weeklyReview'), icon: '/icon-192.png', tag: 'weekly-review' });
                 });
               } catch {}
             }

@@ -55,11 +55,6 @@ const MobileWelcomeModal = () => {
                 onChange={(e) => { const f = e.target.files[0]; if (f) restoreBackup(f); e.target.value = ''; }}
               />
             </label>
-            <div className={`mt-5 flex items-center justify-center gap-2 text-xs ${textSecondary}`}>
-              <a href="https://www.glance-apps.com/dayglance/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-500 transition-colors">{t('onboarding.privacyPolicy')}</a>
-              <span className="opacity-50">·</span>
-              <a href="https://www.glance-apps.com/eula" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-500 transition-colors">{t('onboarding.termsOfUse')}</a>
-            </div>
           </div>
         )}
         {mobileWelcomeStep === 1 && (

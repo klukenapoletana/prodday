@@ -509,7 +509,7 @@ export default function useIntegrationsTopic({ intentForm, setIntentForm }) {
                       </p>
                     )}
                     <p className={`text-xs ${textSecondary} mt-1`}>
-                      {t('settings.obsidianNewNotesFolderHint', { defaultValue: 'Where new notes created in dayGLANCE are saved. Leave empty for vault root.' })}
+                      {t('settings.obsidianNewNotesFolderHint', { defaultValue: 'Where new notes created in prodday are saved. Leave empty for vault root.' })}
                     </p>
                   </div>
                   <div>
@@ -897,7 +897,7 @@ export default function useIntegrationsTopic({ intentForm, setIntentForm }) {
             >
             <div className="space-y-3">
               <p className={`${textSecondary} text-xs`}>
-                {t('settings.glanceIntegrationsDesc', { defaultValue: 'Connect dayGLANCE to other Glance-compatible apps via a shared WebDAV event log.' })}
+                {t('settings.glanceIntegrationsDesc', { defaultValue: 'Connect prodday to other Glance-compatible apps via a shared WebDAV event log.' })}
               </p>
               {/* One card per protocol, each open from the start only when it is
                   on, so the page lists what is set up and folds the rest. */}

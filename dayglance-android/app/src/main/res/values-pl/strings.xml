@@ -88,8 +88,8 @@
         <item quantity="other">%d projektu</item>
     </plurals>
     <string name="config_standalone">Samodzielne</string>
-    <string name="config_no_goals">Nie znaleziono aktywnych celów.\n\nOtwórz dayGLANCE, aby zsynchronizować dane, a następnie spróbuj ponownie dodać widżet.</string>
-    <string name="config_no_projects">Nie znaleziono aktywnych projektów.\n\nOtwórz dayGLANCE, aby zsynchronizować dane, a następnie spróbuj ponownie dodać widżet.</string>
+    <string name="config_no_goals">Nie znaleziono aktywnych celów.\n\nOtwórz prodday, aby zsynchronizować dane, a następnie spróbuj ponownie dodać widżet.</string>
+    <string name="config_no_projects">Nie znaleziono aktywnych projektów.\n\nOtwórz prodday, aby zsynchronizować dane, a następnie spróbuj ponownie dodać widżet.</string>
     <string name="upnext_in_h">za %1$d godz.</string>
     <string name="upnext_in_h_m">za %1$d godz. %2$d min</string>
     <string name="upnext_in_m">za %1$d min</string>
@@ -148,10 +148,10 @@
     <string name="settings_filename_pattern_desc">Wzorzec daty nazwy pliku notatki (bez .md). Używa składni Java DateTimeFormatter.</string>
     <string name="settings_filename_pattern_hint">Wzorzec nazwy pliku (np. yyyy-MM-dd)</string>
     <string name="settings_new_notes_folder">Folder nowych notatek</string>
-    <string name="settings_new_notes_folder_desc">Folder, w którym zapisywane są notatki utworzone w dayGLANCE. Istniejące notatki są zawsze aktualizowane w miejscu, niezależnie od tego ustawienia.</string>
-    <string name="settings_new_notes_folder_hint">Folder nowych notatek (np. dayGLANCE)</string>
+    <string name="settings_new_notes_folder_desc">Folder, w którym zapisywane są notatki utworzone w prodday. Istniejące notatki są zawsze aktualizowane w miejscu, niezależnie od tego ustawienia.</string>
+    <string name="settings_new_notes_folder_hint">Folder nowych notatek (np. prodday)</string>
     <string name="health_permissions_title">Uprawnienia Health Connect</string>
-    <string name="health_intro">dayGLANCE korzysta z Health Connect, aby pokazywać Twój dzienny postęp jako pierścienie nawyków w widoku dnia.</string>
+    <string name="health_intro">prodday korzysta z Health Connect, aby pokazywać Twój dzienny postęp jako pierścienie nawyków w widoku dnia.</string>
     <string name="health_steps">Kroki</string>
     <string name="health_steps_desc">Odczytuje dzienną liczbę kroków, aby wypełnić pierścień nawyku kroków i pokazać postęp względem ustawionego przez Ciebie dziennego celu.</string>
     <string name="health_sleep">Sen</string>
@@ -159,12 +159,12 @@
     <string name="health_data_handling">Jak przetwarzamy Twoje dane</string>
     <string name="health_local_only">• Dane zdrowotne są odczytywane na urządzeniu i wyświetlane lokalnie w aplikacji.</string>
     <string name="health_no_analytics">• Nigdy nie są używane do analityki, udostępniane osobom trzecim ani zapisywane z powrotem w Health Connect.</string>
-    <string name="health_no_servers">• dayGLANCE nie ma serwerów prowadzonych przez dewelopera, systemu kont ani telemetrii.</string>
+    <string name="health_no_servers">• prodday nie ma serwerów prowadzonych przez dewelopera, systemu kont ani telemetrii.</string>
     <string name="health_cloud_sync">• Jeśli włączysz opcjonalną synchronizację w chmurze, dane nawyków są dołączane do przesyłanych danych i szyfrowane metodą zero-knowledge AES-256-GCM. Serwer docelowy (który kontrolujesz) widzi tylko zaszyfrowany tekst.</string>
-    <string name="health_optional">Przyznanie uprawnień Health Connect jest całkowicie opcjonalne. dayGLANCE działa normalnie bez nich. Możesz je cofnąć w dowolnym momencie w aplikacji Health Connect lub w ustawieniach systemowych urządzenia.</string>
+    <string name="health_optional">Przyznanie uprawnień Health Connect jest całkowicie opcjonalne. prodday działa normalnie bez nich. Możesz je cofnąć w dowolnym momencie w aplikacji Health Connect lub w ustawieniach systemowych urządzenia.</string>
     <string name="health_privacy_policy">Przeczytaj pełną politykę prywatności →</string>
     <string name="reminder_precise_title">Włącz dokładne przypomnienia</string>
-    <string name="reminder_precise_message">dayGLANCE potrzebuje uprawnienia do planowania dokładnych alarmów, aby przypomnienia o zadaniach docierały na czas, nawet gdy aplikacja jest zamknięta.\n\nDotknij „Przyznaj dostęp”, a następnie na kolejnym ekranie włącz „dayGLANCE”.</string>
+    <string name="reminder_precise_message">prodday potrzebuje uprawnienia do planowania dokładnych alarmów, aby przypomnienia o zadaniach docierały na czas, nawet gdy aplikacja jest zamknięta.\n\nDotknij „Przyznaj dostęp”, a następnie na kolejnym ekranie włącz „prodday”.</string>
     <string name="grant_access">Przyznaj dostęp</string>
     <string name="not_now">Nie teraz</string>
     <!-- Stale widget state: the stored snapshot describes another day (WidgetFreshness.kt) -->
@@ -176,8 +176,8 @@
         <item quantity="many">%1$d dni temu</item>
         <item quantity="other">%1$d dnia temu</item>
     </plurals>
-    <string name="widget_open_to_refresh">Otwórz dayGLANCE, aby odświeżyć</string>
-    <string name="widget_open_to_set_up">Otwórz dayGLANCE, aby skonfigurować</string>
+    <string name="widget_open_to_refresh">Otwórz prodday, aby odświeżyć</string>
+    <string name="widget_open_to_set_up">Otwórz prodday, aby skonfigurować</string>
     <string name="a11y_item_done">%1$s, zrobione</string>
     <string name="a11y_item_not_done">%1$s, niezrobione</string>
     <string name="a11y_habit_progress">%1$s, ukończono %2$d%%</string>
@@ -219,15 +219,15 @@
     <string name="day_dial_frames">Ramki</string>
     <string name="day_dial_sleep">Sen</string>
     <string name="day_dial_zone_changed">Zmieniono strefę czasową</string>
-    <string name="day_dial_open_to_refresh">Otwórz dayGLANCE, aby odświeżyć</string>
-    <string name="day_dial_open_to_set_up">Otwórz dayGLANCE, aby skonfigurować</string>
+    <string name="day_dial_open_to_refresh">Otwórz prodday, aby odświeżyć</string>
+    <string name="day_dial_open_to_set_up">Otwórz prodday, aby skonfigurować</string>
     <string name="day_dial_all_day">Cały dzień</string>
     <string name="day_dial_effort">Wysiłek</string>
     <string name="day_dial_restore">Odpoczynek</string>
     <string name="day_dial_legend_sleep">Sen</string>
     <string name="day_dial_unblocked">Wolny czas</string>
     <string name="day_dial_routines">Rutyny</string>
-    <string name="launcher_permission_label">Odczyt danych dayGLANCE dla GLANCElauncher</string>
+    <string name="launcher_permission_label">Odczyt danych prodday dla GLANCElauncher</string>
     <string name="launcher_refresh_notification">Odświeżanie dla GLANCElauncher</string>
     <string name="launcher_permission_description">Pozwala GLANCElauncher odczytywać zadania, cele, projekty, rutyny i ramy dnia oraz wysyłać zadania do utworzenia lub ukończenia.</string>
 </resources>

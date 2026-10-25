@@ -47,7 +47,7 @@ export const DAYGLANCE_CONFIG = {
   syncFilename:         'dayglance-sync.json',
   backupFilenamePrefix: 'dayglance-backup-',
   appId:                'dayglance',
-  appName:              'dayGLANCE',
+  appName:              'prodday',
 
   nativeHttpRequest: isNativeApp ? nativeHttpRequest : null,
   electronProxyFetch,

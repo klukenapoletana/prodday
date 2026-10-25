@@ -22,7 +22,7 @@ import {
 } from '../obsidian.js';
 
 export const directAppendFailureMessage = (title) =>
-  `Task "${title}" was not written to your vault: the daily note write failed. The task is saved in dayGLANCE.`;
+  `Task "${title}" was not written to your vault: the daily note write failed. The task is saved in prodday.`;
 
 export const directDailyNoteFailureMessage = (dateStr) =>
   `Daily note ${dateStr} was not written to your vault: the vault write failed. It will be written the next time you edit it.`;

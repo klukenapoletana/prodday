@@ -942,7 +942,7 @@ class MainActivity : AppCompatActivity() {
             Log.w(
                 "MainActivity",
                 "Dropped Activity intent $action: Automation intents are disabled. " +
-                    "Enable them in dayGLANCE Settings to allow automation.",
+                    "Enable them in prodday Settings to allow automation.",
             )
             return
         }
