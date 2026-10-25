@@ -44,3 +44,16 @@ describe('getRecurrenceLabel with an interval', () => {
     expect(label('de', { type: 'daily', interval: 4, maxOccurrences: 5 })).toBe('Alle 4 Tage (5 Mal)');
   });
 });
+
+describe('getRecurrenceLabel after completion', () => {
+  it('names only the distance, then "after completion"', () => {
+    const after = (rec) => ({ ...rec, anchor: 'completion' });
+    expect(label('de', after({ type: 'daily', interval: 4 }))).toBe('Alle 4 Tage ab Erledigung');
+    expect(label('de', after({ type: 'daily' }))).toBe('Jeden Tag ab Erledigung');
+    expect(label('de', after({ type: 'weekly', interval: 3, daysOfWeek: [1] }))).toBe('Alle 3 Wochen ab Erledigung');
+    expect(label('de', after({ type: 'biweekly', daysOfWeek: [1] }))).toBe('Alle 2 Wochen ab Erledigung');
+    expect(label('de', after({ type: 'monthly', monthDay: 15 }))).toBe('Jeden Monat ab Erledigung');
+    expect(label('en', after({ type: 'yearly', interval: 2, startDate: '2026-05-04' }))).toBe('Every 2 years after completion');
+    expect(label('pl', after({ type: 'weekly', interval: 5 }))).toBe('Co 5 tygodni od wykonania');
+  });
+});

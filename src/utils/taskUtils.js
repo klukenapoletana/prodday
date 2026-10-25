@@ -4,7 +4,7 @@ import {
   formatLocalizedDate,
   localizedWeekdays,
 } from './localeFormatting.js';
-import { recurrenceInterval } from './recurrenceEngine.js';
+import { recurrenceInterval, isCompletionAnchored } from './recurrenceEngine.js';
 
 // Format a Date object as a YYYY-MM-DD string in local time.
 // Defined here (not inline in App.jsx) so that useState initialisers that
@@ -291,6 +291,21 @@ export const getRecurrenceLabel = (rec, translate, language = 'en') => {
         ? translateOrDefault(translate, 'recurrence.everyNYears', { count: n }, `Every ${n} years`)
         : translateOrDefault(translate, 'recurrence.everyYear', {}, 'Every year');
     }
+  }
+
+  // "Every 4 days after completion": only the distance counts there, so the
+  // days and dates above do not apply (recurrence.js isCompletionAnchored).
+  if (isCompletionAnchored(rec)) {
+    const step = rec.type === 'biweekly' ? 2 : n;
+    const [key, unit] = {
+      daily: ['recurrence.everyNDays', 'days'],
+      weekly: ['recurrence.everyNWeeks', 'weeks'],
+      biweekly: ['recurrence.everyNWeeks', 'weeks'],
+      monthly: ['recurrence.everyNMonths', 'months'],
+      yearly: ['recurrence.everyNYears', 'years'],
+    }[rec.type] || ['recurrence.everyNDays', 'days'];
+    const every = translateOrDefault(translate, key, { count: step }, `Every ${step} ${unit}`);
+    label = translateOrDefault(translate, 'recurrence.afterCompletion', { label: every }, `${every} after completion`);
   }
 
   if (rec.endDate) {

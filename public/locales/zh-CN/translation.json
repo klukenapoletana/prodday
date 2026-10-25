@@ -966,7 +966,11 @@
     "unitWeeks_other": "周",
     "unitMonths_other": "个月",
     "unitYears_other": "年",
-    "intervalLabel": "重复间隔：每"
+    "intervalLabel": "重复间隔：每",
+    "anchorLabel": "节奏",
+    "anchorFixed": "固定",
+    "anchorCompletion": "完成后",
+    "afterCompletion": "完成后{{label}}"
   },
   "dateRange": {
     "sameMonth": "{{year}}年{{month}}{{startDay}}日至{{endDay}}日",

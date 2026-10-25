@@ -1029,7 +1029,11 @@
     "unitYears_few": "роки",
     "unitYears_many": "років",
     "unitYears_other": "року",
-    "intervalLabel": "Повторювати кожні"
+    "intervalLabel": "Повторювати кожні",
+    "anchorLabel": "Ритм",
+    "anchorFixed": "Сталий",
+    "anchorCompletion": "Від виконання",
+    "afterCompletion": "{{label}} від виконання"
   },
   "dateRange": {
     "sameMonth": "{{startDay}}–{{endDay}} {{month}} {{year}}",

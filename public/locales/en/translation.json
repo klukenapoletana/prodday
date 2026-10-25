@@ -978,7 +978,11 @@
     "unitMonths_other": "months",
     "unitYears_one": "year",
     "unitYears_other": "years",
-    "intervalLabel": "Repeat every"
+    "intervalLabel": "Repeat every",
+    "anchorLabel": "Rhythm",
+    "anchorFixed": "Fixed",
+    "anchorCompletion": "After completion",
+    "afterCompletion": "{{label}} after completion"
   },
   "dateRange": {
     "sameMonth": "{{month}} {{startDay}}–{{endDay}}, {{year}}",

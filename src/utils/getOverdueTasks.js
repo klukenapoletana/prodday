@@ -2,7 +2,9 @@
 // App.jsx supplies both clocks: todayStr comes from the wall clock, while now
 // is currentTime (or its wall-clock fallback). Keep them separate at rollover.
 import { dateToString } from './taskUtils.js';
-import { occurrenceRecurrenceType, getOccurrencesInRange } from './recurrenceEngine.js';
+import {
+  occurrenceRecurrenceType, getOccurrencesInRange, isCompletionAnchored, getPendingOccurrence,
+} from './recurrenceEngine.js';
 import { notBucketed } from './bucketList.js';
 
 /**
@@ -41,6 +43,30 @@ export function getOverdueTasks({
     t.date === todayStr && !t.completed && !t.isExample && isVisibleForUser(t) && isOverdueToday(t)
   ).map(t => ({ ...t, _overdueType: 'scheduled' }));
 
+  // A past occurrence of a series, as the overdue list shows it.
+  const overdueOccurrence = (template, dateStr, exception, timing) => ({
+    id: `recurring-${template.id}-${dateStr}`,
+    title: exception?.title ?? template.title,
+    ...timing,
+    duration: exception?.duration ?? template.duration,
+    color: exception?.color ?? template.color,
+    completed: false,
+    notes: template.notes || '',
+    subtasks: template.subtasks || [],
+    // Energy-axis override is series-level (see setTaskEnergy); the
+    // expansion is an explicit field list, so it must be carried here or
+    // instances silently fall back to auto-derivation.
+    energy: template.energy,
+    date: dateStr,
+    isRecurring: true,
+    recurringTemplateId: template.id,
+    recurrenceType: occurrenceRecurrenceType(template.recurrence),
+    // Project membership is series-level (stored on the template);
+    // instances inherit it so project-filtered views keep occurrences.
+    projectId: template.projectId,
+    _overdueType: 'scheduled',
+  });
+
   // Past uncompleted recurring all-day instances (look back up to 7 days)
   const overdueRecurringAllDay = [];
   for (let i = 1; i <= 7; i++) {
@@ -50,6 +76,7 @@ export function getOverdueTasks({
     for (const template of recurringTasks) {
       if (template.isExample) continue;
       if (!isVisibleForUser(template)) continue;
+      if (isCompletionAnchored(template.recurrence)) continue; // below
       const isTemplateAllDay = template.isAllDay ?? false;
       if (!isTemplateAllDay) continue;
       const occs = getOccurrencesInRange(template, dateStr, dateStr);
@@ -60,30 +87,26 @@ export function getOverdueTasks({
       const instanceId = `recurring-${template.id}-${dateStr}`;
       // Skip if already covered by overdueScheduled (shouldn't happen for recurring, but be safe)
       if (overdueScheduled.some(t => t.id === instanceId)) continue;
-      overdueRecurringAllDay.push({
-        id: instanceId,
-        title: exception?.title ?? template.title,
-        startTime: null,
-        duration: exception?.duration ?? template.duration,
-        color: exception?.color ?? template.color,
-        completed: false,
-        isAllDay: true,
-        notes: template.notes || '',
-        subtasks: template.subtasks || [],
-        // Energy-axis override is series-level (see setTaskEnergy); the
-        // expansion is an explicit field list, so it must be carried here or
-        // instances silently fall back to auto-derivation.
-        energy: template.energy,
-        date: dateStr,
-        isRecurring: true,
-        recurringTemplateId: template.id,
-        recurrenceType: occurrenceRecurrenceType(template.recurrence),
-        // Project membership is series-level (stored on the template);
-        // instances inherit it so project-filtered views keep occurrences.
-        projectId: template.projectId,
-        _overdueType: 'scheduled',
-      });
+      overdueRecurringAllDay.push(overdueOccurrence(template, dateStr, exception, { startTime: null, isAllDay: true }));
     }
+  }
+
+  // An "after completion" series waits for its one open occurrence however
+  // long ago it was due, timed or all-day: nothing is queued behind it, so
+  // dropping it from the list after a week would lose the series from view.
+  const overdueAfterCompletion = [];
+  for (const template of recurringTasks) {
+    if (template.isExample || !isVisibleForUser(template)) continue;
+    if (!isCompletionAnchored(template.recurrence)) continue;
+    const dateStr = getPendingOccurrence(template);
+    if (!dateStr || dateStr >= todayStr) continue;
+    const exception = template.exceptions?.[dateStr];
+    if (exception?.completed) continue;
+    const isAllDay = exception?.isAllDay ?? template.isAllDay ?? false;
+    overdueAfterCompletion.push(overdueOccurrence(template, dateStr, exception, {
+      startTime: isAllDay ? null : (exception?.startTime ?? template.startTime ?? null),
+      isAllDay,
+    }));
   }
 
   // Inbox tasks with past deadlines (bucket items never nag)
@@ -91,5 +114,5 @@ export function getOverdueTasks({
     notBucketed(t) && t.deadline && t.deadline < todayStr && !t.completed && !t.isExample && isVisibleForUser(t)
   ).map(t => ({ ...t, _overdueType: 'deadline' }));
 
-  return [...overdueScheduled, ...todayRecurring, ...overdueRecurringAllDay, ...overdueDeadlines];
+  return [...overdueScheduled, ...todayRecurring, ...overdueRecurringAllDay, ...overdueAfterCompletion, ...overdueDeadlines];
 }

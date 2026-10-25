@@ -992,7 +992,11 @@
     "unitYears_one": "anno",
     "unitYears_many": "anni",
     "unitYears_other": "anni",
-    "intervalLabel": "Ripeti ogni"
+    "intervalLabel": "Ripeti ogni",
+    "anchorLabel": "Ritmo",
+    "anchorFixed": "Fisso",
+    "anchorCompletion": "Dal completamento",
+    "afterCompletion": "{{label}} dal completamento"
   },
   "dateRange": {
     "sameMonth": "{{startDay}}–{{endDay}} {{month}} {{year}}",

@@ -320,3 +320,33 @@ describe('App.jsx overdue wrapper', () => {
     expect(getOverdue().map(item => item.id)).toEqual(['boundary']);
   });
 });
+
+describe('getOverdueTasks: after-completion series', () => {
+  const after = (patch = {}) => template('ac', {
+    isAllDay: false, startTime: '08:00',
+    recurrence: { type: 'daily', interval: 3, startDate: '2026-09-01', anchor: 'completion' },
+    ...patch,
+  });
+
+  it('keeps the one open occurrence however long ago it was due, timed or all-day', () => {
+    expect(ids({ recurringTasks: [after()] })).toEqual(['recurring-ac-2026-09-01']);
+    expect(ids({ recurringTasks: [after({ isAllDay: true })] })).toEqual(['recurring-ac-2026-09-01']);
+    const [item] = getOverdueTasks(base({ recurringTasks: [after()] }));
+    expect(item).toMatchObject({ startTime: '08:00', isAllDay: false, date: '2026-09-01', recurringTemplateId: 'ac' });
+  });
+
+  it('lists it once, not again from the all-day lookback', () => {
+    const t = after({ isAllDay: true, recurrence: { type: 'daily', startDate: '2026-10-08', anchor: 'completion' } });
+    expect(ids({ recurringTasks: [t] })).toEqual(['recurring-ac-2026-10-08']);
+  });
+
+  it('is not overdue once ticked off, or while the open one is today or later', () => {
+    const done = after({
+      completedDates: ['2026-09-01'],
+      completedDatesTimestamps: { '2026-09-01': new Date('2026-10-09T12:00:00').toISOString() },
+    });
+    expect(ids({ recurringTasks: [done] })).toEqual([]);
+    expect(ids({ recurringTasks: [after({ recurrence: { type: 'daily', startDate: TODAY, anchor: 'completion' } })] }))
+      .toEqual([]);
+  });
+});

@@ -1023,7 +1023,11 @@
     "unitYears_few": "lata",
     "unitYears_many": "lat",
     "unitYears_other": "roku",
-    "intervalLabel": "Powtarzaj co"
+    "intervalLabel": "Powtarzaj co",
+    "anchorLabel": "Rytm",
+    "anchorFixed": "Stały",
+    "anchorCompletion": "Od wykonania",
+    "afterCompletion": "{{label}} od wykonania"
   },
   "dateRange": {
     "sameMonth": "{{startDay}}–{{endDay}} {{month}} {{year}}",

@@ -25,7 +25,9 @@ export const recurrenceInterval = (rec) =>
  * (no "move to tomorrow": tomorrow has one anyway); a daily series with an
  * interval does not qualify.
  */
-export const isEveryDay = (rec) => rec?.type === 'daily' && recurrenceInterval(rec) === 1;
+// An after-completion series is not one: its next day depends on the tick.
+export const isEveryDay = (rec) =>
+  rec?.type === 'daily' && recurrenceInterval(rec) === 1 && rec.anchor !== 'completion';
 
 /**
  * The `recurrenceType` an expanded occurrence carries: the series' type,
@@ -34,6 +36,100 @@ export const isEveryDay = (rec) => rec?.type === 'daily' && recurrenceInterval(r
  */
 export const occurrenceRecurrenceType = (rec) =>
   (rec?.type === 'daily' && !isEveryDay(rec) ? 'daily-interval' : rec?.type);
+
+// ── "After completion" series ────────────────────────────────────────────────
+// recurrence.anchor === 'completion': the next occurrence is counted from the
+// day the previous one was ticked off, not from a fixed rhythm. Such a series
+// has one open occurrence at a time; its done ones stay where they were due.
+//
+// The open one ("pending") is found from the done set (completedDates, plus
+// occurrences skipped or deleted by an exception):
+//   - nothing done since startDate (or startDate after the last done one,
+//     which is how a moved series re-anchors): startDate itself;
+//   - otherwise interval units after the day the last done one was ticked
+//     off (completedDatesTimestamps, written by every toggle), never on or
+//     before that last done one's own date. A done one without a stamp (a
+//     skip, an older row) counts from its own date.
+// Weekdays and the day of the month play no part: every 2 weeks after
+// completion is 14 days after the tick.
+
+/** Whether a series counts each occurrence from the previous one's completion. */
+export const isCompletionAnchored = (rec) => rec?.anchor === 'completion';
+
+const noonOf = (dateStr) => new Date(dateStr + 'T12:00:00');
+
+/** `dateStr` plus the series' step (n days, weeks, months or years), clamping month ends. */
+const stepFrom = (dateStr, rec) => {
+  const n = rec.type === 'biweekly' ? 2 : recurrenceInterval(rec);
+  const d = noonOf(dateStr);
+  if (rec.type === 'weekly' || rec.type === 'biweekly') {
+    d.setDate(d.getDate() + 7 * n);
+  } else if (rec.type === 'monthly' || rec.type === 'yearly') {
+    const months = rec.type === 'monthly' ? n : 12 * n;
+    const day = d.getDate();
+    d.setDate(1);
+    d.setMonth(d.getMonth() + months);
+    d.setDate(Math.min(day, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()));
+  } else {
+    d.setDate(d.getDate() + n);
+  }
+  return dateToString(d);
+};
+
+const localDayOf = (iso) => {
+  const t = new Date(iso);
+  return Number.isNaN(t.getTime()) ? null : dateToString(t);
+};
+
+/**
+ * The open occurrence of an after-completion series (YYYY-MM-DD), or null
+ * when the series is over (endDate, maxOccurrences) or has no start.
+ */
+export const getPendingOccurrence = (template) => {
+  const rec = template?.recurrence;
+  if (!rec?.startDate) return null;
+  const completed = template.completedDates || [];
+  if (rec.maxOccurrences && completed.length >= rec.maxOccurrences) return null;
+  const done = new Set(completed);
+  for (const [date, ex] of Object.entries(template.exceptions || {})) {
+    if (ex?.deleted || ex?.skipped) done.add(date);
+  }
+  let lastDone = null;
+  for (const date of done) if (!lastDone || date > lastDone) lastDone = date;
+
+  let pending;
+  if (!lastDone || rec.startDate > lastDone) {
+    pending = rec.startDate;
+  } else {
+    const stamp = completed.includes(lastDone) ? template.completedDatesTimestamps?.[lastDone] : null;
+    const next = stepFrom((stamp && localDayOf(stamp)) || lastDone, rec);
+    const dayAfter = noonOf(lastDone);
+    dayAfter.setDate(dayAfter.getDate() + 1);
+    const floor = dateToString(dayAfter);
+    pending = next > floor ? next : floor;
+  }
+  if (rec.endDate && pending > rec.endDate) return null;
+  return pending;
+};
+
+/**
+ * Move an after-completion series' open occurrence from `fromDate` to
+ * `toDate`, as a NEW template: the series re-anchors there (startDate), and
+ * the moved occurrence's own overrides go with it, merged with `overrides`
+ * (a new start time, all-day). Null when that is not what the move means:
+ * not such a series, `fromDate` is not its open occurrence, or `toDate` is
+ * not after its last done one. Callers fall back to their usual handling.
+ */
+export const reanchorCompletionSeries = (template, fromDate, toDate, overrides = {}) => {
+  if (!isCompletionAnchored(template?.recurrence)) return null;
+  if (!toDate || getPendingOccurrence(template) !== fromDate) return null;
+  const moved = { ...template, recurrence: { ...template.recurrence, startDate: toDate } };
+  if (getPendingOccurrence(moved) !== toDate) return null;
+  const { [fromDate]: fromException, ...exceptions } = template.exceptions || {};
+  const { deleted: _d, skipped: _s, completed: _c, ...carried } = { ...(fromException || {}), ...overrides };
+  if (Object.keys(carried).length) exceptions[toDate] = { ...(exceptions[toDate] || {}), ...carried };
+  return { ...moved, exceptions };
+};
 
 /**
  * Compute all occurrence date strings (YYYY-MM-DD) of a recurring task template
@@ -50,6 +146,17 @@ export const occurrenceRecurrenceType = (rec) =>
 export const getOccurrencesInRange = (template, rangeStartStr, rangeEndStr, maxResults = Infinity) => {
   const rec = template.recurrence;
   if (!rec) return [];
+  if (isCompletionAnchored(rec)) {
+    // The done ones where they were due, and the one open occurrence.
+    const dates = new Set(template.completedDates || []);
+    const pending = getPendingOccurrence(template);
+    if (pending) dates.add(pending);
+    const hidden = (d) => template.exceptions?.[d]?.deleted || template.exceptions?.[d]?.skipped;
+    return [...dates]
+      .filter((d) => d >= rangeStartStr && d <= rangeEndStr && !hidden(d))
+      .sort()
+      .slice(0, maxResults);
+  }
   const results = [];
   const startDate = new Date(rec.startDate + 'T12:00:00');
   const rangeStart = new Date(rangeStartStr + 'T12:00:00');
@@ -280,6 +387,11 @@ const sundayOf = (dateStr) => {
 export const editedSeriesStart = (recurrence, origStart, dateStr) => {
   if (!origStart || dateStr < origStart) return dateStr;
 
+  // An after-completion series counts from its completions, not from a
+  // phase, so a pattern change keeps its start (moving it is
+  // reanchorCompletionSeries).
+  if (isCompletionAnchored(recurrence)) return origStart;
+
   // A series with an interval ("every 3 weeks") takes its phase from
   // startDate, whatever its type, as biweekly does. Keep the start when it
   // already produces the edited occurrence; otherwise move it forward to the
@@ -419,11 +531,12 @@ export const recurrenceUnitAndInterval = (recurrence) => {
 export const setRecurrenceInterval = (recurrence, unit, n, dateStr) => {
   if (!INTERVAL_UNITS.includes(unit)) return recurrence;
   const count = Math.min(MAX_INTERVAL, Math.max(1, Math.round(Number(n)) || 1));
-  const withInterval = (rec) => (count > 1 ? { ...rec, interval: count } : rec);
+  const anchor = isCompletionAnchored(recurrence) ? { anchor: 'completion' } : {};
+  const withInterval = (rec) => ({ ...rec, ...(count > 1 ? { interval: count } : {}), ...anchor });
   if (unit === 'weekly') {
     const days = getSelectedWeekdays(recurrence, dateStr);
     const daysOfWeek = days.length ? days : [new Date(dateStr + 'T12:00:00').getDay()];
-    if (count === 2) return { type: 'biweekly', daysOfWeek };
+    if (count === 2) return { type: 'biweekly', daysOfWeek, ...anchor };
     return withInterval({ type: 'weekly', daysOfWeek });
   }
   if (unit === 'monthly') {
@@ -433,4 +546,14 @@ export const setRecurrenceInterval = (recurrence, unit, n, dateStr) => {
     return withInterval({ type: 'monthly', ...keep });
   }
   return withInterval({ type: unit });
+};
+
+/**
+ * Switch a recurrence between a fixed rhythm and "after completion", as a NEW
+ * recurrence. Everything else (unit, interval, days, end conditions) stays.
+ */
+export const setRecurrenceAnchor = (recurrence, anchor) => {
+  if (!recurrence) return recurrence;
+  const { anchor: _old, ...rest } = recurrence;
+  return anchor === 'completion' ? { ...rest, anchor: 'completion' } : rest;
 };

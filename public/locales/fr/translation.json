@@ -990,7 +990,11 @@
     "unitYears_one": "an",
     "unitYears_many": "ans",
     "unitYears_other": "ans",
-    "intervalLabel": "Répéter tous les"
+    "intervalLabel": "Répéter tous les",
+    "anchorLabel": "Rythme",
+    "anchorFixed": "Fixe",
+    "anchorCompletion": "Après achèvement",
+    "afterCompletion": "{{label}} après achèvement"
   },
   "dateRange": {
     "sameMonth": "{{startDay}}–{{endDay}} {{month}} {{year}}",

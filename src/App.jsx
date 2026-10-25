@@ -86,7 +86,7 @@ import { buildWidgetDueOn } from './utils/widgetGoalsProjects.js';
 import { resolveGoalsLink, areaFilterHides } from './utils/goalsLink.js';
 import { HABIT_ICONS, HABIT_ICON_NAMES, HABIT_COLORS } from './constants/habits.js';
 import { FRAME_COLORS } from './constants/frames.js';
-import { isEveryDay, getOccurrencesInRange, getRecurrencePresets } from './utils/recurrenceEngine.js';
+import { isEveryDay, getOccurrencesInRange, getRecurrencePresets, reanchorCompletionSeries } from './utils/recurrenceEngine.js';
 import { getPartialTag, getFilteredTags, applyTagCompletion, getPartialDate, getPartialTime, getPartialDeadline, getPartialPriority, getPartialDuration, getDateCandidates, parseFlexibleDate, getTimeCandidates, parseFlexibleTime, completeShortcutText, cleanTitle, removeFromTitle } from './utils/suggestionParser.js';
 import ClockTimePicker from './components/ClockTimePicker.jsx';
 import { HabitRing, MiniHabitRing } from './components/HabitRing.jsx';
@@ -3460,7 +3460,7 @@ const DayPlanner = () => {
   } = useDragDrop({
     calendarRef, timeGridRef,
     setNewTask, setShowAddTask, selectedDate, setExpandedNotesTaskId,
-    tasks, setTasks, setUnscheduledTasks, setRecurringTasks, setRecycleBin, setTodayRoutines,
+    tasks, setTasks, setUnscheduledTasks, recurringTasks, setRecurringTasks, setRecycleBin, setTodayRoutines,
     pushUndo, parseRecurringId, getAdjustedTimeForImportedConflicts, wouldExceedMaxColumns,
     playUISound, setSyncNotification, onboardingProgress, setOnboardingProgress,
     moveToRecycleBinRef, clearDeadlineRef,
@@ -3999,7 +3999,22 @@ const DayPlanner = () => {
         } else {
           const dateChanged = newTask.date && newTask.date !== parsed.dateStr;
           const isDaily = isEveryDay(newTask.recurrence);
-          if (dateChanged && !isDaily) {
+          // An "after completion" series moves as a whole: its open occurrence
+          // re-anchors on the new date, and the rest of the edit lands there.
+          const editedTemplate = recurringTasks.find(t => t.id === parsed.templateId);
+          const reanchored = dateChanged && editedTemplate
+            && reanchorCompletionSeries(editedTemplate, parsed.dateStr, newTask.date);
+          if (reanchored) {
+            setRecurringTasks(prev => prev.map(t => t.id !== parsed.templateId ? t : applyRecurringInstanceEdit(reanchored, {
+              dateStr: newTask.date,
+              edit: recurringInstanceEditFrom(newTask),
+              scope: scope || 'this',
+              projectId: newTask.projectId,
+              recurrence: newTask.recurrence,
+              now: new Date().toISOString(),
+              defaultColor: colors[0].class,
+            })));
+          } else if (dateChanged && !isDaily) {
             // Date changed for a non-daily recurring instance:
             // skip the original occurrence and create a one-off task on the new date
             setRecurringTasks(prev => prev.map(t => {

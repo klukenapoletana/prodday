@@ -8,6 +8,8 @@ import {
   toggleRecurrenceDay,
   setRecurrenceFrequency,
   setRecurrenceInterval,
+  setRecurrenceAnchor,
+  isCompletionAnchored,
   recurrenceUnitAndInterval,
   weekdayOrder,
   MAX_INTERVAL,
@@ -51,6 +53,9 @@ const RecurrencePicker = ({ placement = 'bottom', highlightSelected = false }) =
   const recurrence = newTask.recurrence;
   const selectedDays = getSelectedWeekdays(recurrence, dateStr);
   const isWeekly = recurrence?.type === 'weekly' || recurrence?.type === 'biweekly';
+  // "After completion" counts only the distance (recurrence.js
+  // getPendingOccurrence), so the day grid has nothing to say there.
+  const afterCompletion = isCompletionAnchored(recurrence);
 
   // Narrow weekday initials in the user's own language, so the row reads
   // M T W T F S S / L M M J V S D without shipping seven more strings.
@@ -97,6 +102,26 @@ const RecurrencePicker = ({ placement = 'bottom', highlightSelected = false }) =
   const applyInterval = (nextUnit, nextCount) =>
     setNewTask({ ...newTask, recurrence: { ...setRecurrenceInterval(recurrence, nextUnit, nextCount, dateStr), ...endFields() } });
 
+  // A preset is a fixed rhythm; the anchor survives everything else.
+  const applyAnchor = (anchor) =>
+    setNewTask({ ...newTask, recurrence: { ...setRecurrenceAnchor(recurrence, anchor), ...endFields() } });
+
+  const segment = (active, onClick, label, attr) => (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      data-recurrence-anchor={attr}
+      className={`flex-1 px-2 py-1 text-xs rounded-md border ${borderClass} transition-colors ${
+        active
+          ? 'bg-blue-600 text-white border-blue-600'
+          : `${darkMode ? 'bg-gray-700 text-gray-200' : 'bg-white'} ${textPrimary}`
+      }`}
+    >
+      {label}
+    </button>
+  );
+
   const freqButton = (type, label) => (
     <button
       type="button"
@@ -113,7 +138,7 @@ const RecurrencePicker = ({ placement = 'bottom', highlightSelected = false }) =
 
   return (
     <div
-      className={`absolute ${placement === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'} left-0 ${cardBg} rounded-lg shadow-xl z-30 border ${borderClass} min-w-[250px] max-h-[380px] flex flex-col`}
+      className={`absolute ${placement === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'} left-0 ${cardBg} rounded-lg shadow-xl z-30 border ${borderClass} min-w-[250px] max-h-[440px] flex flex-col`}
     >
       {/* Only the presets scroll. The day grid is pinned below them: it is the
           part people will not think to look for, and eight presets are enough
@@ -135,6 +160,7 @@ const RecurrencePicker = ({ placement = 'bottom', highlightSelected = false }) =
       ))}
       </div>
 
+      {!afterCompletion && (
       <div className={`border-t ${borderClass} px-3 py-2 flex-shrink-0`}>
         <span className={`block text-xs font-medium ${textSecondary} mb-1.5`}>{t('task.repeatOn')}</span>
         <div className="flex gap-1">
@@ -165,6 +191,7 @@ const RecurrencePicker = ({ placement = 'bottom', highlightSelected = false }) =
           </div>
         )}
       </div>
+      )}
 
       <div className={`border-t ${borderClass} px-3 py-2 flex-shrink-0`} data-recurrence-interval>
         <label className={`block text-xs font-medium ${textSecondary} mb-1.5`} htmlFor="recurrence-interval-count">
@@ -199,6 +226,15 @@ const RecurrencePicker = ({ placement = 'bottom', highlightSelected = false }) =
             ))}
           </select>
         </div>
+        {recurrence && (
+          <>
+            <span className={`block text-xs font-medium ${textSecondary} mt-2 mb-1.5`}>{t('recurrence.anchorLabel')}</span>
+            <div className="flex gap-1">
+              {segment(!afterCompletion, () => applyAnchor('fixed'), t('recurrence.anchorFixed'), 'fixed')}
+              {segment(afterCompletion, () => applyAnchor('completion'), t('recurrence.anchorCompletion'), 'completion')}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -978,7 +978,11 @@
     "unitMonths_other": "Monate",
     "unitYears_one": "Jahr",
     "unitYears_other": "Jahre",
-    "intervalLabel": "Wiederholen alle"
+    "intervalLabel": "Wiederholen alle",
+    "anchorLabel": "Rhythmus",
+    "anchorFixed": "Fest",
+    "anchorCompletion": "Ab Erledigung",
+    "afterCompletion": "{{label}} ab Erledigung"
   },
   "dateRange": {
     "sameMonth": "{{startDay}}.–{{endDay}}. {{month}} {{year}}",
