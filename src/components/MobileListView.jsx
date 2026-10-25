@@ -1319,7 +1319,7 @@ const MobileListView = ({ hideInboxHandle = false }) => {
   }, [visibleItems, isToday, nowMin, timeToMinutes, listEndOfDayTime]);
 
   // Page background colour — used behind markers (checkbox fill) and long-gap dashed overlays
-  const pageBg = darkMode ? '#1f2937' : '#ffffff';
+  const pageBg = darkMode ? 'rgb(var(--gray-800))' : '#ffffff';
 
   // Single continuous background spine gradient covering the visible time range
   const bgSpineGradient = useMemo(() => {

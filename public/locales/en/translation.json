@@ -778,6 +778,7 @@
     },
     "theme": "Theme",
     "themeSystem": "System",
+    "themeOled": "OLED",
     "glanceWebdavLog": "WebDAV event log",
     "aiNeedsKey": "Add an API key above to turn these on.",
     "binAutoEmpty": "Empty the Recycle Bin automatically",

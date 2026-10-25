@@ -168,7 +168,7 @@ import useCloudSyncAfterEdit from './hooks/useCloudSyncAfterEdit.js';
 import { createDbEngine, resetVaultSyncCursor } from './sync/dbEngine.js';
 import { deriveBlockEnergy } from './utils/energyAxis.js';
 import { isVaultEnabled } from './sync/vaultConfig.js';
-import { readThemePref, systemPrefersDark, resolveDarkMode, restoredThemePref, THEME_PREF_KEY } from './utils/themePref.js';
+import { readThemePref, systemPrefersDark, resolveDarkMode, isOledTheme, restoredThemePref, THEME_PREF_KEY } from './utils/themePref.js';
 import { keepImportedTask } from './sync/payloadExclusions.js';
 import { canEnableMultiUser } from './utils/multiUserGate.js';
 import { encryptData, hasEncryptionReady } from './utils/crypto.js';
@@ -2194,22 +2194,27 @@ const DayPlanner = () => {
   // in useLocalStoragePersist, hence the nudge lives here too.
   useNotifyTrayOnChange(darkMode);
 
-  // Persist darkMode to localStorage and update theme-color meta tag
+  // Persist darkMode to localStorage and update theme-color meta tag. The OLED
+  // theme is the dark theme on true black: the `oled` class swaps the dark
+  // grays (index.css), and the page and browser chrome go black with it.
+  const oledTheme = darkMode && isOledTheme(themePref);
   useEffect(() => {
     writeItem('day-planner-darkmode', JSON.stringify(darkMode));
     document.documentElement.classList.toggle('dark', darkMode);
+    document.documentElement.classList.toggle('oled', oledTheme);
     document.documentElement.style.colorScheme = darkMode ? 'dark' : 'light';
-    document.documentElement.style.backgroundColor = darkMode ? '#1f2937' : '#ffffff';
+    const darkPage = oledTheme ? '#000000' : '#1f2937';
+    document.documentElement.style.backgroundColor = darkMode ? darkPage : '#ffffff';
     // Electron: report the theme so the next launch's window surface is created
     // in the matching color instead of flashing the default white.
     window.electronAPI?.setWindowTheme?.(darkMode);
     const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    if (themeColorMeta) themeColorMeta.setAttribute('content', darkMode ? '#1f2937' : '#ffffff');
+    if (themeColorMeta) themeColorMeta.setAttribute('content', darkMode ? darkPage : '#ffffff');
     // Sync status-bar icon colour with the app's own theme.  The app has its own
     // dark-mode toggle independent of the OS appearance setting, so the native
     // side can't reliably read the system uiMode/trait — it has to be told.
     if (isNativeApp()) window.DayGlanceNative?.setStatusBarAppearance?.(darkMode);
-  }, [darkMode]);
+  }, [darkMode, oledTheme]);
 
   useEffect(() => {
     writeItem('day-planner-view-mode', JSON.stringify(viewMode));

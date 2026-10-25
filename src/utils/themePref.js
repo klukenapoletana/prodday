@@ -1,6 +1,6 @@
 // The theme preference (#2075, docs/settings-redesign.md "Theme: System"):
-// 'light', 'dark', or 'system' (follow the OS, live). Same three values as
-// lastGLANCE. The resolved boolean keeps living in `day-planner-darkmode`,
+// 'light', 'dark', 'oled' (dark on true black, for OLED screens), or 'system'
+// (follow the OS, live). The resolved boolean keeps living in `day-planner-darkmode`,
 // because the tray popup, the subscription wall, backups and the Electron
 // window colour all read it; the preference is stored beside it.
 //
@@ -10,7 +10,7 @@
 
 export const THEME_PREF_KEY = 'day-planner-theme-pref';
 export const LEGACY_DARK_KEY = 'day-planner-darkmode';
-export const THEME_PREFS = ['light', 'dark', 'system'];
+export const THEME_PREFS = ['light', 'dark', 'oled', 'system'];
 
 export const isThemePref = (value) => THEME_PREFS.includes(value);
 
@@ -30,16 +30,24 @@ export function systemPrefersDark(win = globalThis.window) {
 }
 
 export function resolveDarkMode(pref, systemDark) {
-  return pref === 'dark' || (pref === 'system' && !!systemDark);
+  return pref === 'dark' || pref === 'oled' || (pref === 'system' && !!systemDark);
 }
 
-/** The label for a preference: Light, Dark or System. */
+/**
+ * Whether the dark theme draws on true black. 'oled' is the dark theme with
+ * its grays swapped through CSS variables (the `oled` class on <html>, see
+ * index.css and tailwind.config.js), so every dark-mode reader stays as it is.
+ */
+export const isOledTheme = (pref) => pref === 'oled';
+
+/** The label for a preference: Light, Dark, OLED or System. */
 export function themeLabel(t, pref) {
   if (pref === 'system') return t('settings.themeSystem', 'System');
+  if (pref === 'oled') return t('settings.themeOled', 'OLED');
   return pref === 'dark' ? t('settings.darkMode', 'Dark') : t('settings.lightMode', 'Light');
 }
 
-/** The mobile quick tile's cycle: Light → Dark → System → Light. */
+/** The mobile quick tile's cycle: Light → Dark → OLED → System → Light. */
 export function nextThemePref(pref) {
   return THEME_PREFS[(THEME_PREFS.indexOf(pref) + 1) % THEME_PREFS.length] ?? 'light';
 }

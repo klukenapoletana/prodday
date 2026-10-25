@@ -198,7 +198,7 @@ const HabitModal = () => {
                           className={`w-9 h-9 rounded-full ${c.bg} transition-all ${
                             editingHabit.color === c.name ? 'ring-2 ring-offset-2 ring-blue-500' : 'opacity-70 hover:opacity-100'
                           }`}
-                          style={editingHabit.color === c.name && darkMode ? { ringOffsetColor: '#1f2937' } : undefined}
+                          style={editingHabit.color === c.name && darkMode ? { ringOffsetColor: 'rgb(var(--gray-800))' } : undefined}
                         />
                       ))}
                     </div>

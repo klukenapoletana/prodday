@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readThemePref, resolveDarkMode, nextThemePref, restoredThemePref, systemPrefersDark, THEME_PREF_KEY, LEGACY_DARK_KEY } from './themePref.js';
+import { readThemePref, resolveDarkMode, isOledTheme, themeLabel, nextThemePref, restoredThemePref, systemPrefersDark, THEME_PREF_KEY, LEGACY_DARK_KEY } from './themePref.js';
 
 const storage = (entries = {}) => ({ getItem: (k) => (k in entries ? entries[k] : null) });
 
@@ -15,6 +15,7 @@ describe('readThemePref', () => {
 
   it('prefers the stored preference, and ignores garbage', () => {
     expect(readThemePref(storage({ [THEME_PREF_KEY]: 'system', [LEGACY_DARK_KEY]: 'true' }))).toBe('system');
+    expect(readThemePref(storage({ [THEME_PREF_KEY]: 'oled', [LEGACY_DARK_KEY]: 'true' }))).toBe('oled');
     expect(readThemePref(storage({ [THEME_PREF_KEY]: 'blue', [LEGACY_DARK_KEY]: 'true' }))).toBe('dark');
     expect(readThemePref({ getItem: () => { throw new Error('blocked'); } })).toBe('system');
   });
@@ -28,6 +29,13 @@ describe('resolveDarkMode', () => {
     expect(resolveDarkMode('light', true)).toBe(false);
   });
 
+  it('is dark on OLED, whatever the OS says, and only OLED is true black', () => {
+    expect(resolveDarkMode('oled', false)).toBe(true);
+    expect(resolveDarkMode('oled', true)).toBe(true);
+    expect(isOledTheme('oled')).toBe(true);
+    expect(['light', 'dark', 'system'].some(isOledTheme)).toBe(false);
+  });
+
   it('reads the OS preference, and is light without matchMedia', () => {
     expect(systemPrefersDark({ matchMedia: () => ({ matches: true }) })).toBe(true);
     expect(systemPrefersDark({})).toBe(false);
@@ -35,9 +43,10 @@ describe('resolveDarkMode', () => {
 });
 
 describe('nextThemePref', () => {
-  it('cycles Light → Dark → System → Light for the mobile tile', () => {
+  it('cycles Light → Dark → OLED → System → Light for the mobile tile', () => {
     expect(nextThemePref('light')).toBe('dark');
-    expect(nextThemePref('dark')).toBe('system');
+    expect(nextThemePref('dark')).toBe('oled');
+    expect(nextThemePref('oled')).toBe('system');
     expect(nextThemePref('system')).toBe('light');
   });
 });
@@ -49,5 +58,16 @@ describe('restoredThemePref', () => {
     expect(restoredThemePref({ darkMode: true })).toBe('dark');
     expect(restoredThemePref({ darkMode: false })).toBe('light');
     expect(restoredThemePref({})).toBeNull();
+    expect(restoredThemePref({ themePref: 'oled', darkMode: true })).toBe('oled');
+  });
+});
+
+describe('themeLabel', () => {
+  it('names each preference', () => {
+    const t = (key, fallback) => `${key}|${fallback}`;
+    expect(themeLabel(t, 'oled')).toBe('settings.themeOled|OLED');
+    expect(themeLabel(t, 'system')).toBe('settings.themeSystem|System');
+    expect(themeLabel(t, 'dark')).toBe('settings.darkMode|Dark');
+    expect(themeLabel(t, 'light')).toBe('settings.lightMode|Light');
   });
 });

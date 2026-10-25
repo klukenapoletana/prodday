@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* The dark grays as variables (tailwind.config.js, colors.gray). Tailwind's
+   own values by default; the OLED theme (utils/themePref.js) sets the `oled`
+   class on <html> and turns the page and its panels (gray-800/900/950) true
+   black, so those pixels stay off; fields and borders (gray-700) and hovers
+   (gray-600) become neutral dark grays that still set them apart. */
+:root {
+  --gray-600: 75 85 99;
+  --gray-700: 55 65 81;
+  --gray-800: 31 41 55;
+  --gray-900: 17 24 39;
+  --gray-950: 3 7 18;
+}
+html.oled {
+  --gray-600: 82 82 88;
+  --gray-700: 32 32 36;
+  --gray-800: 0 0 0;
+  --gray-900: 0 0 0;
+  --gray-950: 0 0 0;
+}
+
 /* dayGLANCE wordmark — self-hosted Lora (SIL OFL), latin subset only.
    500 normal for "day", 700 italic for "GLANCE". */
 @font-face {
