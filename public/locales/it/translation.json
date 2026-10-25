@@ -2840,7 +2840,9 @@
       "tagMerged": "#{{from}} unito a #{{to}}",
       "tagRemoved": "#{{from}} rimosso",
       "subtasksReordered": "Sottoattività di «{{title}}» riordinate",
-      "toNotes": "«{{title}}» spostata nelle note"
+      "toNotes": "«{{title}}» spostata nelle note",
+      "pinned": "«{{title}}» fissata",
+      "unpinned": "«{{title}}» sbloccata"
     }
   },
   "taskReminders": {
@@ -2892,7 +2894,12 @@
     "addNote": "Aggiungi alle note",
     "empty": "Ancora nessuna nota",
     "emptyHint": "Idee, elenchi e tutto ciò che non ha una data. Con uno scorrimento una nota diventa un’attività.",
-    "settings": "Impostazioni della nota"
+    "settings": "Impostazioni della nota",
+    "pin": "Fissa",
+    "unpin": "Sblocca",
+    "open": "Apri",
+    "pinned": "Fissate",
+    "others": "Altre"
   },
   "noteFormat": {
     "toolbar": "Formattazione",

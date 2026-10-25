@@ -730,6 +730,19 @@ export default function useTaskActions({
     setUndoToast({ message: said, actionable: true });
   };
 
+  // Pin a note to the top of the Notes list, or unpin it (utils/notes.js).
+  const togglePinNote = (id) => {
+    const note = unscheduledTasks.find(t => t.id === id);
+    if (!isNote(note)) return;
+    const said = pushUndo({ key: note.pinned ? 'unpinned' : 'pinned', taskId: id });
+    setUnscheduledTasks(prev => prev.map(t => {
+      if (t.id !== id) return t;
+      const { pinned: _p, ...rest } = t;
+      return note.pinned ? rest : { ...rest, pinned: true };
+    }));
+    setUndoToast({ message: said, actionable: true });
+  };
+
   // The full-screen note editor's title field (components/MobileNoteEditor.jsx).
   const renameNote = (id, title) => {
     const note = unscheduledTasks.find(t => t.id === id);
@@ -1109,6 +1122,7 @@ export default function useTaskActions({
     moveToNotes,
     moveNoteToInbox,
     renameNote,
+    togglePinNote,
     // Subtasks
     addSubtask,
     toggleSubtask,
