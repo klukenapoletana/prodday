@@ -2046,6 +2046,17 @@
     "pastellavender": "Pastelowa lawenda",
     "pastelsand": "Pastelowy piasek"
   },
+  "colorWheel": {
+    "title": "Własny kolor",
+    "open": "Wybierz własny kolor",
+    "brightness": "Jasność",
+    "hex": "Kod koloru hex",
+    "save": "Zapisz",
+    "isSaved": "Zapisano",
+    "saved": "Twoje kolory ({{count}}/{{limit}})",
+    "full": "Przy kolejnym zapisie najstarszy zostanie zastąpiony.",
+    "remove": "Usuń {{color}}"
+  },
   "calendarImport": {
     "title": "Importuj kalendarz",
     "prompt": "Jak chcesz zaimportować „{{file}}”?",

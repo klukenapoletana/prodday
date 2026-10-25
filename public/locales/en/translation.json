@@ -1959,6 +1959,17 @@
     "pastellavender": "Pastel lavender",
     "pastelsand": "Pastel sand"
   },
+  "colorWheel": {
+    "title": "Custom colour",
+    "open": "Pick a custom colour",
+    "brightness": "Brightness",
+    "hex": "Hex colour code",
+    "save": "Save",
+    "isSaved": "Saved",
+    "saved": "Your colours ({{count}}/{{limit}})",
+    "full": "The oldest is replaced when you save another.",
+    "remove": "Remove {{color}}"
+  },
   "calendarImport": {
     "title": "Import Calendar",
     "prompt": "How would you like to import \"{{file}}\"?",

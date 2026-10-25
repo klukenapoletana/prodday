@@ -1959,6 +1959,17 @@
     "pastellavender": "Lavande pastel",
     "pastelsand": "Sable pastel"
   },
+  "colorWheel": {
+    "title": "Couleur personnalisée",
+    "open": "Choisir une couleur personnalisée",
+    "brightness": "Luminosité",
+    "hex": "Code couleur hex",
+    "save": "Enregistrer",
+    "isSaved": "Enregistrée",
+    "saved": "Vos couleurs ({{count}}/{{limit}})",
+    "full": "La plus ancienne est remplacée au prochain enregistrement.",
+    "remove": "Retirer {{color}}"
+  },
   "calendarImport": {
     "title": "Importer un calendrier",
     "prompt": "Comment souhaitez-vous importer « {{file}} » ?",

@@ -7,6 +7,8 @@ import { useSyncCtx } from '../context/SyncContext.jsx';
 import { SOURCE_APPS } from '../native.js';
 import SuggestionAutocomplete from './SuggestionAutocomplete.jsx';
 import DurationField from './DurationField.jsx';
+import CustomColorSwatches from './CustomColorSwatches.jsx';
+import { isCustomColor } from '../utils/customColors.js';
 import QuickAddChips from './QuickAddChips.jsx';
 import TaskProjectField from './TaskProjectField.jsx';
 import RecurrencePicker from './RecurrencePicker.jsx';
@@ -287,6 +289,7 @@ const DesktopNewTaskModal = () => {
                           type="button"
                           onClick={() => setShowColorPicker(showColorPicker === 'newTask' ? null : 'newTask')}
                           className={`w-full h-10 ${newTask.color || colors[0].class} rounded-lg border ${borderClass}`}
+                          style={isCustomColor(newTask.color) ? { backgroundColor: newTask.color } : undefined}
                         />
                         {showColorPicker === 'newTask' && (
                           <div className={`absolute top-12 left-0 ${cardBg} rounded-lg p-2 shadow-xl z-20 border ${borderClass} min-w-[120px]`}>
@@ -303,6 +306,13 @@ const DesktopNewTaskModal = () => {
                                   title={color.name}
                                 />
                               ))}
+                              <CustomColorSwatches
+                                value={newTask.color}
+                                onSelect={(color) => { setNewTask(prev => ({ ...prev, color })); setShowColorPicker(null); }}
+                                swatchClass="w-8 h-8 rounded-full hover:scale-110 transition-transform"
+                                selectedClass="ring-2 ring-offset-1 ring-blue-500"
+                                darkMode={darkMode}
+                              />
                             </div>
                           </div>
                         )}
@@ -353,6 +363,7 @@ const DesktopNewTaskModal = () => {
                           type="button"
                           onClick={() => setShowColorPicker(showColorPicker === 'newTask' ? null : 'newTask')}
                           className={`w-full h-10 ${newTask.color || colors[0].class} rounded-lg border ${borderClass}`}
+                          style={isCustomColor(newTask.color) ? { backgroundColor: newTask.color } : undefined}
                         />
                         {showColorPicker === 'newTask' && (
                           <div className={`absolute top-12 left-0 ${cardBg} rounded-lg p-2 shadow-xl z-20 border ${borderClass} min-w-[120px]`}>
@@ -369,6 +380,13 @@ const DesktopNewTaskModal = () => {
                                   title={color.name}
                                 />
                               ))}
+                              <CustomColorSwatches
+                                value={newTask.color}
+                                onSelect={(color) => { setNewTask(prev => ({ ...prev, color })); setShowColorPicker(null); }}
+                                swatchClass="w-8 h-8 rounded-full hover:scale-110 transition-transform"
+                                selectedClass="ring-2 ring-offset-1 ring-blue-500"
+                                darkMode={darkMode}
+                              />
                             </div>
                           </div>
                         )}
