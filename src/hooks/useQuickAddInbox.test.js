@@ -19,10 +19,10 @@ vi.mock('../native.js', () => ({
   nativeAckQuickAddEntries: (ids) => { native.acked.push(...ids); native.queue = native.queue.filter(e => !ids.includes(e.id)); },
 }));
 import useQuickAddInbox from './useQuickAddInbox.js';
+import { isPendingLocalAdd, resetPendingLocalAdds } from '../sync/pendingLocalAdds.js';
 
 let inbox;
 let props;
-let syncing;
 // As React would: a state change renders again, so the hook sees the new Inbox.
 const setUnscheduledTasks = (fn) => { inbox = fn(inbox); render(); };
 const render = (next) => {
@@ -31,7 +31,7 @@ const render = (next) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useQuickAddInbox({
     setUnscheduledTasks, defaultColor: 'bg-blue-500', unscheduledTasks: inbox, recycleBin: [],
-    isSyncBusy: () => syncing, ...props,
+    ...props,
   });
   react.effects.splice(0).forEach((run) => run());
 };
@@ -43,8 +43,8 @@ beforeEach(() => {
   native.queue = [{ id: 'q1', title: 'Milch kaufen', createdAt: '2026-11-01T08:00:00.000Z' }];
   native.acked = [];
   inbox = [{ id: 'old', title: 'Steuer' }];
-  syncing = false;
   props = {};
+  resetPendingLocalAdds();
   vi.stubGlobal('document', { visibilityState: 'visible', addEventListener: vi.fn(), removeEventListener: vi.fn() });
 });
 
@@ -74,14 +74,11 @@ describe('useQuickAddInbox', () => {
     expect(inbox.map(t => t.id)).toEqual(['old', 'q1']);
   });
 
-  it('waits for a sync cycle in flight, whose apply would replace the Inbox', async () => {
-    syncing = true;
+  it('adds at once, registered so a sync cycle in flight keeps it', async () => {
     render({ dataLoaded: true });
-    await vi.advanceTimersByTimeAsync(1000);
-    expect(inbox.map(t => t.id)).toEqual(['old']);
-    syncing = false;
-    await vi.advanceTimersByTimeAsync(200);
+    await flush();
     expect(inbox.map(t => t.id)).toEqual(['old', 'q1']);
+    expect(isPendingLocalAdd({ id: 'q1' })).toBe(true);
   });
 
   it('an entry the state lost after all stays queued and is added again', async () => {

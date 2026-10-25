@@ -24,6 +24,7 @@ vi.mock('../utils/attachmentStore.js', () => ({
 }));
 vi.mock('../sync/attachmentRemote.js', () => ({ queueUpload: vi.fn() }));
 import useSharedFilesToNotes, { readSharedFile } from './useSharedFilesToNotes.js';
+import { isPendingLocalAdd, resetPendingLocalAdds } from '../sync/pendingLocalAdds.js';
 import { SHARE_CHUNK_BYTES } from '../utils/sharedFilesNote.js';
 
 describe('readSharedFile', () => {
@@ -50,7 +51,6 @@ describe('readSharedFile', () => {
 describe('useSharedFilesToNotes', () => {
   let notes;
   let props;
-  let syncing;
   const created = [];
   const setUnscheduledTasks = (fn) => { notes = fn(notes); render(); };
   const render = (next) => {
@@ -60,7 +60,7 @@ describe('useSharedFilesToNotes', () => {
     useSharedFilesToNotes({
       setUnscheduledTasks, unscheduledTasks: notes, recycleBin: [], defaultColor: 'bg-blue-500',
       fallbackTitle: 'Geteilt', onCreated: (id) => created.push(id), onSkipped: () => {},
-      isSyncBusy: () => syncing, ...props,
+      ...props,
     });
     react.effects.splice(0).forEach((run) => run());
   };
@@ -72,8 +72,8 @@ describe('useSharedFilesToNotes', () => {
     native.batches = [{ batchId: 'b1', subject: 'Rechnung', files: [{ id: 'f1', name: 'r.pdf', mime: 'application/pdf', size: 3 }] }];
     native.acked = [];
     notes = [{ id: 'old', title: 'Einkauf', isNote: true }];
-    syncing = false;
     props = {};
+    resetPendingLocalAdds();
     created.length = 0;
     vi.stubGlobal('document', { visibilityState: 'visible', addEventListener: vi.fn(), removeEventListener: vi.fn() });
     vi.stubGlobal('window', {});
@@ -89,14 +89,10 @@ describe('useSharedFilesToNotes', () => {
     expect(native.acked).toEqual(['b1']);
   });
 
-  it('adds the note only after a sync cycle in flight, whose apply would replace the notes', async () => {
-    syncing = true;
+  it('registers the note, so a sync cycle in flight keeps it', async () => {
     render({ dataLoaded: true });
-    await vi.advanceTimersByTimeAsync(2000);
-    expect(notes.map(n => n.id)).toEqual(['old']);
-    syncing = false;
-    await vi.advanceTimersByTimeAsync(200);
-    expect(notes.map(n => n.id)).toEqual(['old', 'share-b1']);
+    await flush();
+    expect(isPendingLocalAdd({ id: 'share-b1' })).toBe(true);
   });
 
   it('a note the state lost after all keeps its share, and is made again', async () => {

@@ -7,14 +7,14 @@ import { base64ToBlob, blobToBase64, writeAttachmentFile } from '../utils/attach
 import { prepareImage } from '../utils/imageResize.js';
 import { queueUpload } from '../sync/attachmentRemote.js';
 import { toNote } from '../utils/notes.js';
-import { presentIds, waitForSyncIdle } from '../utils/syncIdle.js';
+import { markPendingLocalAdds, presentIds } from '../sync/pendingLocalAdds.js';
 import {
   SHARE_CHUNK_BYTES, attachableFiles, noteIdForShare, noteTextForShare,
 } from '../utils/sharedFilesNote.js';
 
 // As in useQuickAddInbox: the share's copies on the device go only after the
 // app's own save, so an app that dies in between reads them again, and only
-// once the note is in the app's state (utils/syncIdle.js).
+// once the note is in the app's state (sync/pendingLocalAdds.js).
 const ACK_DELAY_MS = 3000;
 
 /** A shared file's bytes as base64, read through the bridge in whole-group pieces. */
@@ -36,12 +36,17 @@ export function readSharedFile(id, read = nativeReadSharedFileChunk) {
  * a share while the app runs (window.__prodCheckSharedFiles). The newest note
  * made opens (`onCreated`); files that could not be taken are reported
  * (`onSkipped`).
+ *
+ * The note is registered with sync/pendingLocalAdds.js, so a sync cycle in
+ * flight, which would replace the notes with what it started from, keeps it.
+ * A share whose note is still missing when it would be acknowledged is read
+ * again instead.
  */
 export default function useSharedFilesToNotes({
-  dataLoaded, unscheduledTasks, recycleBin, setUnscheduledTasks, defaultColor, fallbackTitle, onCreated, onSkipped, isSyncBusy, disabled = false,
+  dataLoaded, unscheduledTasks, recycleBin, setUnscheduledTasks, defaultColor, fallbackTitle, onCreated, onSkipped, disabled = false,
 }) {
   const latest = useRef({});
-  latest.current = { unscheduledTasks, recycleBin, defaultColor, fallbackTitle, onCreated, onSkipped, isSyncBusy };
+  latest.current = { unscheduledTasks, recycleBin, defaultColor, fallbackTitle, onCreated, onSkipped };
 
   useEffect(() => {
     if (disabled || !dataLoaded || !isNativeAndroid()) return undefined;
@@ -100,10 +105,8 @@ export default function useSharedFilesToNotes({
           }));
         }
         if (notes.length) {
-          // The slow part (reading and shrinking the files) is done; add the
-          // note between cycles, so the next one carries it.
-          await waitForSyncIdle(() => latest.current.isSyncBusy?.());
           if (cancelled) return;
+          markPendingLocalAdds(notes.map(n => n.id));
           setUnscheduledTasks(prev => {
             const have = new Set(prev.map(t => t.id));
             const fresh = notes.filter(n => !have.has(n.id));
