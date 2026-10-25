@@ -149,7 +149,7 @@ export default function SubscriptionWall({
           ? (trialDays
               ? t('subscription.trialHeadlineWithDays', { count: trialDays, defaultValue: 'Start your {{count}}-day free trial' })
               : t('subscription.trialHeadline', { defaultValue: 'Start your free trial' }))
-          : t('subscription.unlockPro', { defaultValue: 'Unlock dayGLANCE Pro' })}
+          : t('subscription.unlockPro', { defaultValue: 'Unlock prodday Pro' })}
       </h1>
       <p className={`text-sm text-center mb-7 max-w-xs ${sub}`}>
         {trialEligible

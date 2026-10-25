@@ -77,8 +77,8 @@
         <item quantity="other">%d 个项目</item>
     </plurals>
     <string name="config_standalone">独立项目</string>
-    <string name="config_no_goals">未找到进行中的目标。\n\n请打开 dayGLANCE 同步数据，然后重新添加小组件。</string>
-    <string name="config_no_projects">未找到进行中的项目。\n\n请打开 dayGLANCE 同步数据，然后重新添加小组件。</string>
+    <string name="config_no_goals">未找到进行中的目标。\n\n请打开 prodday 同步数据，然后重新添加小组件。</string>
+    <string name="config_no_projects">未找到进行中的项目。\n\n请打开 prodday 同步数据，然后重新添加小组件。</string>
     <string name="upnext_in_h">%1$d 小时后</string>
     <string name="upnext_in_h_m">%1$d 小时 %2$d 分钟后</string>
     <string name="upnext_in_m">%1$d 分钟后</string>
@@ -137,10 +137,10 @@
     <string name="settings_filename_pattern_desc">笔记文件名的日期格式（不含 .md）。使用 Java DateTimeFormatter 语法。</string>
     <string name="settings_filename_pattern_hint">文件名格式（如：yyyy-MM-dd）</string>
     <string name="settings_new_notes_folder">新笔记文件夹</string>
-    <string name="settings_new_notes_folder_desc">dayGLANCE 新建的笔记将保存在此文件夹。无论此设置为何，已有笔记始终在原位置更新。</string>
-    <string name="settings_new_notes_folder_hint">新笔记文件夹（如：dayGLANCE）</string>
+    <string name="settings_new_notes_folder_desc">prodday 新建的笔记将保存在此文件夹。无论此设置为何，已有笔记始终在原位置更新。</string>
+    <string name="settings_new_notes_folder_hint">新笔记文件夹（如：prodday）</string>
     <string name="health_permissions_title">Health Connect 权限</string>
-    <string name="health_intro">dayGLANCE 使用 Health Connect，在主日视图中用习惯圆环显示你的每日进度。</string>
+    <string name="health_intro">prodday 使用 Health Connect，在主日视图中用习惯圆环显示你的每日进度。</string>
     <string name="health_steps">步数</string>
     <string name="health_steps_desc">读取每日步数以填充步数习惯圆环，显示你距自定每日步数目标的进度。</string>
     <string name="health_sleep">睡眠</string>
@@ -148,12 +148,12 @@
     <string name="health_data_handling">数据处理方式</string>
     <string name="health_local_only">• 健康数据只在设备上读取，并在应用内本地显示。</string>
     <string name="health_no_analytics">• 健康数据不会用于分析、与第三方共享，也不会写回 Health Connect。</string>
-    <string name="health_no_servers">• dayGLANCE 没有由开发者运营的服务器、账户系统或遥测。</string>
+    <string name="health_no_servers">• prodday 没有由开发者运营的服务器、账户系统或遥测。</string>
     <string name="health_cloud_sync">• 如果启用了可选的云同步，习惯数据会使用零知识 AES-256-GCM 加密后加入同步数据。由你控制的目标服务器只能看到密文。</string>
-    <string name="health_optional">授予 Health Connect 权限完全自愿。未授权时 dayGLANCE 仍可正常使用。你可以随时在 Health Connect 应用或设备系统设置中撤销权限。</string>
+    <string name="health_optional">授予 Health Connect 权限完全自愿。未授权时 prodday 仍可正常使用。你可以随时在 Health Connect 应用或设备系统设置中撤销权限。</string>
     <string name="health_privacy_policy">阅读完整隐私政策 →</string>
     <string name="reminder_precise_title">启用精确提醒</string>
-    <string name="reminder_precise_message">dayGLANCE 需要精确闹钟权限，才能在应用关闭时仍按时发送任务提醒。\n\n点击“授予权限”，然后在下一页启用 dayGLANCE。</string>
+    <string name="reminder_precise_message">prodday 需要精确闹钟权限，才能在应用关闭时仍按时发送任务提醒。\n\n点击“授予权限”，然后在下一页启用 prodday。</string>
     <string name="grant_access">授予权限</string>
     <string name="not_now">暂不</string>
     <!-- Stale widget state: the stored snapshot describes another day (WidgetFreshness.kt) -->
@@ -163,8 +163,8 @@
         <item quantity="one">%1$d 天前</item>
         <item quantity="other">%1$d 天前</item>
     </plurals>
-    <string name="widget_open_to_refresh">打开 dayGLANCE 以刷新</string>
-    <string name="widget_open_to_set_up">打开 dayGLANCE 进行设置</string>
+    <string name="widget_open_to_refresh">打开 prodday 以刷新</string>
+    <string name="widget_open_to_set_up">打开 prodday 进行设置</string>
     <string name="a11y_item_done">%1$s，已完成</string>
     <string name="a11y_item_not_done">%1$s，未完成</string>
     <string name="a11y_habit_progress">%1$s，已完成 %2$d%%</string>
@@ -202,15 +202,15 @@
     <string name="day_dial_frames">时间框架</string>
     <string name="day_dial_sleep">睡眠</string>
     <string name="day_dial_zone_changed">时区已更改</string>
-    <string name="day_dial_open_to_refresh">打开 dayGLANCE 以刷新</string>
-    <string name="day_dial_open_to_set_up">打开 dayGLANCE 进行设置</string>
+    <string name="day_dial_open_to_refresh">打开 prodday 以刷新</string>
+    <string name="day_dial_open_to_set_up">打开 prodday 进行设置</string>
     <string name="day_dial_all_day">全天</string>
     <string name="day_dial_effort">投入</string>
     <string name="day_dial_restore">恢复</string>
     <string name="day_dial_legend_sleep">睡眠</string>
     <string name="day_dial_unblocked">可用时间</string>
     <string name="day_dial_routines">日常</string>
-    <string name="launcher_permission_label">为 GLANCElauncher 读取 dayGLANCE 数据</string>
+    <string name="launcher_permission_label">为 GLANCElauncher 读取 prodday 数据</string>
     <string name="launcher_refresh_notification">正在为 GLANCElauncher 刷新</string>
     <string name="launcher_permission_description">允许 GLANCElauncher 读取当天的任务、目标、项目、例行事项和时间框，并向其发送要创建或完成的任务。</string>
 </resources>

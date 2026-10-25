@@ -69,8 +69,8 @@ export async function testVaultConnection(credentials = {}, opts = {}) {
       ok: false,
       code: VAULT_TEST_OUTCOMES.BLOCKED_PRIVATE_ADDRESS,
       message: blocked.canGrant
-        ? `${blocked.origin} is on a private network, so dayGLANCE needs your permission to connect to it.`
-        : `${blocked.origin} is a reserved address that dayGLANCE will not connect to.`,
+        ? `${blocked.origin} is on a private network, so prodday needs your permission to connect to it.`
+        : `${blocked.origin} is a reserved address that prodday will not connect to.`,
       canGrant: blocked.canGrant,
       origin: blocked.origin,
     };

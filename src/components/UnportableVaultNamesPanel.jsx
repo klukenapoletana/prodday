@@ -22,7 +22,7 @@ export default function UnportableVaultNamesPanel({ entries, darkMode, textSecon
           : `${entries.length} vault files have names that may not sync to Windows or Android devices`}
       </p>
       <p className={`text-xs mt-1 ${textSecondary}`}>
-        dayGLANCE no longer creates names like these, but it never renames existing
+        prodday no longer creates names like these, but it never renames existing
         notes: a rename breaks the links pointing at the note from the rest of the
         vault. To fix one, rename it inside Obsidian, which updates its backlinks.
       </p>

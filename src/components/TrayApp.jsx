@@ -98,7 +98,7 @@ export default function TrayApp({ bgClass, darkMode }) {
       />
       {ackNotice && (
         <div className={`flex-shrink-0 px-3 py-2 text-xs font-medium ${darkMode ? 'bg-red-900/40 text-red-300' : 'bg-red-100 text-red-700'}`}>
-          A change did not reach dayGLANCE and was not saved. Make sure dayGLANCE is running, then try again.
+          A change did not reach prodday and was not saved. Make sure prodday is running, then try again.
         </div>
       )}
       {focusState ? (

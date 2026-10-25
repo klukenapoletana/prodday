@@ -109,7 +109,7 @@ const writeWithdrawnNotes = (store) => {
 };
 
 export const OBSIDIAN_TASK_WRITE_ERROR =
-  "Couldn't write to your Obsidian vault. Your changes are saved in dayGLANCE and will be written on the next edit.";
+  "Couldn't write to your Obsidian vault. Your changes are saved in prodday and will be written on the next edit.";
 
 // A plugin-mode cycle whose inbound fetch produced nothing (audit low): the
 // stream is the ONLY way vault changes reach this device while the plugin is
@@ -674,7 +674,7 @@ export default function useObsidianSync({
     if (titleConflicts.length) {
       notices.push(titleConflicts.length === 1
         ? titleConflictNoticeText(titleConflicts[0].vaultTitle)
-        : `${titleConflicts.length} title conflicts: Obsidian's edits won. Your dayGLANCE renames are saved in each task's notes.`);
+        : `${titleConflicts.length} title conflicts: Obsidian's edits won. Your prodday renames are saved in each task's notes.`);
     }
     if (binRestores.length) notices.push(binRestoreNoticeText(binRestores, i18n.t.bind(i18n)));
     if (notices.length && setObsidianSyncNotice) {
