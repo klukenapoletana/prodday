@@ -420,8 +420,9 @@ const DesktopNewTaskModal = () => {
                       >
                         {newTask.recurrence ? getRecurrenceLabel(newTask.recurrence, t, i18n.resolvedLanguage || i18n.language) : t('task.noRepeat')}
                       </button>
-                      {showRecurrencePicker && <RecurrencePicker placement="bottom" highlightSelected />}
                     </div>
+                    {/* The Repeat panel opens in place, across the whole row. */}
+                    {showRecurrencePicker && <div className="col-span-full"><RecurrencePicker /></div>}
                     {/* Shows only when the task stays unscheduled (a project
                         task kept in the inbox) and never for a series: a
                         scheduled task carries no deadline, so the control

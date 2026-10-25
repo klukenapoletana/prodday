@@ -996,7 +996,14 @@
     "anchorLabel": "Ritmo",
     "anchorFixed": "Fisso",
     "anchorCompletion": "Dal completamento",
-    "afterCompletion": "{{label}} dal completamento"
+    "afterCompletion": "{{label}} dal completamento",
+    "daily": "Ogni giorno",
+    "weekly": "Settimanale",
+    "monthly": "Mensile",
+    "yearly": "Annuale",
+    "onDays": "Nei giorni",
+    "onMonthDay": "Il {{day}}",
+    "onOrdinalWeekday": "Il {{ordinal}}° {{day}}"
   },
   "dateRange": {
     "sameMonth": "{{startDay}}–{{endDay}} {{month}} {{year}}",

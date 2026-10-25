@@ -970,7 +970,14 @@
     "anchorLabel": "节奏",
     "anchorFixed": "固定",
     "anchorCompletion": "完成后",
-    "afterCompletion": "完成后{{label}}"
+    "afterCompletion": "完成后{{label}}",
+    "daily": "每天",
+    "weekly": "每周",
+    "monthly": "每月",
+    "yearly": "每年",
+    "onDays": "重复于",
+    "onMonthDay": "{{day}}日",
+    "onOrdinalWeekday": "第{{ordinal}}个{{day}}"
   },
   "dateRange": {
     "sameMonth": "{{year}}年{{month}}{{startDay}}日至{{endDay}}日",

@@ -1033,7 +1033,14 @@
     "anchorLabel": "Ритм",
     "anchorFixed": "Сталий",
     "anchorCompletion": "Від виконання",
-    "afterCompletion": "{{label}} від виконання"
+    "afterCompletion": "{{label}} від виконання",
+    "daily": "Щодня",
+    "weekly": "Щотижня",
+    "monthly": "Щомісяця",
+    "yearly": "Щороку",
+    "onDays": "У дні",
+    "onMonthDay": "{{day}} числа",
+    "onOrdinalWeekday": "{{day}}, {{ordinal}} тижня"
   },
   "dateRange": {
     "sameMonth": "{{startDay}}–{{endDay}} {{month}} {{year}}",
