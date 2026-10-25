@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRightLeft, CheckSquare, Plus, Settings, StickyNote, X } from 'lucide-react';
+import { ArrowRightLeft, CheckSquare, Plus, Settings, StickyNote } from 'lucide-react';
 import { useDayPlannerCtx } from '../context/DayPlannerContext.jsx';
 import { useFeaturesCtx } from '../context/FeaturesContext.jsx';
 import { renderTitle } from '../utils/textFormatting.jsx';
 import { isNote, notePreview, sortNotes } from '../utils/notes.js';
-import NotesSubtasksPanel from './NotesSubtasksPanel.jsx';
+import MobileNoteEditor from './MobileNoteEditor.jsx';
 
 /**
  * The Notes tab (utils/notes.js): the notes as cards, newest first, each
@@ -16,10 +16,9 @@ import NotesSubtasksPanel from './NotesSubtasksPanel.jsx';
 const MobileNotesView = () => {
   const { t } = useTranslation();
   const {
-    unscheduledTasks, openNewNote,
+    unscheduledTasks, openNewNote, showAddTask,
     handleMobileTaskTouchStart, handleMobileTaskTouchMove, handleMobileTaskTouchEnd,
-    updateTaskNotes, addSubtask, toggleSubtask, deleteSubtask, updateSubtaskTitle,
-    cardBg, borderClass, textPrimary, textSecondary, darkMode,
+    textPrimary, textSecondary, darkMode,
   } = useDayPlannerCtx();
   const { isVisibleForUser } = useFeaturesCtx();
   const [openNoteId, setOpenNoteId] = useState(null);
@@ -29,6 +28,21 @@ const MobileNotesView = () => {
     [unscheduledTasks, isVisibleForUser],
   );
   const openNote = notes.find(n => n.id === openNoteId);
+
+  // The + names a new note in the editor; once it is saved, it opens here
+  // for writing. The ids known when + was pressed tell the new one apart.
+  const awaitingNewRef = useRef(null);
+  const startNewNote = () => {
+    awaitingNewRef.current = new Set(notes.map(n => n.id));
+    openNewNote();
+  };
+  useEffect(() => {
+    const known = awaitingNewRef.current;
+    if (!known || showAddTask) return;
+    awaitingNewRef.current = null;
+    const created = notes.find(n => !known.has(n.id));
+    if (created) setOpenNoteId(created.id);
+  }, [notes, showAddTask]);
 
   return (
     <div className="relative flex-1 min-h-0 flex flex-col" data-notes-view>
@@ -41,7 +55,7 @@ const MobileNotesView = () => {
             <p className={`text-base font-semibold ${textPrimary} mb-1`}>{t('notes.empty')}</p>
             <p className={`text-sm ${textSecondary} text-center mb-5`}>{t('notes.emptyHint')}</p>
             <button
-              onClick={openNewNote}
+              onClick={startNewNote}
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-amber-500 text-white active:bg-amber-600 transition-colors"
             >
               <Plus size={16} />
@@ -91,42 +105,11 @@ const MobileNotesView = () => {
         )}
       </div>
 
-      {openNote && (
-        <div className="notes-panel-container fixed inset-0 z-50 flex flex-col justify-end" onClick={() => setOpenNoteId(null)} data-note-open>
-          <div className="bg-black/30 absolute inset-0" />
-          <div
-            className={`relative ${cardBg} rounded-t-2xl shadow-xl max-h-[85vh] overflow-y-auto`}
-            style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={`flex items-center justify-between p-4 border-b ${borderClass}`}>
-              <div className={`font-medium ${textPrimary} truncate flex-1`}>{renderTitle(openNote.title)}</div>
-              <button onClick={() => setOpenNoteId(null)} className="p-1 rounded-lg" aria-label={t('common.close')}>
-                <X size={18} className={textSecondary} />
-              </button>
-            </div>
-            <div className="p-4">
-              <div className={`${openNote.color || ''} rounded-lg`}>
-                <NotesSubtasksPanel
-                  task={openNote}
-                  isInbox={true}
-                  darkMode={darkMode}
-                  updateTaskNotes={updateTaskNotes}
-                  addSubtask={addSubtask}
-                  toggleSubtask={toggleSubtask}
-                  deleteSubtask={deleteSubtask}
-                  updateSubtaskTitle={updateSubtaskTitle}
-                  noAutoFocus
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {openNote && <MobileNoteEditor note={openNote} onClose={() => setOpenNoteId(null)} />}
 
       <div className="absolute bottom-4 right-4 z-40 pointer-events-none">
         <button
-          onClick={openNewNote}
+          onClick={startNewNote}
           className="pointer-events-auto w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 active:bg-blue-800 flex items-center justify-center transition-colors"
           aria-label={t('notes.newNote')}
           title={t('notes.newNote')}

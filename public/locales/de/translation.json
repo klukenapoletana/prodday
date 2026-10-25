@@ -2870,6 +2870,21 @@
     "editNote": "Notiz bearbeiten",
     "addNote": "Zu Notizen hinzufügen",
     "empty": "Noch keine Notizen",
-    "emptyHint": "Ideen, Listen und alles ohne Termin. Mit einem Wisch wird aus einer Notiz eine Aufgabe."
+    "emptyHint": "Ideen, Listen und alles ohne Termin. Mit einem Wisch wird aus einer Notiz eine Aufgabe.",
+    "settings": "Notiz-Einstellungen"
+  },
+  "noteFormat": {
+    "toolbar": "Formatierung",
+    "bold": "Fett",
+    "italic": "Kursiv",
+    "underline": "Unterstrichen",
+    "strike": "Durchgestrichen",
+    "code": "Code",
+    "heading": "Überschrift",
+    "bullet": "Aufzählung",
+    "checklist": "Checkliste",
+    "indent": "Einrücken",
+    "outdent": "Ausrücken",
+    "codeblock": "Codeblock"
   }
 }

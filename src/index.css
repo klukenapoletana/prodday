@@ -292,3 +292,10 @@ body.using-pointer a:focus-visible {
 [data-wheel-picker]::-webkit-scrollbar {
   display: none;
 }
+
+/* The full-screen note editor's body (MobileNoteEditor): a thin scrollbar
+   that stays visible, so a long note shows where in it you are. */
+.note-editor-scroll { scrollbar-width: thin; scrollbar-color: rgba(128, 128, 128, 0.6) transparent; }
+.note-editor-scroll::-webkit-scrollbar { width: 5px; }
+.note-editor-scroll::-webkit-scrollbar-track { background: transparent; }
+.note-editor-scroll::-webkit-scrollbar-thumb { background: rgba(128, 128, 128, 0.6); border-radius: 3px; }

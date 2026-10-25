@@ -2891,6 +2891,21 @@
     "editNote": "Modifica nota",
     "addNote": "Aggiungi alle note",
     "empty": "Ancora nessuna nota",
-    "emptyHint": "Idee, elenchi e tutto ciò che non ha una data. Con uno scorrimento una nota diventa un’attività."
+    "emptyHint": "Idee, elenchi e tutto ciò che non ha una data. Con uno scorrimento una nota diventa un’attività.",
+    "settings": "Impostazioni della nota"
+  },
+  "noteFormat": {
+    "toolbar": "Formattazione",
+    "bold": "Grassetto",
+    "italic": "Corsivo",
+    "underline": "Sottolineato",
+    "strike": "Barrato",
+    "code": "Codice",
+    "heading": "Titolo",
+    "bullet": "Elenco puntato",
+    "checklist": "Lista di controllo",
+    "indent": "Aumenta rientro",
+    "outdent": "Riduci rientro",
+    "codeblock": "Blocco di codice"
   }
 }

@@ -2848,6 +2848,21 @@
     "editNote": "编辑笔记",
     "addNote": "添加到笔记",
     "empty": "还没有笔记",
-    "emptyHint": "想法、清单和所有没有日期的内容。滑动一下，笔记就能变成任务。"
+    "emptyHint": "想法、清单和所有没有日期的内容。滑动一下，笔记就能变成任务。",
+    "settings": "笔记设置"
+  },
+  "noteFormat": {
+    "toolbar": "格式",
+    "bold": "粗体",
+    "italic": "斜体",
+    "underline": "下划线",
+    "strike": "删除线",
+    "code": "代码",
+    "heading": "标题",
+    "bullet": "项目符号列表",
+    "checklist": "清单",
+    "indent": "增加缩进",
+    "outdent": "减少缩进",
+    "codeblock": "代码块"
   }
 }

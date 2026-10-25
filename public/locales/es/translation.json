@@ -2889,6 +2889,21 @@
     "editNote": "Editar nota",
     "addNote": "Añadir a notas",
     "empty": "Aún no hay notas",
-    "emptyHint": "Ideas, listas y todo lo que no tiene fecha. Con un deslizamiento, una nota se convierte en tarea."
+    "emptyHint": "Ideas, listas y todo lo que no tiene fecha. Con un deslizamiento, una nota se convierte en tarea.",
+    "settings": "Ajustes de la nota"
+  },
+  "noteFormat": {
+    "toolbar": "Formato",
+    "bold": "Negrita",
+    "italic": "Cursiva",
+    "underline": "Subrayado",
+    "strike": "Tachado",
+    "code": "Código",
+    "heading": "Encabezado",
+    "bullet": "Lista con viñetas",
+    "checklist": "Lista de verificación",
+    "indent": "Aumentar sangría",
+    "outdent": "Reducir sangría",
+    "codeblock": "Bloque de código"
   }
 }

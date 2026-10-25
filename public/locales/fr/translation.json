@@ -2889,6 +2889,21 @@
     "editNote": "Modifier la note",
     "addNote": "Ajouter aux notes",
     "empty": "Aucune note pour l’instant",
-    "emptyHint": "Idées, listes et tout ce qui n’a pas de date. Un glissement transforme une note en tâche."
+    "emptyHint": "Idées, listes et tout ce qui n’a pas de date. Un glissement transforme une note en tâche.",
+    "settings": "Réglages de la note"
+  },
+  "noteFormat": {
+    "toolbar": "Mise en forme",
+    "bold": "Gras",
+    "italic": "Italique",
+    "underline": "Souligné",
+    "strike": "Barré",
+    "code": "Code",
+    "heading": "Titre",
+    "bullet": "Liste à puces",
+    "checklist": "Liste de cases à cocher",
+    "indent": "Augmenter le retrait",
+    "outdent": "Diminuer le retrait",
+    "codeblock": "Bloc de code"
   }
 }
