@@ -2893,5 +2893,15 @@
     "indent": "Indent",
     "outdent": "Outdent",
     "codeblock": "Code block"
+  },
+  "attachments": {
+    "title": "Attachments",
+    "photo": "Photo",
+    "file": "File",
+    "remove": "Remove “{{name}}”",
+    "unavailable": "Not available",
+    "tooLarge": "Too large (max. {{size}})",
+    "unsupported": "Only images, PDFs and audio",
+    "openFailed": "Could not be opened"
   }
 }

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { writeItem } from '../utils/storageWrites.js';
 import { expiredBinItems } from '../utils/recycleBinRetention.js';
+import { attachmentsOf } from '../utils/attachments.js';
+import { markOrphans } from '../utils/attachmentOrphans.js';
 
 export default function useRecycleBin({
   recycleBin,
@@ -63,6 +65,10 @@ export default function useRecycleBin({
     return writeItem('day-planner-deleted-task-ids', JSON.stringify(tombstones));
   };
 
+  // Their attachment files may go too, once nothing refers to them any more
+  // (an undo of the empty brings them back first; utils/attachmentOrphans.js).
+  const markPurgedAttachments = (items) => markOrphans(items.flatMap(t => attachmentsOf(t).map(a => a.id)));
+
   // Deindex permanently deleted tasks from Spotlight so they don't linger.
   const deindex = (items) => {
     try {
@@ -79,6 +85,7 @@ export default function useRecycleBin({
     }
     pushUndo({ key: 'binEmptied' });
     deindex(recycleBin);
+    markPurgedAttachments(recycleBin);
     setRecycleBin([]);
     setShowEmptyBinConfirm(false);
     setShowMobileRecycleBin(false);
@@ -93,6 +100,7 @@ export default function useRecycleBin({
     const expired = expiredBinItems(recycleBin, autoEmptyDays);
     if (expired.length === 0 || !writeBinTombstones(expired)) return;
     deindex(expired);
+    markPurgedAttachments(expired);
     const ids = new Set(expired.map(t => String(t.id)));
     setRecycleBin(prev => prev.filter(t => !ids.has(String(t.id))));
     // Keyed on load and the setting, not on every bin change: a sweep per

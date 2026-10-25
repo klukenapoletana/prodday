@@ -6,6 +6,8 @@ import { useFeaturesCtx } from '../context/FeaturesContext.jsx';
 import { renderTitle } from '../utils/textFormatting.jsx';
 import { isNote, notePreview, sortNotes } from '../utils/notes.js';
 import MobileNoteEditor from './MobileNoteEditor.jsx';
+import AttachmentBadge from './AttachmentBadge.jsx';
+import { attachmentsOf } from '../utils/attachments.js';
 
 /**
  * A note's menu, opened by holding it (or a right click): the actions the
@@ -169,9 +171,10 @@ const MobileNotesView = () => {
                       {preview && (
                         <div className="text-xs opacity-90 mt-1 whitespace-pre-line line-clamp-3">{preview}</div>
                       )}
-                      {subtasks.length > 0 && (
-                        <div className="text-[11px] opacity-90 mt-1.5 flex items-center gap-1">
-                          <CheckSquare size={11} />{done}/{subtasks.length}
+                      {(subtasks.length > 0 || attachmentsOf(note).length > 0) && (
+                        <div className="text-[11px] opacity-90 mt-1.5 flex items-center gap-3">
+                          {subtasks.length > 0 && <span className="flex items-center gap-1"><CheckSquare size={11} />{done}/{subtasks.length}</span>}
+                          <AttachmentBadge task={note} size={11} />
                         </div>
                       )}
                     </div>

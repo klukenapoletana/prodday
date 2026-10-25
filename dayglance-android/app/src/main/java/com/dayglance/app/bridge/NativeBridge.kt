@@ -479,6 +479,38 @@ class NativeBridge(
         }
     }
 
+    /**
+     * Opens an attachment (src/utils/attachments.js) with the app the system
+     * picks for its type: a PDF viewer, a gallery, a player. [base64] is the
+     * file's bytes; it is written to the cache directory and handed over
+     * through the FileProvider, read-only.
+     *
+     * Returns JSON: { "success": true } or { "success": false, "error": "…" }
+     */
+    @JavascriptInterface
+    fun openFile(filename: String, base64: String, mimeType: String): String {
+        return try {
+            val dir = File(context.cacheDir, "attachments").apply { mkdirs() }
+            val safeName = filename.replace(Regex("[\\\\/:*?\"<>|]"), "_").ifBlank { "attachment" }
+            val file = File(dir, safeName)
+            file.writeBytes(android.util.Base64.decode(base64, android.util.Base64.DEFAULT))
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mimeType.ifBlank { "application/octet-stream" })
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(Intent.createChooser(viewIntent, null).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            })
+            """{"success":true}"""
+        } catch (e: Exception) {
+            val msg = (e.message ?: "unknown").replace("\\", "\\\\").replace("\"", "\\\"")
+            """{"success":false,"error":"$msg"}"""
+        }
+    }
+
     // ── Focus mode ───────────────────────────────────────────────────────────
 
     /**

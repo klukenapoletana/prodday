@@ -14,6 +14,8 @@ import { canFollowUp, resolveTaskRef } from '../utils/followUp.js';
 import { isEveryDay, editedSeriesStart, reanchorCompletionSeries } from '../utils/recurrenceEngine.js';
 import { moveSubtaskTo } from '../utils/subtaskOrder.js';
 import { remindersOf, withReminders } from '../utils/taskReminders.js';
+import { attachmentsOf, withAttachments } from '../utils/attachments.js';
+import { markOrphans } from '../utils/attachmentOrphans.js';
 import { recordDeletedTaskTombstone } from '../utils/deletedTaskTombstones.js';
 
 // Strip a specific tag (e.g. "#obsidian") from a title string.
@@ -206,6 +208,7 @@ export default function useTaskActions({
         ...(newTask.projectId ? { projectId: newTask.projectId } : {}),
         ...(newTask.assignedUserSyncIds?.length ? { assignedUserSyncIds: newTask.assignedUserSyncIds } : {}),
         ...(remindersOf(newTask).length ? { reminders: remindersOf(newTask) } : {}),
+        ...(attachmentsOf(newTask).length ? { attachments: attachmentsOf(newTask) } : {}),
       };
 
       // The id a new one-off task was saved under, for a Do this task was
@@ -251,6 +254,7 @@ export default function useTaskActions({
           // template so every materialised instance inherits it.
           ...(newTask.assignedUserSyncIds?.length ? { assignedUserSyncIds: newTask.assignedUserSyncIds } : {}),
           ...(remindersOf(newTask).length ? { reminders: remindersOf(newTask) } : {}),
+          ...(attachmentsOf(newTask).length ? { attachments: attachmentsOf(newTask) } : {}),
           lastModified: new Date().toISOString()
         };
         setRecurringTasks(prev => [...prev, template]);
@@ -462,6 +466,29 @@ export default function useTaskActions({
     setShowColorPicker(null);
     if (!onboardingProgress.hasUsedActionButtons) {
       setOnboardingProgress(prev => ({ ...prev, hasUsedActionButtons: true }));
+    }
+  };
+
+  // The editor's Attachments field (components/AttachmentsField.jsx): the
+  // list is written at once, like the notes, and a series keeps it on its
+  // template. Files of removed attachments are only marked; they go once
+  // nothing refers to them (utils/attachmentOrphans.js).
+  const updateTaskAttachments = (taskId, list, isInbox) => {
+    const stamp = new Date().toISOString();
+    const apply = (t) => {
+      const before = attachmentsOf(t).map(a => a.id);
+      const next = withAttachments(t, list);
+      const after = new Set(attachmentsOf(next).map(a => a.id));
+      markOrphans(before.filter(id => !after.has(id)));
+      return { ...next, lastModified: stamp };
+    };
+    if (typeof taskId === 'string' && taskId.startsWith('recurring-')) {
+      const parsed = parseRecurringId(taskId);
+      if (parsed) setRecurringTasks(prev => prev.map(t => (t.id === parsed.templateId ? apply(t) : t)));
+    } else if (isInbox) {
+      setUnscheduledTasks(prev => prev.map(t => (t.id === taskId ? apply(t) : t)));
+    } else {
+      setTasks(prev => prev.map(t => (t.id === taskId ? apply(t) : t)));
     }
   };
 
@@ -1110,6 +1137,7 @@ export default function useTaskActions({
     // Update
     changeTaskColor,
     setTaskEnergy,
+    updateTaskAttachments,
     updateTaskNotes,
     updateRecurringTemplate,
     updateRecurrencePattern,

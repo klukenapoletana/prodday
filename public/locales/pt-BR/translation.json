@@ -2912,5 +2912,15 @@
     "indent": "Aumentar recuo",
     "outdent": "Diminuir recuo",
     "codeblock": "Bloco de código"
+  },
+  "attachments": {
+    "title": "Anexos",
+    "photo": "Foto",
+    "file": "Arquivo",
+    "remove": "Remover \"{{name}}\"",
+    "unavailable": "Indisponível",
+    "tooLarge": "Grande demais (máx. {{size}})",
+    "unsupported": "Apenas imagens, PDFs e áudio",
+    "openFailed": "Não foi possível abrir"
   }
 }

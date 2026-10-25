@@ -2912,5 +2912,15 @@
     "indent": "Augmenter le retrait",
     "outdent": "Diminuer le retrait",
     "codeblock": "Bloc de code"
+  },
+  "attachments": {
+    "title": "Pièces jointes",
+    "photo": "Photo",
+    "file": "Fichier",
+    "remove": "Retirer « {{name}} »",
+    "unavailable": "Indisponible",
+    "tooLarge": "Trop volumineux (max. {{size}})",
+    "unsupported": "Images, PDF et audio uniquement",
+    "openFailed": "Impossible d’ouvrir"
   }
 }

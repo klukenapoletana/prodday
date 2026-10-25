@@ -2893,5 +2893,15 @@
     "indent": "Einrücken",
     "outdent": "Ausrücken",
     "codeblock": "Codeblock"
+  },
+  "attachments": {
+    "title": "Anhänge",
+    "photo": "Foto",
+    "file": "Datei",
+    "remove": "„{{name}}“ entfernen",
+    "unavailable": "Nicht verfügbar",
+    "tooLarge": "Zu groß (max. {{size}})",
+    "unsupported": "Nur Bilder, PDFs und Audio",
+    "openFailed": "Konnte nicht geöffnet werden"
   }
 }

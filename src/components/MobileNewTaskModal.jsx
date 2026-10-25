@@ -13,6 +13,7 @@ import TaskProjectField from './TaskProjectField.jsx';
 import RecurrencePicker from './RecurrencePicker.jsx';
 import TaskModalNotes from './TaskModalNotes.jsx';
 import TaskRemindersField from './TaskRemindersField.jsx';
+import TaskAttachmentsField from './TaskAttachmentsField.jsx';
 import TaskMetadataLine from './TaskMetadataLine.jsx';
 import TaskDeadlineField from './TaskDeadlineField.jsx';
 import { extractTags, getRecurrenceLabel } from '../utils/taskUtils.js';
@@ -459,6 +460,8 @@ const MobileNewTaskModal = () => {
                   The only surface for a Bucket List item's. */}
               {/* Reminders set on this task (utils/taskReminders.js). */}
               <TaskRemindersField />
+              {/* Images, PDFs and audio on this task (utils/attachments.js). */}
+              <TaskAttachmentsField />
               <TaskModalNotes newTask={newTask} setNewTask={setNewTask} editingTask={mobileEditingTask} />
               {/* When it was created and completed (#2135); editing only. */}
               {mobileEditingTask && <TaskMetadataLine task={mobileEditingTask} />}

@@ -3046,5 +3046,15 @@
     "indent": "Zwiększ wcięcie",
     "outdent": "Zmniejsz wcięcie",
     "codeblock": "Blok kodu"
+  },
+  "attachments": {
+    "title": "Załączniki",
+    "photo": "Zdjęcie",
+    "file": "Plik",
+    "remove": "Usuń „{{name}}”",
+    "unavailable": "Niedostępne",
+    "tooLarge": "Za duży (maks. {{size}})",
+    "unsupported": "Tylko obrazy, pliki PDF i audio",
+    "openFailed": "Nie udało się otworzyć"
   }
 }

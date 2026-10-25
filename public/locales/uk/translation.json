@@ -3052,5 +3052,15 @@
     "indent": "Збільшити відступ",
     "outdent": "Зменшити відступ",
     "codeblock": "Блок коду"
+  },
+  "attachments": {
+    "title": "Вкладення",
+    "photo": "Фото",
+    "file": "Файл",
+    "remove": "Вилучити «{{name}}»",
+    "unavailable": "Недоступно",
+    "tooLarge": "Завеликий (макс. {{size}})",
+    "unsupported": "Лише зображення, PDF і аудіо",
+    "openFailed": "Не вдалося відкрити"
   }
 }

@@ -41,6 +41,7 @@ export function recurringTaskInstance(template, date) {
     createdAt: template.createdAt ?? null,
     // Reminders are series-level (utils/taskReminders.js): every occurrence has them.
     ...(template.reminders ? { reminders: template.reminders } : {}),
+    ...(template.attachments ? { attachments: template.attachments } : {}),
     ...(template.isExample ? { isExample: true } : {}),
   };
 }

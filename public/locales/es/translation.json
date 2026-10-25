@@ -2912,5 +2912,15 @@
     "indent": "Aumentar sangría",
     "outdent": "Reducir sangría",
     "codeblock": "Bloque de código"
+  },
+  "attachments": {
+    "title": "Adjuntos",
+    "photo": "Foto",
+    "file": "Archivo",
+    "remove": "Quitar «{{name}}»",
+    "unavailable": "No disponible",
+    "tooLarge": "Demasiado grande (máx. {{size}})",
+    "unsupported": "Solo imágenes, PDF y audio",
+    "openFailed": "No se pudo abrir"
   }
 }

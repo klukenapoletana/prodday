@@ -38,7 +38,9 @@ const electronProxyFetch =
     ? (...args) => window.electronAPI.proxyFetch(...args)
     : null;
 
-const DAYGLANCE_CONFIG = {
+// Exported for the attachment transport (sync/attachmentRemote.js), which
+// reaches the same server the same way.
+export const DAYGLANCE_CONFIG = {
   storageKeyPrefix:     'day-planner',
   cryptoDBName:         'dayglance-crypto',
   autoBackupDBName:     'dayglance-auto-backups',
