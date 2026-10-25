@@ -12,6 +12,9 @@
 // The flag is the Notes area's alone: a note sent to the timeline or the
 // Inbox drops it (fromNote, toInboxCopy, the scheduling paths), so a task
 // later sent back to the Inbox lands there and not among the notes.
+//
+// A note can be pinned (`pinned`): pinned notes lead the list. The pin is the
+// Notes area's too and goes with the note flag.
 
 /** True when an entry lives in the Notes area. */
 export const isNote = (task) => !!task?.isNote;
@@ -28,13 +31,13 @@ export const toNote = (task, now = new Date().toISOString()) => {
 
 /** A note back to the Inbox (or on its way to the timeline). */
 export const fromNote = (task, now = new Date().toISOString()) => {
-  const { isNote: _n, ...rest } = task;
+  const { isNote: _n, pinned: _p, ...rest } = task;
   return { ...rest, priority: rest.priority ?? 0, lastModified: now };
 };
 
 /** The note flag dropped, nothing else touched (a scheduling path's copy). */
 export const stripNote = (task) => {
-  const { isNote: _n, ...rest } = task;
+  const { isNote: _n, pinned: _p, ...rest } = task;
   return rest;
 };
 
@@ -54,6 +57,7 @@ export const notePreview = (text, maxLines = 3) => {
     .join('\n');
 };
 
-/** The notes, most recently changed first. */
+/** The notes, pinned ones first, each group most recently changed first. */
 export const sortNotes = (notes) => [...notes].sort((a, b) =>
-  String(b.lastModified || b.createdAt || '').localeCompare(String(a.lastModified || a.createdAt || '')));
+  (Number(!!b.pinned) - Number(!!a.pinned))
+  || String(b.lastModified || b.createdAt || '').localeCompare(String(a.lastModified || a.createdAt || '')));

@@ -2965,7 +2965,9 @@
       "tagMerged": "Scalono #{{from}} z #{{to}}",
       "tagRemoved": "Usunięto #{{from}}",
       "subtasksReordered": "Zmieniono kolejność podzadań w „{{title}}”",
-      "toNotes": "Przeniesiono „{{title}}” do notatek"
+      "toNotes": "Przeniesiono „{{title}}” do notatek",
+      "pinned": "Przypięto „{{title}}”",
+      "unpinned": "Odpięto „{{title}}”"
     }
   },
   "taskReminders": {
@@ -3024,7 +3026,12 @@
     "addNote": "Dodaj do notatek",
     "empty": "Brak notatek",
     "emptyHint": "Pomysły, listy i wszystko bez terminu. Jednym przesunięciem notatka staje się zadaniem.",
-    "settings": "Ustawienia notatki"
+    "settings": "Ustawienia notatki",
+    "pin": "Przypnij",
+    "unpin": "Odepnij",
+    "open": "Otwórz",
+    "pinned": "Przypięte",
+    "others": "Pozostałe"
   },
   "noteFormat": {
     "toolbar": "Formatowanie",

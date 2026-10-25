@@ -2811,7 +2811,9 @@
       "tagMerged": "已将 #{{from}} 合并到 #{{to}}",
       "tagRemoved": "已移除 #{{from}}",
       "subtasksReordered": "已调整“{{title}}”的子任务顺序",
-      "toNotes": "已将“{{title}}”移至笔记"
+      "toNotes": "已将“{{title}}”移至笔记",
+      "pinned": "已置顶“{{title}}”",
+      "unpinned": "已取消置顶“{{title}}”"
     }
   },
   "taskReminders": {
@@ -2849,7 +2851,12 @@
     "addNote": "添加到笔记",
     "empty": "还没有笔记",
     "emptyHint": "想法、清单和所有没有日期的内容。滑动一下，笔记就能变成任务。",
-    "settings": "笔记设置"
+    "settings": "笔记设置",
+    "pin": "置顶",
+    "unpin": "取消置顶",
+    "open": "打开",
+    "pinned": "已置顶",
+    "others": "其他"
   },
   "noteFormat": {
     "toolbar": "格式",

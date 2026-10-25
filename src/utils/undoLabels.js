@@ -27,6 +27,8 @@ export const UNDO_LABELS = [
   'resized',
   'toInbox',
   'toNotes',
+  'pinned',
+  'unpinned',
   'toBucket',
   'scheduled',
   'scheduledDroppedDeadline',

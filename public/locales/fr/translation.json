@@ -2838,7 +2838,9 @@
       "tagMerged": "#{{from}} fusionnée avec #{{to}}",
       "tagRemoved": "#{{from}} retirée",
       "subtasksReordered": "Sous-tâches de « {{title}} » réordonnées",
-      "toNotes": "« {{title}} » déplacée vers les notes"
+      "toNotes": "« {{title}} » déplacée vers les notes",
+      "pinned": "« {{title}} » épinglée",
+      "unpinned": "« {{title}} » désépinglée"
     }
   },
   "taskReminders": {
@@ -2890,7 +2892,12 @@
     "addNote": "Ajouter aux notes",
     "empty": "Aucune note pour l’instant",
     "emptyHint": "Idées, listes et tout ce qui n’a pas de date. Un glissement transforme une note en tâche.",
-    "settings": "Réglages de la note"
+    "settings": "Réglages de la note",
+    "pin": "Épingler",
+    "unpin": "Désépingler",
+    "open": "Ouvrir",
+    "pinned": "Épinglées",
+    "others": "Autres"
   },
   "noteFormat": {
     "toolbar": "Mise en forme",

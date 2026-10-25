@@ -61,3 +61,22 @@ describe('notes actions', () => {
     expect(state.unscheduled[0]).toMatchObject({ title: 'Einkauf', isNote: true });
   });
 });
+
+describe('pinning', () => {
+  it('pins a note and unpins it again, with an undo step', () => {
+    const { actions, state, deps } = build({ unscheduled: [{ id: 'n', title: 'Liste', isNote: true }] });
+    actions.togglePinNote('n');
+    expect(state.unscheduled[0].pinned).toBe(true);
+    expect(deps.pushUndo).toHaveBeenCalledWith({ key: 'pinned', taskId: 'n' });
+    const again = build({ unscheduled: state.unscheduled });
+    again.actions.togglePinNote('n');
+    expect('pinned' in again.state.unscheduled[0]).toBe(false);
+    expect(again.deps.pushUndo).toHaveBeenCalledWith({ key: 'unpinned', taskId: 'n' });
+  });
+
+  it('leaves an Inbox entry alone', () => {
+    const { actions, state } = build({ unscheduled: [{ id: 'i', title: 'Steuer' }] });
+    actions.togglePinNote('i');
+    expect(state.unscheduled[0].pinned).toBeUndefined();
+  });
+});

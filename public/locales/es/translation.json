@@ -2838,7 +2838,9 @@
       "tagMerged": "#{{from}} combinada con #{{to}}",
       "tagRemoved": "#{{from}} quitada",
       "subtasksReordered": "Subtareas de «{{title}}» reordenadas",
-      "toNotes": "Se movió «{{title}}» a notas"
+      "toNotes": "Se movió «{{title}}» a notas",
+      "pinned": "Se fijó «{{title}}»",
+      "unpinned": "Se dejó de fijar «{{title}}»"
     }
   },
   "taskReminders": {
@@ -2890,7 +2892,12 @@
     "addNote": "Añadir a notas",
     "empty": "Aún no hay notas",
     "emptyHint": "Ideas, listas y todo lo que no tiene fecha. Con un deslizamiento, una nota se convierte en tarea.",
-    "settings": "Ajustes de la nota"
+    "settings": "Ajustes de la nota",
+    "pin": "Fijar",
+    "unpin": "Dejar de fijar",
+    "open": "Abrir",
+    "pinned": "Fijadas",
+    "others": "Otras"
   },
   "noteFormat": {
     "toolbar": "Formato",

@@ -2826,7 +2826,9 @@
       "tagMerged": "#{{from}} mit #{{to}} zusammengeführt",
       "tagRemoved": "#{{from}} entfernt",
       "subtasksReordered": "Unteraufgaben von „{{title}}“ neu geordnet",
-      "toNotes": "„{{title}}“ zu den Notizen verschoben"
+      "toNotes": "„{{title}}“ zu den Notizen verschoben",
+      "pinned": "„{{title}}“ angeheftet",
+      "unpinned": "„{{title}}“ gelöst"
     }
   },
   "taskReminders": {
@@ -2871,7 +2873,12 @@
     "addNote": "Zu Notizen hinzufügen",
     "empty": "Noch keine Notizen",
     "emptyHint": "Ideen, Listen und alles ohne Termin. Mit einem Wisch wird aus einer Notiz eine Aufgabe.",
-    "settings": "Notiz-Einstellungen"
+    "settings": "Notiz-Einstellungen",
+    "pin": "Anheften",
+    "unpin": "Lösen",
+    "open": "Öffnen",
+    "pinned": "Angeheftet",
+    "others": "Weitere"
   },
   "noteFormat": {
     "toolbar": "Formatierung",

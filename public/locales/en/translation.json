@@ -2826,7 +2826,9 @@
       "tagMerged": "Merged #{{from}} into #{{to}}",
       "tagRemoved": "Removed #{{from}}",
       "subtasksReordered": "Reordered the subtasks of \"{{title}}\"",
-      "toNotes": "Moved \"{{title}}\" to notes"
+      "toNotes": "Moved \"{{title}}\" to notes",
+      "pinned": "Pinned \"{{title}}\"",
+      "unpinned": "Unpinned \"{{title}}\""
     }
   },
   "taskReminders": {
@@ -2871,7 +2873,12 @@
     "addNote": "Add to notes",
     "empty": "No notes yet",
     "emptyHint": "Ideas, lists and anything without a date. A swipe turns a note into a task.",
-    "settings": "Note settings"
+    "settings": "Note settings",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "open": "Open",
+    "pinned": "Pinned",
+    "others": "Others"
   },
   "noteFormat": {
     "toolbar": "Formatting",

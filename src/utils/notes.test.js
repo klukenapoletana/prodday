@@ -43,3 +43,21 @@ describe('notes', () => {
     expect(sortNotes(list).map((n) => n.id)).toEqual(['b', 'c', 'a']);
   });
 });
+
+describe('pinned notes', () => {
+  it('lead the list, each group newest first', () => {
+    const list = [
+      { id: 'a', lastModified: '2026-03-01' },
+      { id: 'b', lastModified: '2026-01-01', pinned: true },
+      { id: 'c', lastModified: '2026-04-01' },
+      { id: 'd', lastModified: '2026-02-01', pinned: true },
+    ];
+    expect(sortNotes(list).map((n) => n.id)).toEqual(['d', 'b', 'c', 'a']);
+  });
+
+  it('the pin goes with the note flag, wherever the note leaves to', () => {
+    expect(fromNote({ id: 'a', isNote: true, pinned: true }, NOW).pinned).toBeUndefined();
+    expect(stripNote({ id: 'a', isNote: true, pinned: true })).toEqual({ id: 'a' });
+    expect(toInboxCopy({ id: 'a', isNote: true, pinned: true, date: '2026-11-01' }, NOW).pinned).toBeUndefined();
+  });
+});
