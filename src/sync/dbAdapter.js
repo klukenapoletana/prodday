@@ -95,6 +95,7 @@ export const BUNDLE_OWNS = {
   obsidianCompletionDates: ['obsidianCompletionDatesUpdatedAt'],
   multiUserEnabled:     ['multiUserEnabledUpdatedAt'],
   icsCalendars:         ['icsCalendarsUpdatedAt'],
+  customColors:         ['customColorsUpdatedAt'],
 };
 const OWNED_KEYS = new Set(Object.values(BUNDLE_OWNS).flat());
 
@@ -543,7 +544,7 @@ const ALWAYS_DEVICE_LOCAL = new Set([
 // multiUserEnabled flag (itself device-local, so stable regardless of merge order).
 const MULTIUSER_DEVICE_LOCAL = new Set([
   'habitsEnabled', 'routinesEnabled', 'goalsProjectsEnabled', 'syncUrl', 'taskCalendarUrl',
-  'icsCalendars', 'obsidianCompletionDates',
+  'icsCalendars', 'obsidianCompletionDates', 'customColors',
 ]);
 // True when `key` must keep the local value rather than accept the pulled one,
 // given this device's multi-user state. Used by both the merge and the re-push
@@ -642,6 +643,16 @@ function mergeBundle(data, key, value, extra) {
       // matching the file tier's wrapper in mergeSync.js.
       if (data.multiUserEnabled) return;
       const tsKey = 'icsCalendarsUpdatedAt';
+      data[key] = pickByTs(data[key], data[tsKey], value, extra[tsKey]);
+      data[tsKey] = newerIso(data[tsKey], extra[tsKey]);
+      return;
+    }
+    case 'customColors': {
+      // Colours saved from the colour wheel: per-user in multi-user, else
+      // whole-list LWW by the sibling customColorsUpdatedAt (stamped on every
+      // edit), matching the file tier's wrapper in mergeSync.js.
+      if (data.multiUserEnabled) return;
+      const tsKey = 'customColorsUpdatedAt';
       data[key] = pickByTs(data[key], data[tsKey], value, extra[tsKey]);
       data[tsKey] = newerIso(data[tsKey], extra[tsKey]);
       return;

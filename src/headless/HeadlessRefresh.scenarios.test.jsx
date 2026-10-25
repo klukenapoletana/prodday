@@ -391,6 +391,43 @@ describe('HeadlessRefresh', () => {
     }
   });
 
+  // The saved wheel colours through the real payload and apply: this device's
+  // list goes out with its stamp, and a newer list from another device lands
+  // in storage with that device's stamp, not a new one.
+  // MUTATION: drop the customColors line from applyEngineData and the pulled
+  // list never reaches storage.
+  it('sends the saved colours and applies a newer list from another device', async () => {
+    seedStorage(ls);
+    ls.setItem('day-planner-custom-colors', JSON.stringify(['#7ab3e0']));
+    ls.setItem('day-planner-custom-colors-updated-at', '2026-10-18T10:00:00.000Z');
+    const { resetSavedColorsCache } = await import('../hooks/useSavedColors.js');
+    resetSavedColorsCache();
+    const { bridge, calls } = fakeBridge();
+    globalThis.window.DayGlanceNative = bridge;
+    const sent = [];
+    const factory = vi.fn((callbacks) => ({
+      sync: async () => {
+        const payload = await callbacks.buildPayload();
+        sent.push(payload.data);
+        await callbacks.applyPayload({
+          ...payload.data,
+          customColors: ['#3d405b', '#7ab3e0'],
+          customColorsUpdatedAt: '2026-10-19T09:00:00.000Z',
+        }, { allowEmpty: true });
+      },
+      getLastSynced: () => '2026-10-19T10:00:00.000Z',
+    }));
+    const root = await mount({ bridge: () => bridge, createFileEngine: factory, createVaultEngine: () => null, now: () => new Date('2026-10-19T12:00:00') });
+    await until(() => calls.headlessDone.length > 0);
+
+    expect(sent[0].customColors).toEqual(['#7ab3e0']);
+    expect(sent[0].customColorsUpdatedAt).toBe('2026-10-18T10:00:00.000Z');
+    expect(JSON.parse(ls.getItem('day-planner-custom-colors'))).toEqual(['#3d405b', '#7ab3e0']);
+    expect(ls.getItem('day-planner-custom-colors-updated-at')).toBe('2026-10-19T09:00:00.000Z');
+    resetSavedColorsCache();
+    root.unmount();
+  });
+
   it('the store supplies every dep the sync payload and apply read', () => {
     // A key the store does not carry is a slice the headless payload would
     // send as undefined with a fresh lastModified; the hook names it.

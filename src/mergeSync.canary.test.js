@@ -68,6 +68,8 @@ const REPRESENTATIVE = {
   taskCalendarUrl: 'https://dav.example.com/tasks',
   icsCalendars: [{ id: 'ics-1', name: 'Work', url: 'https://dav.example.com/work', color: 'bg-blue-600', enabled: true }],
   icsCalendarsUpdatedAt: ISO,
+  customColors: ['#7ab3e0', '#f7c5cf'],
+  customColorsUpdatedAt: ISO,
   calendarConfigByUser: { u1: { syncUrl: 'https://x', updatedAt: ISO } },
   completedTaskUids: ['uid-1::2026-08-01'],
   recurringTasks: [{ id: 'rec1', title: 'series', recurrence: { type: 'daily' }, completedDates: [], lastModified: ISO }],
