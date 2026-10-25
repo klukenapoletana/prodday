@@ -10,6 +10,7 @@ import { isNativeAndroid, isNativeApp, nativeShowNotification, nativeShowTaskNot
 // sounds and notifications don't fire twice (once per renderer process).
 import { isTrayMode } from '../utils/trayMode.js';
 import { writeItem } from '../utils/storageWrites.js';
+import { upcomingReminders, REMINDER_HORIZON_DAYS } from '../utils/taskReminders.js';
 
 // Pure local helpers
 const timeToMinutes = (time) => {
@@ -34,6 +35,12 @@ const hgUpNextBody = (session, minutes) =>
   session.taskCount > 0
     ? i18n.t('reminders.hgUpNextWithTasks', { title: session.title, count: session.taskCount, minutes })
     : i18n.t('reminders.hgUpNext', { title: session.title, minutes });
+
+// A reminder set on the task itself (utils/taskReminders.js): the start time
+// when it has one, otherwise just "Reminder".
+const customReminderBody = (entry) =>
+  (entry.startTime ? i18n.t('reminders.customAt', { time: entry.startTime }) : i18n.t('reminders.custom'));
+const SNOOZE_MS = 15 * 60 * 1000;
 
 const getTaskCategory = (task) => {
   if (task.isAllDay) return 'allDayTasks';
@@ -66,6 +73,8 @@ export default function useReminderEngine({
   reminderSettings,
   tasks,
   expandedRecurringTasks,
+  recurringTasks = [],
+  unscheduledTasks = [],
   hgSessions = [],
   isVisibleForUser = () => true,
   playUISound,
@@ -88,6 +97,10 @@ export default function useReminderEngine({
     return () => i18n.off('languageChanged', bump);
   }, []);
   const firedRemindersRef = useRef(new Set());
+  // Reminders set on a task fire by their own key and moment; a snoozed one
+  // waits here for its new moment (the task itself does not move).
+  const firedCustomRef = useRef(new Set());
+  const snoozedCustomRef = useRef([]);
   const lastReminderDateRef = useRef((() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -196,6 +209,59 @@ export default function useReminderEngine({
       }
     }
 
+    // ── Reminders set on a task ───────────────────────────────────────────
+    // Independent of the global toggle: the user set each one explicitly.
+    const nowMs = currentTime.getTime();
+    const dueCustom = upcomingReminders({
+      tasks: tasks.filter(isVisibleForUser),
+      unscheduledTasks: unscheduledTasks.filter(isVisibleForUser),
+      recurringTasks: recurringTasks.filter(isVisibleForUser),
+      from: new Date(nowMs - 2 * 60 * 1000),
+      to: new Date(nowMs + 1),
+    }).filter(entry => !firedCustomRef.current.has(`${entry.key}@${entry.at}`));
+    const snoozedDue = snoozedCustomRef.current.filter(s => s.at <= nowMs);
+    snoozedCustomRef.current = snoozedCustomRef.current.filter(s => s.at > nowMs);
+    const customFires = [...dueCustom, ...snoozedDue].map(entry => {
+      firedCustomRef.current.add(`${entry.key}@${entry.at}`);
+      const task = [...tasks, ...unscheduledTasks].find(t => t.id === entry.taskId);
+      return {
+        id: `${entry.key}-${Date.now()}`,
+        taskId: entry.taskId,
+        taskTitle: stripWikilinks(entry.title || ''),
+        taskColor: task?.color,
+        startTime: entry.startTime,
+        message: customReminderBody(entry),
+        type: 'custom',
+        isCalendarEvent: false,
+        isInbox: unscheduledTasks.some(t => t.id === entry.taskId),
+        entry,
+        firedAt: Date.now(),
+      };
+    });
+    if (customFires.length > 0) {
+      playUISound('reminder');
+      if (window.electronAPI?.isElectron) window.electronAPI.setTrayIndicator(true);
+      if (reminderSettings.inAppToasts !== false) {
+        const ids = new Set(customFires.map(r => r.taskId));
+        setActiveReminders(prev => [...prev.filter(r => !ids.has(r.taskId)), ...customFires]);
+      }
+      if (isNativeApp()) {
+        for (const r of customFires) nativeShowTaskNotification(r);
+      } else if (reminderSettings.browserNotifications && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        if (window.electronAPI?.isElectron) {
+          for (const r of customFires) {
+            try { new Notification(r.taskTitle, { body: r.message }); } catch {}
+          }
+        } else {
+          navigator.serviceWorker?.ready.then(reg => {
+            for (const r of customFires) {
+              try { reg.showNotification(r.taskTitle, { body: r.message, icon: '/icon-192.png', tag: String(r.taskId) }); } catch {}
+            }
+          });
+        }
+      }
+    }
+
     if (!reminderSettings.enabled) return;
     const todayStr = dateToString(currentTime);
     const nowMin = currentTime.getHours() * 60 + currentTime.getMinutes();
@@ -271,7 +337,7 @@ export default function useReminderEngine({
         }
       }
     }
-  }, [currentTime, reminderSettings, tasks, expandedRecurringTasks, hgSessions, isVisibleForUser]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentTime, reminderSettings, tasks, expandedRecurringTasks, recurringTasks, unscheduledTasks, hgSessions, isVisibleForUser]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-dismiss reminders based on type
   useEffect(() => {
@@ -331,6 +397,28 @@ export default function useReminderEngine({
       }
     }
 
+    // ── Reminders set on a task (independent of the global toggle) ─────────
+    // The next REMINDER_HORIZON_DAYS, not just today, so a reminder next week
+    // fires though the app is not opened in between. Every change replaces
+    // the set; the native side keeps it across reboots.
+    for (const entry of upcomingReminders({
+      tasks: tasks.filter(isVisibleForUser),
+      unscheduledTasks: unscheduledTasks.filter(isVisibleForUser),
+      recurringTasks: recurringTasks.filter(isVisibleForUser),
+      from: new Date(now + 1000),
+      to: new Date(now + REMINDER_HORIZON_DAYS * 24 * 60 * 60 * 1000),
+    })) {
+      futureReminders.push({
+        id: entry.key,
+        taskId: String(entry.taskId),
+        title: stripWikilinks(entry.title || ''),
+        body: customReminderBody(entry),
+        type: 'custom',
+        isCalendarEvent: false,
+        triggerAtMillis: entry.at,
+      });
+    }
+
     // ── HG session alarms (independent of global enabled toggle) ──────────
     const hgNotifEnabled = reminderSettings.hyperGlance?.enabled !== false;
     if (hgNotifEnabled) {
@@ -367,10 +455,17 @@ export default function useReminderEngine({
     }
 
     nativeSyncReminders(futureReminders);
-  }, [tasks, expandedRecurringTasks, reminderSettings, hgSessions, isVisibleForUser, langEpoch]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tasks, expandedRecurringTasks, recurringTasks, unscheduledTasks, reminderSettings, hgSessions, isVisibleForUser, langEpoch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reminder snooze: push task start time forward 15 minutes
   const snoozeReminder = (reminder) => {
+    // A reminder set on the task comes back in 15 minutes; the task stays put.
+    if (reminder.type === 'custom') {
+      setActiveReminders(prev => prev.filter(r => r.id !== reminder.id));
+      const at = Date.now() + SNOOZE_MS;
+      snoozedCustomRef.current = [...snoozedCustomRef.current, { ...reminder.entry, at }];
+      return;
+    }
     pushUndo({ key: 'snoozed', taskId: reminder.taskId });
     setActiveReminders(prev => prev.filter(r => r.id !== reminder.id));
     const newStartMin = Math.min(timeToMinutes(reminder.startTime) + 15, 23 * 60 + 45);

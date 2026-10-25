@@ -13,7 +13,7 @@ describe('the editor scheduling an unscheduled task', () => {
   it('leaves priority and deadline behind', () => {
     const branch = save.slice(save.indexOf('Task was unscheduled (e.g. a project task)'));
     expect(branch).toContain('const { priority: _priority, deadline: _deadline, ...scheduledFields } = existing || {};');
-    expect(branch).toMatch(/setTasks\(prev => \[\.\.\.prev, \{\s*\.\.\.scheduledFields,/);
+    expect(branch).toMatch(/setTasks\(prev => \[\.\.\.prev, (withReminders\()?\{\s*\.\.\.scheduledFields,/);
     expect(branch).not.toContain('...(existing || {})');
   });
 

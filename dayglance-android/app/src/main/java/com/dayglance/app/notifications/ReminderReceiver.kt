@@ -96,8 +96,9 @@ class ReminderReceiver : BroadcastReceiver() {
             builder.addAction(0, context.getString(R.string.notif_snooze), snoozePi)
         }
 
-        // Mark Complete — available for start/end reminders on non-calendar tasks
-        if ((type == "start" || type == "end") && !isCalendar) {
+        // Mark Complete — available for start/end reminders on non-calendar tasks,
+        // and for a reminder the user set on the task itself ("custom")
+        if ((type == "start" || type == "end" || type == "custom") && !isCalendar) {
             // Launches MainActivity directly. A broadcast receiver calling
             // startActivity() is a background activity launch the platform can drop
             // on SDK 34+, which is why this button did nothing; a notification that

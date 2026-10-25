@@ -28,7 +28,7 @@ const ReminderToasts = () => {
                   <p className={`text-sm font-medium ${textPrimary}`}>{reminder.taskTitle}</p>
                   <div className="flex items-center gap-2">
                     <p className={`text-xs ${textSecondary}`}>{reminder.message}</p>
-                    {reminder.startTime && reminder.type !== 'morning' && (
+                    {reminder.startTime && reminder.type !== 'morning' && reminder.type !== 'custom' && (
                       <span className={`text-xs ${textSecondary}`}>{reminder.startTime}</span>
                     )}
                   </div>
@@ -42,15 +42,15 @@ const ReminderToasts = () => {
                 </button>
               </div>
               <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
-                {reminder.type === 'end' && !reminder.isCalendarEvent && (
+                {(reminder.type === 'end' || reminder.type === 'custom') && !reminder.isCalendarEvent && (
                   <button
-                    onClick={() => { toggleComplete(reminder.taskId); dismissReminder(reminder.id); }}
+                    onClick={() => { toggleComplete(reminder.taskId, !!reminder.isInbox); dismissReminder(reminder.id); }}
                     className="px-2.5 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                   >
                     {t('focus.complete')}
                   </button>
                 )}
-                {reminder.type !== 'end' && reminder.type !== 'morning' && reminder.startTime && (
+                {reminder.type !== 'end' && reminder.type !== 'morning' && (reminder.startTime || reminder.type === 'custom') && (
                   <button
                     onClick={() => snoozeReminder(reminder)}
                     className="px-2.5 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"

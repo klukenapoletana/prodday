@@ -139,8 +139,9 @@ class NotificationBridge(private val context: Context) {
                 snoozePendingIntent(notifId, taskId, title, body, type, isCalendarEvent))
         }
 
-        // Mark Complete — available for start/end reminders on non-calendar tasks
-        if ((type == "start" || type == "end") && !isCalendarEvent) {
+        // Mark Complete — available for start/end reminders on non-calendar tasks,
+        // and for a reminder the user set on the task itself ("custom")
+        if ((type == "start" || type == "end" || type == "custom") && !isCalendarEvent) {
             builder.addAction(0, context.getString(R.string.notif_complete), completePendingIntent(notifId, taskId))
         }
 

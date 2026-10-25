@@ -39,6 +39,8 @@ export function recurringTaskInstance(template, date) {
     // an occurrence turned into its own task (a cross-date drag spreads this
     // object) inherits it rather than being stamped as created on the spot.
     createdAt: template.createdAt ?? null,
+    // Reminders are series-level (utils/taskReminders.js): every occurrence has them.
+    ...(template.reminders ? { reminders: template.reminders } : {}),
     ...(template.isExample ? { isExample: true } : {}),
   };
 }

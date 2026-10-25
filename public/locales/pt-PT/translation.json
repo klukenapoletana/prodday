@@ -1525,7 +1525,9 @@
     "taskCount_one": "{{count}} tarefa",
     "taskCount_other": "{{count}} tarefas",
     "snoozeMinutes": "Adiar {{count}} min",
-    "title": "Lembretes"
+    "title": "Lembretes",
+    "custom": "Lembrete",
+    "customAt": "Começa às {{time}}"
   },
   "frames": {
     "title": "Blocos GTD",
@@ -2837,5 +2839,45 @@
       "tagRemoved": "#{{from}} removida",
       "subtasksReordered": "Subtarefas de “{{title}}” reordenadas"
     }
+  },
+  "taskReminders": {
+    "title": "Lembretes",
+    "addReminder": "Lembrete",
+    "add": "Adicionar",
+    "remove": "Remover lembrete",
+    "tab_before": "Antes do início",
+    "tab_day": "No dia",
+    "tab_at": "Data e hora",
+    "atStart": "No início",
+    "custom": "Personalizado",
+    "unit_minutes": "minutos",
+    "unit_hours": "horas",
+    "unit_days": "dias",
+    "sameDay": "No mesmo dia",
+    "time": "Hora",
+    "date": "Data",
+    "onDayAt": "No dia às {{time}}",
+    "minutesBefore_one": "{{count}} min antes",
+    "minutesBefore_many": "{{count}} min antes",
+    "minutesBefore_other": "{{count}} min antes",
+    "hoursBefore_one": "{{count}} hora antes",
+    "hoursBefore_many": "{{count}} horas antes",
+    "hoursBefore_other": "{{count}} horas antes",
+    "daysBefore_one": "{{count}} dia antes",
+    "daysBefore_many": "{{count}} dias antes",
+    "daysBefore_other": "{{count}} dias antes",
+    "daysBeforeAt_one": "{{count}} dia antes às {{time}}",
+    "daysBeforeAt_many": "{{count}} dias antes às {{time}}",
+    "daysBeforeAt_other": "{{count}} dias antes às {{time}}",
+    "presetStart": "Início",
+    "minutesShort_one": "{{count}} min",
+    "minutesShort_many": "{{count}} min",
+    "minutesShort_other": "{{count}} min",
+    "hoursShort_one": "{{count}} hora",
+    "hoursShort_many": "{{count}} horas",
+    "hoursShort_other": "{{count}} horas",
+    "daysShort_one": "{{count}} dia",
+    "daysShort_many": "{{count}} dias",
+    "daysShort_other": "{{count}} dias"
   }
 }

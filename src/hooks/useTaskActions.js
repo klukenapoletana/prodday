@@ -12,6 +12,7 @@ import { createPendingProject } from '../utils/pendingProject.js';
 import { canFollowUp, resolveTaskRef } from '../utils/followUp.js';
 import { isEveryDay, editedSeriesStart, reanchorCompletionSeries } from '../utils/recurrenceEngine.js';
 import { moveSubtaskTo } from '../utils/subtaskOrder.js';
+import { remindersOf, withReminders } from '../utils/taskReminders.js';
 import { recordDeletedTaskTombstone } from '../utils/deletedTaskTombstones.js';
 
 // Strip a specific tag (e.g. "#obsidian") from a title string.
@@ -203,6 +204,7 @@ export default function useTaskActions({
         ...(obsidianMeta ? { createdAt: createdTimestamp() } : {}),
         ...(newTask.projectId ? { projectId: newTask.projectId } : {}),
         ...(newTask.assignedUserSyncIds?.length ? { assignedUserSyncIds: newTask.assignedUserSyncIds } : {}),
+        ...(remindersOf(newTask).length ? { reminders: remindersOf(newTask) } : {}),
       };
 
       // The id a new one-off task was saved under, for a Do this task was
@@ -243,6 +245,7 @@ export default function useTaskActions({
           // User assignment on recurring tasks is series-level: it lives on the
           // template so every materialised instance inherits it.
           ...(newTask.assignedUserSyncIds?.length ? { assignedUserSyncIds: newTask.assignedUserSyncIds } : {}),
+          ...(remindersOf(newTask).length ? { reminders: remindersOf(newTask) } : {}),
           lastModified: new Date().toISOString()
         };
         setRecurringTasks(prev => [...prev, template]);
@@ -261,7 +264,7 @@ export default function useTaskActions({
             ? { conflicted: false, adjustedStartTime: requestedStartTime, conflictingEvent: null }
             : getAdjustedTimeForImportedConflicts(inboxTask.id, requestedStartTime, newTask.duration, taskDate);
           const { priority, deadline, ...preserved } = inboxTask;
-          setTasks(prev => [...prev, {
+          setTasks(prev => [...prev, withReminders({
             ...preserved,
             title: savedTitle,
             duration: newTask.duration,
@@ -269,7 +272,7 @@ export default function useTaskActions({
             isAllDay: newTask.isAllDay || false,
             startTime: adjustedStartTime,
             date: taskDate
-          }]);
+          }, newTask.reminders)]);
           setUnscheduledTasks(prev => prev.filter(t => t.id !== inboxId));
           if (conflicted && conflictingEvent) {
             setSyncNotification({
