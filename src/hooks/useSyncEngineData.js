@@ -23,7 +23,8 @@ import { keepImportedTask } from '../sync/payloadExclusions.js';
 import { dropResurrectedTasks } from '../utils/dropResurrectedTasks.js';
 import { preserveStickyFields } from '../utils/preserveStickyFields.js';
 import { stripProjectRefs, stripGoalRefs, resolveDeletedIds } from '../utils/referentialIntegrity.js';
-import { rescueUnsyncedTasks } from '../utils/rescueUnsyncedTasks.js';
+import { isDefaultRescuable, rescueUnsyncedTasks } from '../utils/rescueUnsyncedTasks.js';
+import { isPendingLocalAdd, settlePendingLocalAdds } from '../sync/pendingLocalAdds.js';
 import { readRetiredTaskIds, applyTaskRetirements, RETIRED_TASK_IDS_STORAGE_KEY } from '../utils/retiredTaskIds.js';
 import { dropTombstonedObsidianTasks, dropTombstonedObsidianNotes } from '../utils/obsidianDeletions.js';
 import { containObsidianGhostRows, persistDerivedGhostRetirements } from '../utils/obsidianGhostRows.js';
@@ -636,6 +637,11 @@ export default function useSyncEngineData(deps) {
     // — that resurrects a task deleted on another device (the seed-task ping-pong).
     // See utils/rescueUnsyncedTasks.js.
     const rescueDeletedIds = data.deletedTaskIds || {};
+    // An entry added from outside the app during this cycle (quick add, a
+    // share) is rescued too, until a result carries it (sync/pendingLocalAdds.js).
+    settlePendingLocalAdds(new Set([...(normalizedTasks || []), ...(normalizedUnsched || []), ...(data.recycleBin || [])]
+      .filter(Boolean).map(t => String(t.id))));
+    const isRescuable = (t) => isDefaultRescuable(t) || isPendingLocalAdd(t);
     // The merge's fence, for the horizon guard: a prev-only task the payload
     // would have sent, older than this, was dropped by the merge as a zombie
     // (tombstone pruned); rescuing it re-applied every cycle (2026-10-06).
@@ -662,10 +668,10 @@ export default function useSyncEngineData(deps) {
     // carried: the invariant is that no state list may reference a tombstoned
     // project, not just the rows the payload happened to contain.
     if (normalizedTasks) setTasks(prev => stripProjectRefs(applyTaskRetirements(
-      rescueUnsyncedTasks(preserveStickyFields(normalizedTasks, prev), prev, rescueDeletedIds, undefined, rescueObsidianTombstones, retiredLiveIds, rescueOpts),
+      rescueUnsyncedTasks(preserveStickyFields(normalizedTasks, prev), prev, rescueDeletedIds, isRescuable, rescueObsidianTombstones, retiredLiveIds, rescueOpts),
       retiredRecord, retiredLiveIds), deletedProjectIds));
     if (normalizedUnsched) setUnscheduledTasks(prev => stripProjectRefs(applyTaskRetirements(
-      rescueUnsyncedTasks(preserveStickyFields(normalizedUnsched, prev), prev, rescueDeletedIds, undefined, rescueObsidianTombstones, retiredLiveIds, rescueOpts),
+      rescueUnsyncedTasks(preserveStickyFields(normalizedUnsched, prev), prev, rescueDeletedIds, isRescuable, rescueObsidianTombstones, retiredLiveIds, rescueOpts),
       retiredRecord, retiredLiveIds), deletedProjectIds));
     if (data.unscheduledOrderTimestamp) {
       setUnscheduledOrderTimestamp(data.unscheduledOrderTimestamp);

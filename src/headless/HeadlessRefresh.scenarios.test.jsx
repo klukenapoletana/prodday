@@ -26,7 +26,17 @@ vi.mock('../sync/dbEngine.js', async (importOriginal) => ({
   restoreDbRootKey: async () => true,
 }));
 
+// The store the root renders with, so a scenario can make a local write
+// mid-cycle the way the app's own hooks would.
+const storeSeen = vi.hoisted(() => ({ current: null }));
+vi.mock('./useHeadlessStore.js', async (importOriginal) => {
+  const { default: useStore } = await importOriginal();
+  const useSeenStore = () => { const store = useStore(); storeSeen.current = store; return store; };
+  return { default: useSeenStore };
+});
+
 const { default: HeadlessRefresh } = await import('./HeadlessRefresh.jsx');
+const { markPendingLocalAdds, resetPendingLocalAdds } = await import('../sync/pendingLocalAdds.js');
 const { IDBFactory } = await import('fake-indexeddb');
 const notesStore = await import('../utils/dailyNotesStore.js');
 const { openDatabase } = await import('../utils/idbKeyValue.js');
@@ -426,6 +436,41 @@ describe('HeadlessRefresh', () => {
     expect(ls.getItem('day-planner-custom-colors-updated-at')).toBe('2026-10-19T09:00:00.000Z');
     resetSavedColorsCache();
     root.unmount();
+  });
+
+  // Quick add and shared files add their entries while the app starts, when
+  // a file-tier cycle runs: its apply replaces the lists with a result built
+  // from the payload taken BEFORE the add. Registered as pending, the entry
+  // survives that apply (sync/pendingLocalAdds.js); unregistered, the same
+  // write made by hand in the app would not (that is the rescue's rule for
+  // a governed task).
+  // MUTATION: drop isPendingLocalAdd from the apply's rescue predicate and the
+  // shared note vanishes, as it did on the phone.
+  it('an entry added from outside mid-cycle survives the apply that did not carry it', async () => {
+    resetPendingLocalAdds();
+    seedStorage(ls);
+    const { bridge, calls } = fakeBridge();
+    globalThis.window.DayGlanceNative = bridge;
+    const note = { id: 'share-b1', title: 'Rechnung', isNote: true, notes: '', subtasks: [], createdAt: '2026-10-19T11:59:00.000Z' };
+    const factory = vi.fn((callbacks) => ({
+      sync: async () => {
+        const payload = await callbacks.buildPayload();
+        // The share lands while the cycle is on the network.
+        await act(async () => {
+          markPendingLocalAdds([note.id]);
+          storeSeen.current.setUnscheduledTasks((prev) => [...prev, note]);
+        });
+        await callbacks.applyPayload({ ...payload.data }, { allowEmpty: true });
+      },
+      getLastSynced: () => '2026-10-19T10:00:00.000Z',
+    }));
+    const root = await mount({ bridge: () => bridge, createFileEngine: factory, createVaultEngine: () => null, now: () => new Date('2026-10-19T12:00:00') });
+    await until(() => calls.headlessDone.length > 0);
+
+    expect(storeSeen.current.unscheduledTasks.map((t) => t.id)).toEqual(['u1', 'share-b1']);
+    expect(JSON.parse(ls.getItem('day-planner-unscheduled')).map((t) => t.id)).toEqual(['u1', 'share-b1']);
+    root.unmount();
+    resetPendingLocalAdds();
   });
 
   it('the store supplies every dep the sync payload and apply read', () => {

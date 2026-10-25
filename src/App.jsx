@@ -1568,18 +1568,16 @@ const DayPlanner = () => {
   useStorageProjection({ dataLoaded, isTrayMode, setUndoToast, t });
   // Attachment files: uploads, and deleting the ones nothing refers to.
   useAttachmentSync({ tasks, unscheduledTasks, recurringTasks, recycleBin, dataLoaded, disabled: isTrayMode });
-  // Lines typed into the Quick add widget's window land in the Inbox. Both
-  // these and shared files are added between sync cycles (utils/syncIdle.js).
-  const isSyncBusy = () => !!(cloudSyncEngineRef.current?.isSyncing?.() || dbEngineRef.current?.isSyncing?.());
+  // Lines typed into the Quick add widget's window land in the Inbox.
   useQuickAddInbox({
-    dataLoaded, unscheduledTasks, recycleBin, setUnscheduledTasks, isSyncBusy,
+    dataLoaded, unscheduledTasks, recycleBin, setUnscheduledTasks,
     defaultColor: TASK_COLORS[0].class, disabled: isTrayMode,
   });
   // Files shared from another app become a note, which then opens in the
   // Notes tab (MobileNotesView reads noteToOpen).
   const [noteToOpen, setNoteToOpen] = useState(null);
   useSharedFilesToNotes({
-    dataLoaded, unscheduledTasks, recycleBin, setUnscheduledTasks, isSyncBusy,
+    dataLoaded, unscheduledTasks, recycleBin, setUnscheduledTasks,
     defaultColor: TASK_COLORS[0].class,
     fallbackTitle: t('share.untitled'),
     onCreated: (id) => { setMobileActiveTab('notes'); setNoteToOpen(id); },
