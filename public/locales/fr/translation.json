@@ -994,7 +994,14 @@
     "anchorLabel": "Rythme",
     "anchorFixed": "Fixe",
     "anchorCompletion": "Après achèvement",
-    "afterCompletion": "{{label}} après achèvement"
+    "afterCompletion": "{{label}} après achèvement",
+    "daily": "Quotidien",
+    "weekly": "Hebdomadaire",
+    "monthly": "Mensuel",
+    "yearly": "Annuel",
+    "onDays": "Les jours",
+    "onMonthDay": "Le {{day}}",
+    "onOrdinalWeekday": "Le {{ordinal}} {{day}}"
   },
   "dateRange": {
     "sameMonth": "{{startDay}}–{{endDay}} {{month}} {{year}}",

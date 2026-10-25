@@ -982,7 +982,14 @@
     "anchorLabel": "Rhythm",
     "anchorFixed": "Fixed",
     "anchorCompletion": "After completion",
-    "afterCompletion": "{{label}} after completion"
+    "afterCompletion": "{{label}} after completion",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "onDays": "On days",
+    "onMonthDay": "On the {{day}}",
+    "onOrdinalWeekday": "On the {{ordinal}} {{day}}"
   },
   "dateRange": {
     "sameMonth": "{{month}} {{startDay}}–{{endDay}}, {{year}}",

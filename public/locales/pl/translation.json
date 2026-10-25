@@ -1027,7 +1027,14 @@
     "anchorLabel": "Rytm",
     "anchorFixed": "Stały",
     "anchorCompletion": "Od wykonania",
-    "afterCompletion": "{{label}} od wykonania"
+    "afterCompletion": "{{label}} od wykonania",
+    "daily": "Codziennie",
+    "weekly": "Co tydzień",
+    "monthly": "Co miesiąc",
+    "yearly": "Co rok",
+    "onDays": "W dni",
+    "onMonthDay": "{{day}} dzień miesiąca",
+    "onOrdinalWeekday": "{{ordinal}} {{day}}"
   },
   "dateRange": {
     "sameMonth": "{{startDay}}–{{endDay}} {{month}} {{year}}",

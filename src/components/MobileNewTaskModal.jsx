@@ -377,7 +377,7 @@ const MobileNewTaskModal = () => {
                       >
                         {newTask.recurrence ? getRecurrenceLabel(newTask.recurrence, t, i18n.resolvedLanguage || i18n.language) : t('task.noRepeat')}
                       </button>
-                      {showRecurrencePicker && <RecurrencePicker placement="top" />}
+                      {showRecurrencePicker && <RecurrencePicker />}
                     </div>
                     {newTask.recurrence && (
                       <div className="col-span-2">

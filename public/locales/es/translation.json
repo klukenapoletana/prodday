@@ -994,7 +994,14 @@
     "anchorLabel": "Ritmo",
     "anchorFixed": "Fijo",
     "anchorCompletion": "Tras completar",
-    "afterCompletion": "{{label}} tras completar"
+    "afterCompletion": "{{label}} tras completar",
+    "daily": "Diario",
+    "weekly": "Semanal",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "onDays": "Los días",
+    "onMonthDay": "El día {{day}}",
+    "onOrdinalWeekday": "El {{ordinal}}.º {{day}}"
   },
   "dateRange": {
     "sameMonth": "{{startDay}}–{{endDay}} de {{month}} de {{year}}",

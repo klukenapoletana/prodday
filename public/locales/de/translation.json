@@ -982,7 +982,14 @@
     "anchorLabel": "Rhythmus",
     "anchorFixed": "Fest",
     "anchorCompletion": "Ab Erledigung",
-    "afterCompletion": "{{label}} ab Erledigung"
+    "afterCompletion": "{{label}} ab Erledigung",
+    "daily": "Täglich",
+    "weekly": "Wöchentlich",
+    "monthly": "Monatlich",
+    "yearly": "Jährlich",
+    "onDays": "An Tagen",
+    "onMonthDay": "Am {{day}}.",
+    "onOrdinalWeekday": "Am {{ordinal}}. {{day}}"
   },
   "dateRange": {
     "sameMonth": "{{startDay}}.–{{endDay}}. {{month}} {{year}}",
