@@ -13,9 +13,9 @@
 
 name: Trigger glance-apps.com rebuild
 
+# prodday: kept from the original for manual runs only. A version tag or a
+# release builds the Android APK (release-android.yml), nothing else.
 on:
-  release:
-    types: [published]
   workflow_dispatch:
 
 jobs:

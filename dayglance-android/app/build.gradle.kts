@@ -20,12 +20,13 @@ android {
         applicationId = "io.github.klukenapoletana.prodday"
         minSdk = 26  // Android 8.0 — required for Health Connect
         targetSdk = 36
-        // Overridable per-build from the command line (build-and-install.sh
-        // passes -PversionCode=N for release builds); the literal is the
-        // fallback for plain gradle/IDE builds and no longer needs a commit
-        // per Play upload.
-        versionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull() ?: 185
-        versionName = "5.9.0"
+        // Overridable per-build from the command line; the release workflow
+        // (.github/workflows/release-android.yml) passes -PversionCode derived
+        // from the tag (major * 10000 + minor * 100 + patch). The literal is
+        // the fallback for plain gradle/IDE builds. Keep versionName equal to
+        // package.json's version.
+        versionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull() ?: 10000
+        versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

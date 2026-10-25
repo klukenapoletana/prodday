@@ -135,13 +135,16 @@ const gradleText = sub(
 
 // ── 3. README.md shields.io badge ─────────────────────────────────────────
 // e.g.  https://img.shields.io/badge/version-3.10.0-green.svg
+// prodday's README has no badge; it is updated only where one exists.
 const readme = read('README.md');
-const readmeText = sub(
-  readme.text,
-  /(shields\.io\/badge\/version-)(\d+\.\d+\.\d+)(-)/,
-  (_all, pre, _old, post) => `${pre}${version}${post}`,
-  { file: 'README.md', label: 'version badge', to: version },
-);
+const readmeText = /shields\.io\/badge\/version-\d+\.\d+\.\d+-/.test(readme.text)
+  ? sub(
+    readme.text,
+    /(shields\.io\/badge\/version-)(\d+\.\d+\.\d+)(-)/,
+    (_all, pre, _old, post) => `${pre}${version}${post}`,
+    { file: 'README.md', label: 'version badge', to: version },
+  )
+  : readme.text;
 
 // ── 4. package-lock.json ──────────────────────────────────────────────────
 // npm records the app's own version in TWO places in the lockfile (the root

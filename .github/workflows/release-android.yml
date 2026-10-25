@@ -1,0 +1,139 @@
+name: Release Android
+
+# Builds the signed Android APK (github flavor) for a version tag such as
+# v1.0.0 and attaches it to a DRAFT GitHub release. A draft is visible only to
+# the repository's owner and collaborators: prodday is not distributed
+# publicly (README). Publishing the draft is a deliberate step on GitHub.
+#
+# Needs four repository secrets (RELEASING.md, "Signier-Schlüssel"):
+#   ANDROID_KEYSTORE_BASE64   the release keystore, base64-encoded
+#   ANDROID_KEYSTORE_PASSWORD
+#   ANDROID_KEY_ALIAS
+#   ANDROID_KEY_PASSWORD
+#
+# The versionCode comes from the tag: major * 10000 + minor * 100 + patch, so
+# every release installs over the previous one.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to build, e.g. v1.0.0'
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-android-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Check the tag against the version
+        id: version
+        run: |
+          VERSION="${TAG#v}"
+          if ! [[ "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "::error::Tag $TAG is not vX.Y.Z"; exit 1
+          fi
+          PKG=$(node -p "require('./package.json').version")
+          GRADLE=$(sed -n 's/.*versionName = "\(.*\)".*/\1/p' dayglance-android/app/build.gradle.kts)
+          if [ "$PKG" != "$VERSION" ] || [ "$GRADLE" != "$VERSION" ]; then
+            echo "::error::Tag $TAG, package.json $PKG and versionName $GRADLE differ. Run npm run bump $VERSION first."
+            exit 1
+          fi
+          CODE=$(( ${BASH_REMATCH[1]} * 10000 + ${BASH_REMATCH[2]} * 100 + ${BASH_REMATCH[3]} ))
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+
+      - name: Check the signing secrets
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          for name in KEYSTORE STORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Signing secret missing ($name). See RELEASING.md."; exit 1
+            fi
+          done
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build the web app
+        run: |
+          npm ci
+          npm run build:android
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Write the keystore
+        working-directory: dayglance-android
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE" | base64 --decode > app/release.keystore
+          {
+            echo "storeFile=release.keystore"
+            echo "storePassword=$STORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > keystore.properties
+
+      - name: Build the signed APK
+        working-directory: dayglance-android
+        run: ./gradlew --stacktrace :app:assembleGithubRelease -PversionCode=${{ steps.version.outputs.code }}
+
+      - name: Remove the keystore
+        if: always()
+        working-directory: dayglance-android
+        run: rm -f app/release.keystore keystore.properties
+
+      - name: Create the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          APK="prodday-$VERSION.apk"
+          cp dayglance-android/app/build/outputs/apk/github/release/app-github-release.apk "$APK"
+          sha256sum "$APK" > "$APK.sha256"
+          NOTES="docs/releases/$TAG.md"
+          if [ ! -f "$NOTES" ]; then echo "prodday $VERSION" > /tmp/notes.md; NOTES=/tmp/notes.md; fi
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" "$APK.sha256" --clobber
+          else
+            gh release create "$TAG" "$APK" "$APK.sha256" --draft --title "prodday $VERSION" --notes-file "$NOTES"
+          fi
