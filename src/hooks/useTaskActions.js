@@ -10,7 +10,7 @@ import { isCalendarEventRow } from '../utils/eventNotes.js';
 import { describeObstacle } from '../utils/dayOccupancy.js';
 import { createPendingProject } from '../utils/pendingProject.js';
 import { canFollowUp, resolveTaskRef } from '../utils/followUp.js';
-import { editedSeriesStart } from '../utils/recurrenceEngine.js';
+import { isEveryDay, editedSeriesStart } from '../utils/recurrenceEngine.js';
 import { moveSubtaskTo } from '../utils/subtaskOrder.js';
 import { recordDeletedTaskTombstone } from '../utils/deletedTaskTombstones.js';
 
@@ -584,7 +584,7 @@ export default function useTaskActions({
       if (!parsed) return;
       const template = recurringTasks.find(t => t.id === parsed.templateId);
       if (!template) return;
-      if (template.recurrence?.type === 'daily') return; // daily tasks recur tomorrow anyway
+      if (isEveryDay(template.recurrence)) return; // an every-day series recurs tomorrow anyway
       const exc = template.exceptions?.[parsed.dateStr] || {};
       const title = exc.title || template.title;
       const startTime = exc.startTime !== undefined ? exc.startTime : (template.startTime || '');

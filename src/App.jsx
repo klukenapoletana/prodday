@@ -86,7 +86,7 @@ import { buildWidgetDueOn } from './utils/widgetGoalsProjects.js';
 import { resolveGoalsLink, areaFilterHides } from './utils/goalsLink.js';
 import { HABIT_ICONS, HABIT_ICON_NAMES, HABIT_COLORS } from './constants/habits.js';
 import { FRAME_COLORS } from './constants/frames.js';
-import { getOccurrencesInRange, getRecurrencePresets } from './utils/recurrenceEngine.js';
+import { isEveryDay, getOccurrencesInRange, getRecurrencePresets } from './utils/recurrenceEngine.js';
 import { getPartialTag, getFilteredTags, applyTagCompletion, getPartialDate, getPartialTime, getPartialDeadline, getPartialPriority, getPartialDuration, getDateCandidates, parseFlexibleDate, getTimeCandidates, parseFlexibleTime, completeShortcutText, cleanTitle, removeFromTitle } from './utils/suggestionParser.js';
 import ClockTimePicker from './components/ClockTimePicker.jsx';
 import { HabitRing, MiniHabitRing } from './components/HabitRing.jsx';
@@ -3937,7 +3937,7 @@ const DayPlanner = () => {
     if (mobileEditIsInbox || !newTask.recurrence) return false;
     const parsed = parseRecurringId(mobileEditingTask.id);
     if (!parsed) return false;
-    if (newTask.date && newTask.date !== parsed.dateStr && newTask.recurrence.type !== 'daily') return false;
+    if (newTask.date && newTask.date !== parsed.dateStr && !isEveryDay(newTask.recurrence)) return false;
     const template = recurringTasks.find(t => t.id === parsed.templateId);
     if (!template) return false;
     return instanceEditChanges(template, parsed.dateStr, recurringInstanceEditFrom(newTask), { defaultColor: colors[0].class }).any;
@@ -3998,7 +3998,7 @@ const DayPlanner = () => {
           setRecurringTasks(prev => prev.filter(t => t.id !== parsed.templateId));
         } else {
           const dateChanged = newTask.date && newTask.date !== parsed.dateStr;
-          const isDaily = newTask.recurrence?.type === 'daily';
+          const isDaily = isEveryDay(newTask.recurrence);
           if (dateChanged && !isDaily) {
             // Date changed for a non-daily recurring instance:
             // skip the original occurrence and create a one-off task on the new date

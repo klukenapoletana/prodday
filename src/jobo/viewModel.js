@@ -11,6 +11,7 @@ import { resolveOccurrence } from './detector.js';
 import { validCivilDate } from './viewDates.js';
 
 import { completionMarker } from './completionMarker.js';
+import { occurrenceRecurrenceType } from '../utils/recurrenceEngine.js';
 
 const DAY_MINUTES = 24 * 60;
 const PROGRESS_ORDER = Object.freeze([
@@ -230,7 +231,7 @@ function expandRecurringOccurrence(template, date) {
     date,
     isRecurring: true,
     recurringTemplateId: template.id,
-    recurrenceType: template.recurrence?.type,
+    recurrenceType: occurrenceRecurrenceType(template.recurrence),
     projectId: template.projectId,
     ...(template.isExample ? { isExample: true } : {}),
     // This occurrence was synthesized outside the native expansion window.

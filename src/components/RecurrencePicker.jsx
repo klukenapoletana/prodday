@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDayPlannerCtx } from '../context/DayPlannerContext.jsx';
 import { dateToString } from '../utils/taskUtils.js';
@@ -7,8 +7,18 @@ import {
   getSelectedWeekdays,
   toggleRecurrenceDay,
   setRecurrenceFrequency,
+  setRecurrenceInterval,
+  recurrenceUnitAndInterval,
   weekdayOrder,
+  MAX_INTERVAL,
 } from '../utils/recurrenceEngine.js';
+
+const INTERVAL_UNITS = [
+  ['daily', 'recurrence.unitDays'],
+  ['weekly', 'recurrence.unitWeeks'],
+  ['monthly', 'recurrence.unitMonths'],
+  ['yearly', 'recurrence.unitYears'],
+];
 
 /**
  * The Repeat dropdown, shared by the mobile and desktop task editors — the two
@@ -68,8 +78,24 @@ const RecurrencePicker = ({ placement = 'bottom', highlightSelected = false }) =
   const applyDay = (dow) =>
     setNewTask({ ...newTask, recurrence: { ...toggleRecurrenceDay(recurrence, dow, dateStr), ...endFields() } });
 
-  const applyFrequency = (type) =>
-    setNewTask({ ...newTask, recurrence: { ...setRecurrenceFrequency(recurrence, type, dateStr), ...endFields() } });
+  // The week buttons mean every 1 and every 2 weeks, so they drop an interval.
+  const applyFrequency = (type) => {
+    const { interval: _interval, ...next } = setRecurrenceFrequency(recurrence, type, dateStr);
+    setNewTask({ ...newTask, recurrence: { ...next, ...endFields() } });
+  };
+
+  // "Repeat every [n] [unit]" (utils/recurrenceEngine.js setRecurrenceInterval).
+  // It reflects the selection like the day grid does; with no repeat chosen
+  // it shows "every 1 day" and choosing anything there starts one. The count
+  // is typed as text and applied once it is a whole number in range, so
+  // clearing the field to type "12" does not reset the series on the way.
+  const current = recurrenceUnitAndInterval(recurrence);
+  const unit = current?.unit ?? 'daily';
+  const count = current?.n ?? 1;
+  const [countDraft, setCountDraft] = useState(String(count));
+  useEffect(() => { setCountDraft(String(count)); }, [count]);
+  const applyInterval = (nextUnit, nextCount) =>
+    setNewTask({ ...newTask, recurrence: { ...setRecurrenceInterval(recurrence, nextUnit, nextCount, dateStr), ...endFields() } });
 
   const freqButton = (type, label) => (
     <button
@@ -87,7 +113,7 @@ const RecurrencePicker = ({ placement = 'bottom', highlightSelected = false }) =
 
   return (
     <div
-      className={`absolute ${placement === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'} left-0 ${cardBg} rounded-lg shadow-xl z-30 border ${borderClass} min-w-[250px] max-h-[320px] flex flex-col`}
+      className={`absolute ${placement === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'} left-0 ${cardBg} rounded-lg shadow-xl z-30 border ${borderClass} min-w-[250px] max-h-[380px] flex flex-col`}
     >
       {/* Only the presets scroll. The day grid is pinned below them: it is the
           part people will not think to look for, and eight presets are enough
@@ -138,6 +164,41 @@ const RecurrencePicker = ({ placement = 'bottom', highlightSelected = false }) =
             {freqButton('biweekly', t('task.every2Weeks'))}
           </div>
         )}
+      </div>
+
+      <div className={`border-t ${borderClass} px-3 py-2 flex-shrink-0`} data-recurrence-interval>
+        <label className={`block text-xs font-medium ${textSecondary} mb-1.5`} htmlFor="recurrence-interval-count">
+          {t('recurrence.intervalLabel')}
+        </label>
+        <div className="flex gap-2">
+          <input
+            id="recurrence-interval-count"
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={MAX_INTERVAL}
+            step={1}
+            value={countDraft}
+            onChange={(e) => {
+              setCountDraft(e.target.value);
+              const n = Number(e.target.value);
+              if (Number.isInteger(n) && n >= 1 && n <= MAX_INTERVAL) applyInterval(unit, n);
+            }}
+            onBlur={() => setCountDraft(String(count))}
+            className={`w-16 px-2 py-1 text-sm border ${borderClass} rounded-md ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'}`}
+          />
+          <select
+            value={current ? unit : ''}
+            onChange={(e) => applyInterval(e.target.value, count)}
+            aria-label={t('recurrence.intervalLabel')}
+            className={`flex-1 min-w-0 px-2 py-1 text-sm border ${borderClass} rounded-md ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'}`}
+          >
+            {!current && <option value="" disabled>—</option>}
+            {INTERVAL_UNITS.map(([value, key]) => (
+              <option key={value} value={value}>{t(key, { count })}</option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   );

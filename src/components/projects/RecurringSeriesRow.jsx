@@ -2,7 +2,7 @@ import React from 'react';
 import { CheckSquare, Repeat, Square } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useDayPlannerCtx } from '../../context/DayPlannerContext.jsx';
-import { getOccurrencesInRange } from '../../utils/recurrenceEngine.js';
+import { occurrenceRecurrenceType, getOccurrencesInRange } from '../../utils/recurrenceEngine.js';
 import { renderTitle } from '../../utils/textFormatting.jsx';
 
 /**
@@ -43,7 +43,7 @@ const RecurringSeriesRow = ({ template, projectHex }) => {
     date: todayStr,
     isRecurring: true,
     recurringTemplateId: template.id,
-    recurrenceType: template.recurrence?.type,
+    recurrenceType: occurrenceRecurrenceType(template.recurrence),
     projectId: template.projectId,
   };
 

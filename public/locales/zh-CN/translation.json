@@ -953,7 +953,20 @@
     "monthDayOrdinal_ordinal_one": "{{count}}",
     "monthDayOrdinal_ordinal_two": "{{count}}",
     "monthDayOrdinal_ordinal_few": "{{count}}",
-    "monthDayOrdinal_ordinal_other": "{{count}}"
+    "monthDayOrdinal_ordinal_other": "{{count}}",
+    "everyNDays_other": "每{{count}}天",
+    "everyNWeeks_other": "每{{count}}周",
+    "everyNWeeksOnDays_other": "每{{count}}周：{{days}}",
+    "everyNMonths_other": "每{{count}}个月",
+    "everyNMonthsOnDate_other": "每{{count}}个月的{{day}}日",
+    "everyNMonthsOnOrdinalWeekday_other": "每{{count}}个月的第{{ordinal}}个{{day}}",
+    "everyNYears_other": "每{{count}}年",
+    "everyNYearsOn_other": "每{{count}}年的{{date}}",
+    "unitDays_other": "天",
+    "unitWeeks_other": "周",
+    "unitMonths_other": "个月",
+    "unitYears_other": "年",
+    "intervalLabel": "重复间隔：每"
   },
   "dateRange": {
     "sameMonth": "{{year}}年{{month}}{{startDay}}日至{{endDay}}日",

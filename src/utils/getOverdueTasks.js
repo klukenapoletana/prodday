@@ -2,7 +2,7 @@
 // App.jsx supplies both clocks: todayStr comes from the wall clock, while now
 // is currentTime (or its wall-clock fallback). Keep them separate at rollover.
 import { dateToString } from './taskUtils.js';
-import { getOccurrencesInRange } from './recurrenceEngine.js';
+import { occurrenceRecurrenceType, getOccurrencesInRange } from './recurrenceEngine.js';
 import { notBucketed } from './bucketList.js';
 
 /**
@@ -77,7 +77,7 @@ export function getOverdueTasks({
         date: dateStr,
         isRecurring: true,
         recurringTemplateId: template.id,
-        recurrenceType: template.recurrence?.type,
+        recurrenceType: occurrenceRecurrenceType(template.recurrence),
         // Project membership is series-level (stored on the template);
         // instances inherit it so project-filtered views keep occurrences.
         projectId: template.projectId,

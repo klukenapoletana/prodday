@@ -11,6 +11,31 @@ const dateToString = (date) => {
 };
 
 /**
+ * How many units a series steps between occurrences: `recurrence.interval`
+ * when it is a whole number above 1 ("every 4 days", "every 3 weeks"), else 1.
+ * Absent on every series made before intervals existed, which therefore
+ * expand exactly as they always did. 'biweekly' is the older spelling of
+ * weekly every 2 and keeps its own type.
+ */
+export const recurrenceInterval = (rec) =>
+  (Number.isInteger(rec?.interval) && rec.interval > 1 ? rec.interval : 1);
+
+/**
+ * Whether a series falls on every single day. The app treats those apart
+ * (no "move to tomorrow": tomorrow has one anyway); a daily series with an
+ * interval does not qualify.
+ */
+export const isEveryDay = (rec) => rec?.type === 'daily' && recurrenceInterval(rec) === 1;
+
+/**
+ * The `recurrenceType` an expanded occurrence carries: the series' type,
+ * except that a daily series with an interval reads 'daily-interval', so the
+ * every-day special cases (which test recurrenceType === 'daily') skip it.
+ */
+export const occurrenceRecurrenceType = (rec) =>
+  (rec?.type === 'daily' && !isEveryDay(rec) ? 'daily-interval' : rec?.type);
+
+/**
  * Compute all occurrence date strings (YYYY-MM-DD) of a recurring task template
  * that fall within [rangeStartStr, rangeEndStr] inclusive.
  *
@@ -44,20 +69,25 @@ export const getOccurrencesInRange = (template, rangeStartStr, rangeEndStr, maxR
   };
 
   if (rec.type === 'daily') {
-    // Fast-forward: skip directly to rangeStart instead of iterating from a
-    // potentially distant startDate.  Adjust count so maxOccurrences still works.
-    const cursor = new Date(Math.max(startDate.getTime(), rangeStart.getTime()));
-    if (cursor > startDate) {
+    // Every `step` days from startDate. Fast-forward: skip directly to the
+    // first occurrence on or after rangeStart instead of iterating from a
+    // potentially distant startDate; count the occurrences skipped so
+    // maxOccurrences still works.
+    const step = recurrenceInterval(rec);
+    const cursor = new Date(startDate);
+    if (rangeStart > startDate) {
       // All noon-anchored dates, so dividing by 86400000 and rounding handles DST correctly.
-      count = Math.round((cursor.getTime() - startDate.getTime()) / 86400000);
+      const days = Math.round((rangeStart.getTime() - startDate.getTime()) / 86400000);
+      count = Math.ceil(days / step);
+      cursor.setDate(cursor.getDate() + count * step);
     }
     while (cursor <= rangeEnd && count < maxOcc) {
       if (endDate && cursor > endDate) break;
       if (!addIfInRange(cursor)) break;
-      cursor.setDate(cursor.getDate() + 1);
+      cursor.setDate(cursor.getDate() + step);
     }
   } else if (rec.type === 'weekly' || rec.type === 'biweekly') {
-    const step = rec.type === 'biweekly' ? 2 : 1;
+    const step = rec.type === 'biweekly' ? 2 : recurrenceInterval(rec);
     const days = (rec.daysOfWeek && rec.daysOfWeek.length > 0) ? rec.daysOfWeek : [startDate.getDay()];
     // Copied before sorting: `days` is often rec.daysOfWeek itself, and this
     // runs inside render-path memos — sorting in place mutated the template
@@ -95,6 +125,7 @@ export const getOccurrencesInRange = (template, rangeStartStr, rangeEndStr, maxR
       cursor.setDate(cursor.getDate() + 7 * step);
     }
   } else if (rec.type === 'monthly') {
+    const step = recurrenceInterval(rec);
     const cursor = new Date(startDate);
     cursor.setDate(1);
     while (cursor <= rangeEnd && count < maxOcc) {
@@ -110,7 +141,7 @@ export const getOccurrencesInRange = (template, rangeStartStr, rangeEndStr, maxR
         target.setDate(1 + offset + (week - 1) * 7);
         // Verify still in same month
         if (target.getMonth() !== cursor.getMonth()) {
-          cursor.setMonth(cursor.getMonth() + 1, 1);
+          cursor.setMonth(cursor.getMonth() + step, 1);
           continue;
         }
       } else {
@@ -123,7 +154,7 @@ export const getOccurrencesInRange = (template, rangeStartStr, rangeEndStr, maxR
         if (endDate && target > endDate) break;
         if (!addIfInRange(target)) break;
       }
-      cursor.setMonth(cursor.getMonth() + 1, 1);
+      cursor.setMonth(cursor.getMonth() + step, 1);
     }
   } else if (rec.type === 'yearly') {
     // Each year's date comes from the START's month and day, not from the
@@ -135,7 +166,8 @@ export const getOccurrencesInRange = (template, rangeStartStr, rangeEndStr, maxR
     // matching; only leap years return to the 29th.
     const month = startDate.getMonth();
     const day = startDate.getDate();
-    for (let year = startDate.getFullYear(); count < maxOcc; year++) {
+    const step = recurrenceInterval(rec);
+    for (let year = startDate.getFullYear(); count < maxOcc; year += step) {
       const cursor = new Date(year, month, day, 12);
       if (cursor > rangeEnd) break;
       if (endDate && cursor > endDate) break;
@@ -248,6 +280,25 @@ const sundayOf = (dateStr) => {
 export const editedSeriesStart = (recurrence, origStart, dateStr) => {
   if (!origStart || dateStr < origStart) return dateStr;
 
+  // A series with an interval ("every 3 weeks") takes its phase from
+  // startDate, whatever its type, as biweekly does. Keep the start when it
+  // already produces the edited occurrence; otherwise move it forward to the
+  // first start on or after origStart whose series does, so nothing is
+  // invented before the edit and the edited occurrence stays.
+  if (recurrenceInterval(recurrence) > 1) {
+    const produces = (start) =>
+      getOccurrencesInRange({ recurrence: { ...recurrence, startDate: start } }, dateStr, dateStr, 1).includes(dateStr);
+    if (produces(origStart)) return origStart;
+    const cursor = noon(origStart);
+    const last = noon(dateStr);
+    while (cursor < last) {
+      cursor.setDate(cursor.getDate() + 1);
+      const candidate = dateToString(cursor);
+      if (produces(candidate)) return candidate;
+    }
+    return dateStr;
+  }
+
   if ((recurrence?.type === 'yearly' || recurrence?.type === 'biweekly')
       && getOccurrencesInRange({ recurrence: { ...recurrence, startDate: origStart } }, dateStr, dateStr, 1).includes(dateStr)) {
     return origStart;
@@ -340,3 +391,46 @@ export const setRecurrenceFrequency = (recurrence, type, dateStr) => {
  */
 export const weekdayOrder = (weekStartDay = 0) =>
   Array.from({ length: 7 }, (_, i) => (i + weekStartDay) % 7);
+
+const INTERVAL_UNITS = ['daily', 'weekly', 'monthly', 'yearly'];
+export const MAX_INTERVAL = 99;
+
+/**
+ * The picker's reading of a recurrence as "every n <unit>": weekly and
+ * biweekly are both weeks (biweekly is every 2). Null for no recurrence.
+ */
+export const recurrenceUnitAndInterval = (recurrence) => {
+  if (!recurrence) return null;
+  if (recurrence.type === 'biweekly') return { unit: 'weekly', n: 2 };
+  if (!INTERVAL_UNITS.includes(recurrence.type)) return null;
+  return { unit: recurrence.type, n: recurrenceInterval(recurrence) };
+};
+
+/**
+ * "Every n <unit>" as a NEW recurrence, from whatever is selected now.
+ *
+ * Every 1 stores no interval, so it is the plain series it always was, and
+ * weekly every 2 is stored as 'biweekly', the existing spelling, so the two
+ * week buttons keep lighting up for it. What the unit can keep is kept:
+ * weekdays stay on a weekly series (or fall back to the task's own day), the
+ * day of the month or "2nd Tuesday" on a monthly one. End conditions
+ * (endDate, maxOccurrences) are the caller's to keep, as for the presets.
+ */
+export const setRecurrenceInterval = (recurrence, unit, n, dateStr) => {
+  if (!INTERVAL_UNITS.includes(unit)) return recurrence;
+  const count = Math.min(MAX_INTERVAL, Math.max(1, Math.round(Number(n)) || 1));
+  const withInterval = (rec) => (count > 1 ? { ...rec, interval: count } : rec);
+  if (unit === 'weekly') {
+    const days = getSelectedWeekdays(recurrence, dateStr);
+    const daysOfWeek = days.length ? days : [new Date(dateStr + 'T12:00:00').getDay()];
+    if (count === 2) return { type: 'biweekly', daysOfWeek };
+    return withInterval({ type: 'weekly', daysOfWeek });
+  }
+  if (unit === 'monthly') {
+    const keep = recurrence?.type === 'monthly'
+      ? { monthDay: recurrence.monthDay ?? null, monthWeekday: recurrence.monthWeekday ?? null }
+      : { monthDay: new Date(dateStr + 'T12:00:00').getDate(), monthWeekday: null };
+    return withInterval({ type: 'monthly', ...keep });
+  }
+  return withInterval({ type: unit });
+};

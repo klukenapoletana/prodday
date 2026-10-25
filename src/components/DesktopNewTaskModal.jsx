@@ -19,6 +19,7 @@ import TaskMetadataLine from './TaskMetadataLine.jsx';
 import { extractTags, getRecurrenceLabel } from '../utils/taskUtils.js';
 import { formatLocalizedDate } from '../utils/localeFormatting.js';
 import { aiFeatureOn } from '../ai.js';
+import { isEveryDay } from '../utils/recurrenceEngine.js';
 
 const DesktopNewTaskModal = () => {
   const { t, i18n } = useTranslation();
@@ -396,7 +397,7 @@ const DesktopNewTaskModal = () => {
                       <label className={`block text-sm ${textSecondary} mb-1`}>{t('task.date')}</label>
                       {(() => {
                         const isRecurringEdit = mobileEditingTask && typeof mobileEditingTask.id === 'string' && mobileEditingTask.id.startsWith('recurring-');
-                        const dateDisabled = newTask.keepUnscheduled || (isRecurringEdit && (mobileEditingTask.recurrenceType === 'daily' || newTask.recurrence?.type === 'daily'));
+                        const dateDisabled = newTask.keepUnscheduled || (isRecurringEdit && (mobileEditingTask.recurrenceType === 'daily' || isEveryDay(newTask.recurrence)));
                         return (
                           <button
                             type="button"
