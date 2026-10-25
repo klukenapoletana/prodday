@@ -11,6 +11,10 @@ import {
   setRecurrenceFrequency,
   weekdayOrder,
   editedSeriesStart,
+  isEveryDay,
+  occurrenceRecurrenceType,
+  setRecurrenceInterval,
+  recurrenceUnitAndInterval,
 } from './recurrenceEngine.js';
 
 // The clock is frozen for the whole file. getNextOccurrence reads "today", and
@@ -555,5 +559,112 @@ describe('getOccurrencesInRange — yearly from a 29 February start', () => {
       if (occ.length !== 13 || occ.some((o, k) => o !== `${2023 + k}${start.slice(4)}`)) moved.push(start);
     }
     expect(moved).toEqual([]);
+  });
+});
+
+describe('intervals: every n days, weeks, months, years', () => {
+  it('a daily series with an interval steps from its start', () => {
+    const t = template({ type: 'daily', interval: 4, startDate: '2026-08-01' });
+    expect(getOccurrencesInRange(t, '2026-08-01', '2026-08-20'))
+      .toEqual(['2026-08-01', '2026-08-05', '2026-08-09', '2026-08-13', '2026-08-17']);
+  });
+
+  it('fast-forwards a daily interval to a far window without losing its phase', () => {
+    const t = template({ type: 'daily', interval: 5, startDate: '2020-01-01' });
+    const [first] = getOccurrencesInRange(t, '2026-08-01', '2026-08-31', 1);
+    const days = Math.round((new Date(`${first}T12:00:00`) - new Date('2020-01-01T12:00:00')) / 86400000);
+    expect(days % 5).toBe(0);
+    expect(first >= '2026-08-01' && first <= '2026-08-05').toBe(true);
+  });
+
+  it('counts maxOccurrences across a fast-forwarded daily interval', () => {
+    const t = template({ type: 'daily', interval: 3, startDate: '2026-08-01', maxOccurrences: 4 });
+    // 1, 4, 7, 10 — the 4th is the last, wherever the window starts.
+    expect(getOccurrencesInRange(t, '2026-08-05', '2026-08-31')).toEqual(['2026-08-07', '2026-08-10']);
+  });
+
+  it('every 3 weeks keeps its phase from the start week, on every chosen day', () => {
+    const t = template({ type: 'weekly', interval: 3, daysOfWeek: [1, 4], startDate: '2026-08-03' });
+    expect(getOccurrencesInRange(t, '2026-08-01', '2026-09-30'))
+      .toEqual(['2026-08-03', '2026-08-06', '2026-08-24', '2026-08-27', '2026-09-14', '2026-09-17']);
+  });
+
+  it('every 2 months on a day, and on an nth weekday', () => {
+    expect(getOccurrencesInRange(template({ type: 'monthly', interval: 2, monthDay: 15, startDate: '2026-01-15' }), '2026-01-01', '2026-08-31'))
+      .toEqual(['2026-01-15', '2026-03-15', '2026-05-15', '2026-07-15']);
+    // 2nd Tuesday, every 3 months from January.
+    expect(getOccurrencesInRange(template({ type: 'monthly', interval: 3, monthWeekday: { week: 2, day: 2 }, startDate: '2026-01-13' }), '2026-01-01', '2026-12-31'))
+      .toEqual(['2026-01-13', '2026-04-14', '2026-07-14', '2026-10-13']);
+  });
+
+  it('every 2 years', () => {
+    expect(getOccurrencesInRange(template({ type: 'yearly', interval: 2, startDate: '2024-05-04' }), '2024-01-01', '2030-12-31'))
+      .toEqual(['2024-05-04', '2026-05-04', '2028-05-04', '2030-05-04']);
+  });
+
+  it('an interval of 1, 0, a fraction or garbage is the plain series', () => {
+    const plain = getOccurrencesInRange(template({ type: 'daily', startDate: '2026-08-01' }), '2026-08-01', '2026-08-05');
+    for (const interval of [1, 0, 2.5, '3', null, -2]) {
+      expect(getOccurrencesInRange(template({ type: 'daily', interval, startDate: '2026-08-01' }), '2026-08-01', '2026-08-05')).toEqual(plain);
+    }
+  });
+
+  it('only an interval-free daily series is every day', () => {
+    expect(isEveryDay({ type: 'daily' })).toBe(true);
+    expect(isEveryDay({ type: 'daily', interval: 1 })).toBe(true);
+    expect(isEveryDay({ type: 'daily', interval: 4 })).toBe(false);
+    expect(isEveryDay({ type: 'weekly' })).toBe(false);
+    expect(occurrenceRecurrenceType({ type: 'daily' })).toBe('daily');
+    expect(occurrenceRecurrenceType({ type: 'daily', interval: 4 })).toBe('daily-interval');
+    expect(occurrenceRecurrenceType({ type: 'weekly', interval: 3 })).toBe('weekly');
+  });
+});
+
+describe('setRecurrenceInterval / recurrenceUnitAndInterval', () => {
+  const DATE = '2026-08-19'; // a Wednesday, the 19th
+
+  it('builds every n of each unit, storing no interval for 1', () => {
+    expect(setRecurrenceInterval(null, 'daily', 4, DATE)).toEqual({ type: 'daily', interval: 4 });
+    expect(setRecurrenceInterval(null, 'daily', 1, DATE)).toEqual({ type: 'daily' });
+    expect(setRecurrenceInterval(null, 'weekly', 3, DATE)).toEqual({ type: 'weekly', daysOfWeek: [3], interval: 3 });
+    expect(setRecurrenceInterval(null, 'monthly', 2, DATE)).toEqual({ type: 'monthly', monthDay: 19, monthWeekday: null, interval: 2 });
+    expect(setRecurrenceInterval(null, 'yearly', 5, DATE)).toEqual({ type: 'yearly', interval: 5 });
+  });
+
+  it('stores weekly every 2 as biweekly, and reads biweekly back as every 2 weeks', () => {
+    expect(setRecurrenceInterval({ type: 'weekly', daysOfWeek: [1, 5] }, 'weekly', 2, DATE)).toEqual({ type: 'biweekly', daysOfWeek: [1, 5] });
+    expect(recurrenceUnitAndInterval({ type: 'biweekly', daysOfWeek: [1] })).toEqual({ unit: 'weekly', n: 2 });
+  });
+
+  it('keeps what the unit can keep: weekdays, the month day or nth weekday', () => {
+    expect(setRecurrenceInterval({ type: 'weekly', daysOfWeek: [1, 3] }, 'weekly', 4, DATE).daysOfWeek).toEqual([1, 3]);
+    const nth = { type: 'monthly', monthDay: null, monthWeekday: { week: 3, day: 3 } };
+    expect(setRecurrenceInterval(nth, 'monthly', 2, DATE)).toEqual({ ...nth, interval: 2 });
+  });
+
+  it('clamps the count to 1..99', () => {
+    expect(setRecurrenceInterval(null, 'daily', 0, DATE)).toEqual({ type: 'daily' });
+    expect(setRecurrenceInterval(null, 'daily', 500, DATE).interval).toBe(99);
+  });
+
+  it('reads none, and each unit with its count', () => {
+    expect(recurrenceUnitAndInterval(null)).toBe(null);
+    expect(recurrenceUnitAndInterval({ type: 'daily', interval: 4 })).toEqual({ unit: 'daily', n: 4 });
+    expect(recurrenceUnitAndInterval({ type: 'monthly' })).toEqual({ unit: 'monthly', n: 1 });
+  });
+});
+
+describe('editedSeriesStart with an interval', () => {
+  it('keeps the start when the series already lands on the edited occurrence', () => {
+    expect(editedSeriesStart({ type: 'daily', interval: 4 }, '2026-08-01', '2026-08-09')).toBe('2026-08-01');
+  });
+
+  it('moves the start forward to the first one that lands on it, never before the old start', () => {
+    // From the 1st every 4 days misses the 11th; starting on the 3rd hits it.
+    expect(editedSeriesStart({ type: 'daily', interval: 4 }, '2026-08-01', '2026-08-11')).toBe('2026-08-03');
+    // Every 3 weeks on Wednesday, edited from a Wednesday out of phase.
+    const start = editedSeriesStart({ type: 'weekly', interval: 3, daysOfWeek: [3] }, '2026-08-05', '2026-08-19');
+    expect(start >= '2026-08-05').toBe(true);
+    expect(getOccurrencesInRange(template({ type: 'weekly', interval: 3, daysOfWeek: [3], startDate: start }), '2026-08-19', '2026-08-19')).toEqual(['2026-08-19']);
   });
 });

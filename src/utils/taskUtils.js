@@ -4,6 +4,7 @@ import {
   formatLocalizedDate,
   localizedWeekdays,
 } from './localeFormatting.js';
+import { recurrenceInterval, isCompletionAnchored } from './recurrenceEngine.js';
 
 // Format a Date object as a YYYY-MM-DD string in local time.
 // Defined here (not inline in App.jsx) so that useState initialisers that
@@ -215,9 +216,20 @@ export const getRecurrenceLabel = (rec, translate, language = 'en') => {
     .format(selectedDayIndexes.map(day => shortDayNames[day]));
   const fallbackDays = selectedDayIndexes.map(day => englishShortDays[day]).join(', ');
 
+  // "Every 4 days", "Every 3 weeks on Mon": a series with an interval
+  // (recurrenceInterval) reads its count; without one, the labels below are
+  // exactly as before. 'biweekly' keeps its own wording.
+  const n = recurrenceInterval(rec);
+
   let label = translateOrDefault(translate, 'recurrence.custom', {}, 'Custom');
   if (rec.type === 'daily') {
-    label = translateOrDefault(translate, 'recurrence.everyDay', {}, 'Every day');
+    label = n > 1
+      ? translateOrDefault(translate, 'recurrence.everyNDays', { count: n }, `Every ${n} days`)
+      : translateOrDefault(translate, 'recurrence.everyDay', {}, 'Every day');
+  } else if (rec.type === 'weekly' && n > 1) {
+    label = localizedDays
+      ? translateOrDefault(translate, 'recurrence.everyNWeeksOnDays', { count: n, days: localizedDays }, `Every ${n} weeks on ${fallbackDays}`)
+      : translateOrDefault(translate, 'recurrence.everyNWeeks', { count: n }, `Every ${n} weeks`);
   } else if (rec.type === 'weekly') {
     label = localizedDays
       ? translateOrDefault(translate, 'recurrence.weeklyOnDays', { days: localizedDays }, `Weekly on ${fallbackDays}`)
@@ -229,35 +241,71 @@ export const getRecurrenceLabel = (rec, translate, language = 'en') => {
   } else if (rec.type === 'monthly') {
     if (rec.monthWeekday) {
       const { week, day } = rec.monthWeekday;
-      label = translateOrDefault(
-        translate,
-        'recurrence.monthlyOnOrdinalWeekday',
-        { ordinal: translateOrDefault(translate, 'recurrence.ordinal', { count: week, ordinal: true }, ordinals[week]), day: fullDayNames[day] },
-        `Monthly on the ${ordinals[week]} ${englishFullDays[day]}`,
-      );
+      const ordinal = translateOrDefault(translate, 'recurrence.ordinal', { count: week, ordinal: true }, ordinals[week]);
+      label = n > 1
+        ? translateOrDefault(
+          translate,
+          'recurrence.everyNMonthsOnOrdinalWeekday',
+          { count: n, ordinal, day: fullDayNames[day] },
+          `Every ${n} months on the ${ordinals[week]} ${englishFullDays[day]}`,
+        )
+        : translateOrDefault(
+          translate,
+          'recurrence.monthlyOnOrdinalWeekday',
+          { ordinal, day: fullDayNames[day] },
+          `Monthly on the ${ordinals[week]} ${englishFullDays[day]}`,
+        );
     } else {
       const day = rec.monthDay || (rec.startDate ? new Date(`${rec.startDate}T12:00:00`).getDate() : null);
       if (day) {
         const suffix = day === 1 || day === 21 || day === 31 ? 'st' : day === 2 || day === 22 ? 'nd' : day === 3 || day === 23 ? 'rd' : 'th';
         const localizedDay = translateOrDefault(translate, 'recurrence.ordinal', { count: day, ordinal: true }, `${day}${suffix}`);
-        label = translateOrDefault(translate, 'recurrence.monthlyOnDate', { day: localizedDay }, `Monthly on the ${day}${suffix}`);
+        label = n > 1
+          ? translateOrDefault(translate, 'recurrence.everyNMonthsOnDate', { count: n, day: localizedDay }, `Every ${n} months on the ${day}${suffix}`)
+          : translateOrDefault(translate, 'recurrence.monthlyOnDate', { day: localizedDay }, `Monthly on the ${day}${suffix}`);
       } else {
-        label = translateOrDefault(translate, 'recurrence.everyMonth', {}, 'Every month');
+        label = n > 1
+          ? translateOrDefault(translate, 'recurrence.everyNMonths', { count: n }, `Every ${n} months`)
+          : translateOrDefault(translate, 'recurrence.everyMonth', {}, 'Every month');
       }
     }
   } else if (rec.type === 'yearly') {
     if (rec.startDate) {
       const startDate = new Date(`${rec.startDate}T12:00:00`);
       const date = formatLocalizedDate(startDate, { month: 'long', day: 'numeric' }, language);
-      label = translateOrDefault(
-        translate,
-        'recurrence.yearlyOn',
-        { date },
-        `Yearly on ${englishMonths[startDate.getMonth()]} ${startDate.getDate()}`,
-      );
+      label = n > 1
+        ? translateOrDefault(
+          translate,
+          'recurrence.everyNYearsOn',
+          { count: n, date },
+          `Every ${n} years on ${englishMonths[startDate.getMonth()]} ${startDate.getDate()}`,
+        )
+        : translateOrDefault(
+          translate,
+          'recurrence.yearlyOn',
+          { date },
+          `Yearly on ${englishMonths[startDate.getMonth()]} ${startDate.getDate()}`,
+        );
     } else {
-      label = translateOrDefault(translate, 'recurrence.everyYear', {}, 'Every year');
+      label = n > 1
+        ? translateOrDefault(translate, 'recurrence.everyNYears', { count: n }, `Every ${n} years`)
+        : translateOrDefault(translate, 'recurrence.everyYear', {}, 'Every year');
     }
+  }
+
+  // "Every 4 days after completion": only the distance counts there, so the
+  // days and dates above do not apply (recurrence.js isCompletionAnchored).
+  if (isCompletionAnchored(rec)) {
+    const step = rec.type === 'biweekly' ? 2 : n;
+    const [key, unit] = {
+      daily: ['recurrence.everyNDays', 'days'],
+      weekly: ['recurrence.everyNWeeks', 'weeks'],
+      biweekly: ['recurrence.everyNWeeks', 'weeks'],
+      monthly: ['recurrence.everyNMonths', 'months'],
+      yearly: ['recurrence.everyNYears', 'years'],
+    }[rec.type] || ['recurrence.everyNDays', 'days'];
+    const every = translateOrDefault(translate, key, { count: step }, `Every ${step} ${unit}`);
+    label = translateOrDefault(translate, 'recurrence.afterCompletion', { label: every }, `${every} after completion`);
   }
 
   if (rec.endDate) {

@@ -10,7 +10,7 @@ import { isCalendarEventRow } from '../utils/eventNotes.js';
 import { describeObstacle } from '../utils/dayOccupancy.js';
 import { createPendingProject } from '../utils/pendingProject.js';
 import { canFollowUp, resolveTaskRef } from '../utils/followUp.js';
-import { editedSeriesStart } from '../utils/recurrenceEngine.js';
+import { isEveryDay, editedSeriesStart, reanchorCompletionSeries } from '../utils/recurrenceEngine.js';
 import { moveSubtaskTo } from '../utils/subtaskOrder.js';
 import { recordDeletedTaskTombstone } from '../utils/deletedTaskTombstones.js';
 
@@ -584,7 +584,19 @@ export default function useTaskActions({
       if (!parsed) return;
       const template = recurringTasks.find(t => t.id === parsed.templateId);
       if (!template) return;
-      if (template.recurrence?.type === 'daily') return; // daily tasks recur tomorrow anyway
+      // An "after completion" series moves its one open occurrence, and the
+      // count from it, to tomorrow (recurrence.js reanchorCompletionSeries).
+      const tomorrow = new Date(parsed.dateStr + 'T12:00:00');
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const moved = reanchorCompletionSeries(template, parsed.dateStr, dateToString(tomorrow));
+      if (moved) {
+        const said = pushUndo({ key: 'postponed', title: template.exceptions?.[parsed.dateStr]?.title || template.title });
+        setRecurringTasks(prev => prev.map(t => (t.id === parsed.templateId ? { ...moved, lastModified: new Date().toISOString() } : t)));
+        setUndoToast({ message: said, actionable: true });
+        playUISound('slide');
+        return;
+      }
+      if (isEveryDay(template.recurrence)) return; // an every-day series recurs tomorrow anyway
       const exc = template.exceptions?.[parsed.dateStr] || {};
       const title = exc.title || template.title;
       const startTime = exc.startTime !== undefined ? exc.startTime : (template.startTime || '');

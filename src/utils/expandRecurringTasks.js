@@ -4,7 +4,7 @@
 // same expansion the app renders with, not a stand-in for it. The range comes
 // from computeRecurringExpansionRange (recurringExpansionRange.js).
 
-import { getOccurrencesInRange } from './recurrenceEngine.js';
+import { occurrenceRecurrenceType, getOccurrencesInRange } from './recurrenceEngine.js';
 
 // The same occurrence shape is also used by read-only historical statistics.
 // Keeping this separate does not change which dates the live app expands.
@@ -31,7 +31,7 @@ export function recurringTaskInstance(template, date) {
     date,
     isRecurring: true,
     recurringTemplateId: template.id,
-    recurrenceType: template.recurrence?.type,
+    recurrenceType: occurrenceRecurrenceType(template.recurrence),
     // Project membership is series-level (stored on the template);
     // instances inherit it so project-filtered views keep occurrences.
     projectId: template.projectId,

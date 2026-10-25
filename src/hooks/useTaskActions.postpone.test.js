@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import useTaskActions from './useTaskActions.js';
+import { parseRecurringId } from '../utils/recurringId.js';
 
 // useTaskActions is a plain factory (no React hooks in its body), so it can be
 // called directly with just the deps postponeTask touches.
@@ -58,5 +59,46 @@ describe('postponeTask — all-day tasks', () => {
     postponeTask('t');
 
     expect(setTasks).not.toHaveBeenCalled();
+  });
+});
+
+describe('postponeTask — after-completion series', () => {
+  const build = (template) => {
+    let recurring = [template];
+    let tasks = [];
+    const setRecurringTasks = vi.fn(fn => { recurring = fn(recurring); });
+    const setTasks = vi.fn(fn => { tasks = fn(tasks); });
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { postponeTask } = useTaskActions({
+      tasks: [], setTasks, recurringTasks: [template], setRecurringTasks, parseRecurringId,
+      getAdjustedTimeForImportedConflicts: vi.fn(() => ({ conflicted: false })),
+      pushUndo: vi.fn(() => 'Postponed'), setUndoToast: vi.fn(), playUISound: vi.fn(),
+      setSyncNotification: vi.fn(),
+      onboardingProgress: { hasUsedActionButtons: true }, setOnboardingProgress: vi.fn(),
+    });
+    return { postponeTask, recurring: () => recurring, tasks: () => tasks };
+  };
+
+  it('moves the series to tomorrow instead of a one-off copy, an every-day one too', () => {
+    for (const rec of [{ type: 'daily', interval: 3 }, { type: 'daily' }]) {
+      const { postponeTask, recurring, tasks } = build({
+        id: 's', title: 'Gießen', startTime: '08:00', duration: 15,
+        recurrence: { ...rec, startDate: '2026-10-17', anchor: 'completion' },
+      });
+      postponeTask('recurring-s-2026-10-17');
+      expect(recurring()[0].recurrence.startDate).toBe('2026-10-18');
+      expect(recurring()[0].exceptions?.['2026-10-17']).toBeUndefined();
+      expect(tasks()).toEqual([]);
+    }
+  });
+
+  it('a fixed series still skips and copies', () => {
+    const { postponeTask, recurring, tasks } = build({
+      id: 's', title: 'Gießen', startTime: '08:00', duration: 15,
+      recurrence: { type: 'daily', interval: 3, startDate: '2026-10-17' },
+    });
+    postponeTask('recurring-s-2026-10-17');
+    expect(recurring()[0].exceptions['2026-10-17'].skipped).toBe(true);
+    expect(tasks()).toHaveLength(1);
   });
 });

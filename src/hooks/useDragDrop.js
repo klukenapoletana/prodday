@@ -4,6 +4,7 @@ import { TASK_COLORS } from '../utils/colorUtils.js';
 import { nativeUpdateEvent, triggerHaptic } from '../native.js';
 import { describeObstacle } from '../utils/dayOccupancy.js';
 import { SNAP_MINUTES, LAST_SNAPPED_START, snapMinutes } from '../utils/dragUtils.js';
+import { reanchorCompletionSeries } from '../utils/recurrenceEngine.js';
 
 // Pure utilities used by position helpers
 const timeToMinutes = (time) => {
@@ -39,7 +40,7 @@ const isOverTrashFAB = (touchX, touchY, padding = 24) => {
 export default function useDragDrop({
   calendarRef, timeGridRef,
   setNewTask, setShowAddTask, selectedDate, setExpandedNotesTaskId,
-  tasks, setTasks, setUnscheduledTasks, setRecurringTasks, setRecycleBin, setTodayRoutines,
+  tasks, setTasks, setUnscheduledTasks, recurringTasks, setRecurringTasks, setRecycleBin, setTodayRoutines,
   pushUndo, parseRecurringId, getAdjustedTimeForImportedConflicts, wouldExceedMaxColumns,
   playUISound, setSyncNotification, onboardingProgress, setOnboardingProgress,
   moveToRecycleBinRef, clearDeadlineRef,
@@ -48,6 +49,16 @@ export default function useDragDrop({
   expandedRecurringTasksRef, moveToInboxRef, openMobileEditTaskRef, openMobileEditNativeEventRef,
 }) {
   const [draggedTask, setDraggedTask] = useState(null);
+
+  // An "after completion" series has one open occurrence; moving it to another
+  // day moves the series there rather than detaching a one-off copy
+  // (recurrence.js reanchorCompletionSeries). Null for every other series.
+  const reanchored = (templateId, fromDate, toDate, overrides) => {
+    const template = recurringTasks?.find(t => t.id === templateId);
+    if (!template) return null;
+    const moved = reanchorCompletionSeries(template, fromDate, toDate, overrides);
+    return moved && { ...moved, lastModified: new Date().toISOString() };
+  };
   const [dragSource, setDragSource] = useState(null);
   const [dragPreviewTime, setDragPreviewTime] = useState(null);
   const [dragPreviewDate, setDragPreviewDate] = useState(null);
@@ -463,12 +474,16 @@ export default function useDragDrop({
         const parsed = parseRecurringId(draggedTask.id);
         if (parsed) {
           const { templateId, dateStr: origDateStr } = parsed;
+          const moved = origDateStr !== dropDateStr
+            && reanchored(templateId, origDateStr, dropDateStr, { startTime, isAllDay: false });
           if (origDateStr === dropDateStr) {
             // Same-date drag: store startTime override in exception
             setRecurringTasks(prev => prev.map(t => {
               if (t.id !== templateId) return t;
               return { ...t, exceptions: { ...t.exceptions, [origDateStr]: { ...t.exceptions?.[origDateStr], startTime } }, lastModified: new Date().toISOString() };
             }));
+          } else if (moved) {
+            setRecurringTasks(prev => prev.map(t => (t.id === templateId ? moved : t)));
           } else {
             // Cross-date drag: mark deleted on old date, create regular task on new date
             setRecurringTasks(prev => prev.map(t => {
@@ -598,13 +613,18 @@ export default function useDragDrop({
         const parsed = parseRecurringId(draggedTask.id);
         if (parsed) {
           const { templateId, dateStr: origDateStr } = parsed;
-          // Detach: mark deleted on original date, create regular all-day task
-          setRecurringTasks(prev => prev.map(t => {
-            if (t.id !== templateId) return t;
-            return { ...t, exceptions: { ...t.exceptions, [origDateStr]: { ...t.exceptions?.[origDateStr], deleted: true } } };
-          }));
-          const { id, isRecurring, recurringTemplateId, ...taskData } = draggedTask;
-          setTasks(prev => [...prev, { ...taskData, id: crypto.randomUUID(), startTime: '00:00', date: dropDateStr, isAllDay: true }]);
+          const moved = reanchored(templateId, origDateStr, dropDateStr, { isAllDay: true });
+          if (moved) {
+            setRecurringTasks(prev => prev.map(t => (t.id === templateId ? moved : t)));
+          } else {
+            // Detach: mark deleted on original date, create regular all-day task
+            setRecurringTasks(prev => prev.map(t => {
+              if (t.id !== templateId) return t;
+              return { ...t, exceptions: { ...t.exceptions, [origDateStr]: { ...t.exceptions?.[origDateStr], deleted: true } } };
+            }));
+            const { id, isRecurring, recurringTemplateId, ...taskData } = draggedTask;
+            setTasks(prev => [...prev, { ...taskData, id: crypto.randomUUID(), startTime: '00:00', date: dropDateStr, isAllDay: true }]);
+          }
         }
       } else {
         setTasks(prev => prev.map(t =>
