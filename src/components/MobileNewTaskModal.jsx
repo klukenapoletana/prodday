@@ -82,7 +82,7 @@ const MobileNewTaskModal = () => {
           >
             <div className={`flex items-center justify-between p-4 border-b ${borderClass}`}>
               <h3 className={`font-semibold ${textPrimary} text-lg`}>
-                {mobileEditingTask ? t('task.editTask') : newTask.openInInbox ? t('task.newInbox') : t('task.newScheduled')}
+                {newTask.isNote ? (mobileEditingTask ? t('notes.editNote') : t('notes.newNote')) : mobileEditingTask ? t('task.editTask') : newTask.openInInbox ? t('task.newInbox') : t('task.newScheduled')}
               </h3>
               <button onClick={() => { setShowAddTask(false); setShowNewTaskDeadlinePicker(false); setMobileEditingTask(null); setMobileEditIsInbox(false); }} className={`p-1 rounded-lg ${hoverBg}`}>
                 <X size={18} className={textSecondary} />
@@ -264,8 +264,9 @@ const MobileNewTaskModal = () => {
                 </div>
               </div>
 
-              {/* Fields grid */}
-              {newTask.openInInbox ? (
+              {/* Fields grid. A note has none of these: no priority, deadline
+                  or duration (utils/notes.js). */}
+              {newTask.isNote ? null : newTask.openInInbox ? (
                 <div className="grid grid-cols-2 gap-3">
                   {!isBucketItem && (<>
                   <div>
@@ -468,12 +469,12 @@ const MobileNewTaskModal = () => {
                   type="submit"
                   className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                 >
-                  {mobileEditingTask ? t('task.saveChanges') : newTask.openInInbox ? (newTask.projectId ? t('task.addToProject') : t('task.addToInbox')) : newTask.projectId && newTask.keepUnscheduled ? t('task.addToProject') : newTask.projectId ? t('task.addToProjectAndSchedule') : t('task.addToSchedule')}
+                  {mobileEditingTask ? t('task.saveChanges') : newTask.isNote ? t('notes.addNote') : newTask.openInInbox ? (newTask.projectId ? t('task.addToProject') : t('task.addToInbox')) : newTask.projectId && newTask.keepUnscheduled ? t('task.addToProject') : newTask.projectId ? t('task.addToProjectAndSchedule') : t('task.addToSchedule')}
                 </button>
               </div>
 
               {/* Send-to-Bucket for inbox tasks in edit mode */}
-              {mobileEditingTask && mobileEditIsInbox && !mobileEditingTask.bucketId && (
+              {mobileEditingTask && mobileEditIsInbox && !mobileEditingTask.bucketId && !mobileEditingTask.isNote && (
                 <button
                   type="button"
                   onClick={() => {

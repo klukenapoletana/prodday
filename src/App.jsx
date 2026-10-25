@@ -3458,6 +3458,8 @@ const DayPlanner = () => {
     handleMobileTaskTouchMove,
     // mobile touch end (swipe actions)
     handleMobileTaskTouchEnd,
+    // the move sheet a right swipe opens
+    moveMenu, setMoveMenu, scheduleUnscheduledTask,
   } = useDragDrop({
     calendarRef, timeGridRef,
     setNewTask, setShowAddTask, selectedDate, setExpandedNotesTaskId,
@@ -3724,6 +3726,7 @@ const DayPlanner = () => {
         duration: task.duration || 30,
         color: task.color || colors[0].class,
         openInInbox: true,
+        isNote: !!task.isNote,
         deadline: task.deadline || null,
         priority: task.priority || 0,
         startTime: getNextQuarterHour(),
@@ -4160,7 +4163,7 @@ const DayPlanner = () => {
         // list. Priority and deadline are inbox-only, so they stay behind, as
         // on every other path that schedules an inbox task.
         const existing = unscheduledTasks.find(t => t.id === taskId);
-        const { priority: _priority, deadline: _deadline, ...scheduledFields } = existing || {};
+        const { priority: _priority, deadline: _deadline, isNote: _note, ...scheduledFields } = existing || {};
         setUnscheduledTasks(prev => prev.filter(t => t.id !== taskId));
         setTasks(prev => [...prev, withReminders({
           ...scheduledFields,
@@ -6425,6 +6428,7 @@ const DayPlanner = () => {
     openNewTaskForm,
     openNewAllDayTask,
     openNewInboxTask,
+    openNewNote,
     changeTaskColor,
     setTaskEnergy,
     updateTaskNotes,
@@ -6434,6 +6438,8 @@ const DayPlanner = () => {
     toggleComplete,
     postponeTask,
     moveToInbox,
+    moveToNotes,
+    moveNoteToInbox,
     addSubtask,
     toggleSubtask,
     deleteSubtask,
@@ -7596,6 +7602,7 @@ const DayPlanner = () => {
     stickyHeaderRef, mobileDateHeaderRef, mobileAllDaySectionRef,
     longPressTriggeredRef, longPressTimerRef,
     autoScrollInterval, frameResizingRef,
+    moveMenu, setMoveMenu, scheduleUnscheduledTask,
     swipeTouchStartX, swipeTouchStartY, swipeCurrentOffset, swipedTaskId,
     swipeDirection, swipeLocked, swipeIsVertical, swipeTaskElement,
     swipeSchedulingInboxTaskId,
@@ -7849,7 +7856,7 @@ const DayPlanner = () => {
     archiveInboxTask, restoreArchivedInboxTask,
     deleteRecurringInstance, updateRecurrencePattern,
     updateRecurrenceEndCondition, updateRecurringTemplate,
-    moveToRecycleBin, moveToInbox, undeleteTask,
+    moveToRecycleBin, moveToInbox, moveToNotes, moveNoteToInbox, openNewNote, undeleteTask,
     setDeadline, clearDeadline, postponeTask, postponeDeadlineTask,
     cyclePriority, changeTaskColor,
     toggleSubtask, addSubtask, deleteSubtask, updateSubtaskTitle, moveSubtask, updateTaskNotes,

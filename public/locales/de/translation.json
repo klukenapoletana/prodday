@@ -2825,7 +2825,8 @@
       "tagRenamed": "#{{from}} in #{{to}} umbenannt",
       "tagMerged": "#{{from}} mit #{{to}} zusammengeführt",
       "tagRemoved": "#{{from}} entfernt",
-      "subtasksReordered": "Unteraufgaben von „{{title}}“ neu geordnet"
+      "subtasksReordered": "Unteraufgaben von „{{title}}“ neu geordnet",
+      "toNotes": "„{{title}}“ zu den Notizen verschoben"
     }
   },
   "taskReminders": {
@@ -2860,5 +2861,15 @@
     "hoursShort_other": "{{count}} Std.",
     "daysShort_one": "{{count}} Tag",
     "daysShort_other": "{{count}} Tage"
+  },
+  "notes": {
+    "title": "Notizen",
+    "move": "Verschieben",
+    "moveTo": "Verschieben nach",
+    "newNote": "Neue Notiz",
+    "editNote": "Notiz bearbeiten",
+    "addNote": "Zu Notizen hinzufügen",
+    "empty": "Noch keine Notizen",
+    "emptyHint": "Ideen, Listen und alles ohne Termin. Mit einem Wisch wird aus einer Notiz eine Aufgabe."
   }
 }

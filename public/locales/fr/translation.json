@@ -2837,7 +2837,8 @@
       "tagRenamed": "#{{from}} renommée en #{{to}}",
       "tagMerged": "#{{from}} fusionnée avec #{{to}}",
       "tagRemoved": "#{{from}} retirée",
-      "subtasksReordered": "Sous-tâches de « {{title}} » réordonnées"
+      "subtasksReordered": "Sous-tâches de « {{title}} » réordonnées",
+      "toNotes": "« {{title}} » déplacée vers les notes"
     }
   },
   "taskReminders": {
@@ -2879,5 +2880,15 @@
     "daysShort_one": "{{count}} jour",
     "daysShort_many": "{{count}} jours",
     "daysShort_other": "{{count}} jours"
+  },
+  "notes": {
+    "title": "Notes",
+    "move": "Déplacer",
+    "moveTo": "Déplacer vers",
+    "newNote": "Nouvelle note",
+    "editNote": "Modifier la note",
+    "addNote": "Ajouter aux notes",
+    "empty": "Aucune note pour l’instant",
+    "emptyHint": "Idées, listes et tout ce qui n’a pas de date. Un glissement transforme une note en tâche."
   }
 }

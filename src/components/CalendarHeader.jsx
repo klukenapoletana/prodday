@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  AlertCircle, Calendar, Check, GripVertical, Inbox, MoreHorizontal,
+  AlertCircle, ArrowRightLeft, Calendar, Check, GripVertical, Inbox, MoreHorizontal,
   NotebookPen, Pencil, RefreshCw, Settings, SkipForward, Target, Trash2,
 } from 'lucide-react';
 import ViewCycler from './ViewCycler.jsx';
@@ -619,7 +619,7 @@ const CalendarHeader = () => {
                       {isRecurringAllDay ? (
                         <><Trash2 size={14} className="mr-1" />{t('common.delete')}</>
                       ) : (
-                        <><Inbox size={14} className="mr-1" />{t('settings.inbox')}</>
+                        <><ArrowRightLeft size={14} className="mr-1" />{t('notes.move')}</>
                       )}
                     </div>
                     <div data-swipe-strip="left" style={{ display: 'none', left: '8px' }} className={`absolute inset-0 ${darkMode ? 'bg-amber-900/80 text-amber-300' : 'bg-amber-100 text-amber-600'} rounded-lg flex items-center justify-end pr-3 text-xs font-medium`}>

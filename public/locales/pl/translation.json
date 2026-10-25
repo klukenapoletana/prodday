@@ -2964,7 +2964,8 @@
       "tagRenamed": "Zmieniono #{{from}} na #{{to}}",
       "tagMerged": "Scalono #{{from}} z #{{to}}",
       "tagRemoved": "Usunięto #{{from}}",
-      "subtasksReordered": "Zmieniono kolejność podzadań w „{{title}}”"
+      "subtasksReordered": "Zmieniono kolejność podzadań w „{{title}}”",
+      "toNotes": "Przeniesiono „{{title}}” do notatek"
     }
   },
   "taskReminders": {
@@ -3013,5 +3014,15 @@
     "daysShort_few": "{{count}} dni",
     "daysShort_many": "{{count}} dni",
     "daysShort_other": "{{count}} dnia"
+  },
+  "notes": {
+    "title": "Notatki",
+    "move": "Przenieś",
+    "moveTo": "Przenieś do",
+    "newNote": "Nowa notatka",
+    "editNote": "Edytuj notatkę",
+    "addNote": "Dodaj do notatek",
+    "empty": "Brak notatek",
+    "emptyHint": "Pomysły, listy i wszystko bez terminu. Jednym przesunięciem notatka staje się zadaniem."
   }
 }

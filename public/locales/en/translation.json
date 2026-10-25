@@ -2825,7 +2825,8 @@
       "tagRenamed": "Renamed #{{from}} to #{{to}}",
       "tagMerged": "Merged #{{from}} into #{{to}}",
       "tagRemoved": "Removed #{{from}}",
-      "subtasksReordered": "Reordered the subtasks of \"{{title}}\""
+      "subtasksReordered": "Reordered the subtasks of \"{{title}}\"",
+      "toNotes": "Moved \"{{title}}\" to notes"
     }
   },
   "taskReminders": {
@@ -2860,5 +2861,15 @@
     "hoursShort_other": "{{count}} hours",
     "daysShort_one": "{{count}} day",
     "daysShort_other": "{{count}} days"
+  },
+  "notes": {
+    "title": "Notes",
+    "move": "Move",
+    "moveTo": "Move to",
+    "newNote": "New note",
+    "editNote": "Edit note",
+    "addNote": "Add to notes",
+    "empty": "No notes yet",
+    "emptyHint": "Ideas, lists and anything without a date. A swipe turns a note into a task."
   }
 }

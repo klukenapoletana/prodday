@@ -7,7 +7,7 @@ import {
   Filter, Flag, Flame, FolderOpen, GitBranch, Globe, GripVertical, Hash,
   HelpCircle, Inbox, Key, Layers, LayoutGrid, Link, Loader, Menu, Mic,
   Minus, Moon, MoreHorizontal, NotebookPen, Plus, RefreshCw, Save, Search,
-  Settings, SkipForward, Sparkles, Sun, Target, Telescope, Trash2,
+  Settings, SkipForward, Sparkles, StickyNote, Sun, Target, Telescope, Trash2,
   TrendingUp, Trophy, Undo2, Upload, Volume2, VolumeX, Wifi, X, Zap,
 } from 'lucide-react';
 import { isNativeAndroid } from '../native.js';
@@ -21,6 +21,8 @@ import { PROVIDER_MODELS, PROVIDER_LABELS, aiFeatureOn } from '../ai.js';
 import { HabitRing, MiniHabitRing } from './HabitRing.jsx';
 import GettingStartedChecklist from './GettingStartedChecklist.jsx';
 import NotesSubtasksPanel from './NotesSubtasksPanel.jsx';
+import MobileNotesView from './MobileNotesView.jsx';
+import MoveToAreaSheet from './MoveToAreaSheet.jsx';
 import EventNotesPanel, { editsDeviceCalendar } from './EventNotesPanel.jsx';
 import FrameEditor from './FrameEditor.jsx';
 import SmartSchedulePanel from './SmartSchedulePanel.jsx';
@@ -622,6 +624,16 @@ const MobileLayout = () => {
               </div>
             )}
 
+            {mobileActiveTab === 'notes' && (
+              <div className={`${cardBg} border-b ${borderClass} sticky top-0 z-30`}>
+                <div className="px-4 py-3">
+                  <h2 className={`font-bold text-lg ${textPrimary} flex items-center gap-2`}>
+                    <StickyNote size={20} /> {t('notes.title')}
+                  </h2>
+                </div>
+              </div>
+            )}
+
             {mobileActiveTab === 'goals' && (
               <div className={`${cardBg} border-b ${borderClass} sticky top-0 z-30`}>
                 {/* Title only: creating things is the tab's FAB (GoalDashboard),
@@ -940,6 +952,11 @@ const MobileLayout = () => {
             )}
 
             {mobileActiveTab === 'inbox' && <InboxArchivedBar />}
+
+            {/* The Notes area (utils/notes.js). */}
+            {mobileActiveTab === 'notes' && <MobileNotesView />}
+            {/* The sheet a right swipe on an entry opens. */}
+            <MoveToAreaSheet />
 
 
             {/* GoalDashboard stays mounted to avoid expensive remount on every tab switch */}

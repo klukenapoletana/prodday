@@ -26,6 +26,7 @@ export const UNDO_LABELS = [
   'moved',
   'resized',
   'toInbox',
+  'toNotes',
   'toBucket',
   'scheduled',
   'scheduledDroppedDeadline',

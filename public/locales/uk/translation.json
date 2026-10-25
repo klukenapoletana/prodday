@@ -2970,7 +2970,8 @@
       "tagRenamed": "#{{from}} перейменовано на #{{to}}",
       "tagMerged": "#{{from}} об’єднано з #{{to}}",
       "tagRemoved": "#{{from}} видалено",
-      "subtasksReordered": "Змінено порядок підзавдань у «{{title}}»"
+      "subtasksReordered": "Змінено порядок підзавдань у «{{title}}»",
+      "toNotes": "«{{title}}» переміщено до нотаток"
     }
   },
   "taskReminders": {
@@ -3019,5 +3020,15 @@
     "daysShort_few": "{{count}} дні",
     "daysShort_many": "{{count}} днів",
     "daysShort_other": "{{count}} дня"
+  },
+  "notes": {
+    "title": "Нотатки",
+    "move": "Перемістити",
+    "moveTo": "Перемістити до",
+    "newNote": "Нова нотатка",
+    "editNote": "Редагувати нотатку",
+    "addNote": "Додати до нотаток",
+    "empty": "Нотаток ще немає",
+    "emptyHint": "Ідеї, списки й усе без дати. Одним свайпом нотатка стає завданням."
   }
 }

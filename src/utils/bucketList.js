@@ -29,9 +29,10 @@ export const isBucketTask = (task) => !!task?.bucketId;
  * The unconditional Inbox exclusion. Applied at every unscheduledTasks
  * consumer that feeds Inbox lists, counts, or nag machinery — ahead of the
  * feature-gated project filters (unlike hideProjectTasksInbox, this is not
- * user-toggleable).
+ * user-toggleable). Notes (utils/notes.js) are unscheduledTasks the Inbox
+ * leaves out too, so they take the same exclusion.
  */
-export const notBucketed = (task) => !task?.bucketId;
+export const notBucketed = (task) => !task?.bucketId && !task?.isNote;
 
 /**
  * Demote an Inbox task into the Bucket List (the main entry point in
