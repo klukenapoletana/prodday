@@ -7,12 +7,14 @@ import { base64ToBlob, blobToBase64, writeAttachmentFile } from '../utils/attach
 import { prepareImage } from '../utils/imageResize.js';
 import { queueUpload } from '../sync/attachmentRemote.js';
 import { toNote } from '../utils/notes.js';
+import { presentIds, waitForSyncIdle } from '../utils/syncIdle.js';
 import {
   SHARE_CHUNK_BYTES, attachableFiles, noteIdForShare, noteTextForShare,
 } from '../utils/sharedFilesNote.js';
 
 // As in useQuickAddInbox: the share's copies on the device go only after the
-// app's own save, so an app that dies in between reads them again.
+// app's own save, so an app that dies in between reads them again, and only
+// once the note is in the app's state (utils/syncIdle.js).
 const ACK_DELAY_MS = 3000;
 
 /** A shared file's bytes as base64, read through the bridge in whole-group pieces. */
@@ -36,14 +38,15 @@ export function readSharedFile(id, read = nativeReadSharedFileChunk) {
  * (`onSkipped`).
  */
 export default function useSharedFilesToNotes({
-  dataLoaded, unscheduledTasks, setUnscheduledTasks, defaultColor, fallbackTitle, onCreated, onSkipped, disabled = false,
+  dataLoaded, unscheduledTasks, recycleBin, setUnscheduledTasks, defaultColor, fallbackTitle, onCreated, onSkipped, isSyncBusy, disabled = false,
 }) {
   const latest = useRef({});
-  latest.current = { unscheduledTasks, defaultColor, fallbackTitle, onCreated, onSkipped };
+  latest.current = { unscheduledTasks, recycleBin, defaultColor, fallbackTitle, onCreated, onSkipped, isSyncBusy };
 
   useEffect(() => {
     if (disabled || !dataLoaded || !isNativeAndroid()) return undefined;
     let busy = false;
+    let cancelled = false;
     const timers = new Set();
 
     const ingest = async () => {
@@ -97,6 +100,10 @@ export default function useSharedFilesToNotes({
           }));
         }
         if (notes.length) {
+          // The slow part (reading and shrinking the files) is done; add the
+          // note between cycles, so the next one carries it.
+          await waitForSyncIdle(() => latest.current.isSyncBusy?.());
+          if (cancelled) return;
           setUnscheduledTasks(prev => {
             const have = new Set(prev.map(t => t.id));
             const fresh = notes.filter(n => !have.has(n.id));
@@ -106,7 +113,17 @@ export default function useSharedFilesToNotes({
         }
         if (skipped) latest.current.onSkipped?.(skipped);
         const ids = batches.map(b => b?.batchId).filter(Boolean);
-        const timer = setTimeout(() => { timers.delete(timer); nativeAckSharedFiles(ids); }, ACK_DELAY_MS);
+        const timer = setTimeout(() => {
+          timers.delete(timer);
+          // A note that is not in the state (a cycle replaced the notes after
+          // all) keeps its share, and the share is read again. One already
+          // deleted is in the bin and counts as taken.
+          const { unscheduledTasks: now, recycleBin: bin } = latest.current;
+          const present = new Set(presentIds([...(now || []), ...(bin || [])], ids.map(noteIdForShare)));
+          const done = ids.filter(id => present.has(noteIdForShare(id)));
+          if (done.length) nativeAckSharedFiles(done);
+          if (done.length < ids.length) run();
+        }, ACK_DELAY_MS);
         timers.add(timer);
       } finally {
         busy = false;
@@ -121,6 +138,7 @@ export default function useSharedFilesToNotes({
     return () => {
       if (window.__prodCheckSharedFiles === run) delete window.__prodCheckSharedFiles;
       document.removeEventListener('visibilitychange', onVisible);
+      cancelled = true;
       timers.forEach(clearTimeout);
     };
   }, [dataLoaded, disabled, setUnscheduledTasks]);
