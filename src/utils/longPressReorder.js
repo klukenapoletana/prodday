@@ -104,7 +104,14 @@ export function beginLongPressReorder(e, {
   const activate = () => {
     timer = null;
     state.activated = true;
-    try { doc.defaultView?.getSelection?.()?.removeAllRanges?.(); } catch (_) {}
+    // Clear the text selection a long press starts, but not while a field is
+    // being typed in: on Android that drops the field's caret and closes the
+    // keyboard (reordering a note's checklist while writing it).
+    const active = doc.activeElement;
+    const typing = !!active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT' || active.isContentEditable);
+    if (!typing) {
+      try { doc.defaultView?.getSelection?.()?.removeAllRanges?.(); } catch (_) {}
+    }
     try { haptic('heavy'); } catch (_) {}
     onActivate?.(idx);
   };
