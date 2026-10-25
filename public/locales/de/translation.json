@@ -1960,6 +1960,17 @@
     "pastellavender": "Pastelllavendel",
     "pastelsand": "Pastellsand"
   },
+  "colorWheel": {
+    "title": "Eigene Farbe",
+    "open": "Eigene Farbe wählen",
+    "brightness": "Helligkeit",
+    "hex": "Hex-Farbcode",
+    "save": "Speichern",
+    "isSaved": "Gespeichert",
+    "saved": "Eigene Farben ({{count}}/{{limit}})",
+    "full": "Beim nächsten Speichern wird die älteste ersetzt.",
+    "remove": "{{color}} entfernen"
+  },
   "calendarImport": {
     "title": "Kalender importieren",
     "prompt": "Wie möchtest du „{{file}}“ importieren?",

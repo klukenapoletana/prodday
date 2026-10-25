@@ -1962,6 +1962,17 @@
     "pastellavender": "Lavanda pastello",
     "pastelsand": "Sabbia pastello"
   },
+  "colorWheel": {
+    "title": "Colore personalizzato",
+    "open": "Scegli un colore personalizzato",
+    "brightness": "Luminosità",
+    "hex": "Codice colore esadecimale",
+    "save": "Salva",
+    "isSaved": "Salvato",
+    "saved": "I tuoi colori ({{count}}/{{limit}})",
+    "full": "Salvandone un altro, il più vecchio viene sostituito.",
+    "remove": "Rimuovi {{color}}"
+  },
   "calendarImport": {
     "title": "Importa calendario",
     "prompt": "Come vuoi importare «{{file}}»?",

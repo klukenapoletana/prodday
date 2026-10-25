@@ -230,6 +230,7 @@ import DesktopLayout from './components/DesktopLayout.jsx';
 import GlanceSidebar from './components/GlanceSidebar.jsx';
 import TrayApp from './components/TrayApp.jsx';
 import MobileLayout from './components/MobileLayout.jsx';
+import CustomColorStyles from './components/CustomColorStyles.jsx';
 import { DESKTOP_VIEW_MODES, NARROW_DESKTOP_VIEW_MODES, MOBILE_VIEW_MODES, VIEW_SCOPES, resolveStoredView, normalizeHiddenViews, enabledViews, homeView, gateExperimentalViews } from './constants/views.js';
 import ShortcutHelpModal from './components/ShortcutHelpModal.jsx';
 import FocusModeModal from './components/FocusModeModal.jsx';
@@ -8287,6 +8288,8 @@ const DayPlanner = () => {
       {/* Safe-area cover: fills the status bar inset with the header color so
            bg-gray-900 (which has a blue tint) doesn't peek through as a visible line */}
       <div className={`fixed top-0 left-0 right-0 ${cardBg} z-[60]`} style={{ height: 'env(safe-area-inset-top, 0px)' }} />
+      {/* Fills for the colours picked on the colour wheel (utils/customColors.js) */}
+      <CustomColorStyles tasks={tasks} unscheduledTasks={unscheduledTasks} recurringTasks={recurringTasks} />
       {/* Landscape blocker overlay for phones only (not tablets or narrow desktop windows) */}
       {isPhone && isLandscape && (
         <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 ${bgClass}`}>

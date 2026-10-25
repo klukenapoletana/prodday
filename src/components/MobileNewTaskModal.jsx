@@ -7,6 +7,7 @@ import { useSyncCtx } from '../context/SyncContext.jsx';
 import { SOURCE_APPS } from '../native.js';
 import LastGlanceBadge from './LastGlanceBadge.jsx';
 import DurationField from './DurationField.jsx';
+import CustomColorSwatches from './CustomColorSwatches.jsx';
 import QuickAddChips from './QuickAddChips.jsx';
 import TaskProjectField from './TaskProjectField.jsx';
 import RecurrencePicker from './RecurrencePicker.jsx';
@@ -251,6 +252,13 @@ const MobileNewTaskModal = () => {
                       title={t(`colors.${color.name.toLowerCase()}`)}
                     />
                   ))}
+                  <CustomColorSwatches
+                    value={newTask.color}
+                    onSelect={(color) => setNewTask(prev => ({ ...prev, color }))}
+                    swatchClass="w-full aspect-square rounded-full transition-transform"
+                    selectedClass="ring-2 ring-offset-2 ring-blue-500 scale-110"
+                    darkMode={darkMode}
+                  />
                 </div>
               </div>
 

@@ -1957,6 +1957,17 @@
     "pastellavender": "粉彩薰衣草",
     "pastelsand": "粉彩沙色"
   },
+  "colorWheel": {
+    "title": "自定义颜色",
+    "open": "选择自定义颜色",
+    "brightness": "亮度",
+    "hex": "十六进制颜色代码",
+    "save": "保存",
+    "isSaved": "已保存",
+    "saved": "我的颜色（{{count}}/{{limit}}）",
+    "full": "再保存一个时，最早的颜色会被替换。",
+    "remove": "移除 {{color}}"
+  },
   "calendarImport": {
     "title": "导入日历",
     "prompt": "您希望如何导入“{{file}}”？",

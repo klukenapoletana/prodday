@@ -257,30 +257,33 @@ body.using-pointer a:focus-visible {
   [data-settings-found] { animation: none; }
 }
 
-/* Pastel task colours (bg-pastel-*, TASK_COLORS in src/utils/colorUtils.js).
-   Task cards hard-code white text, which a light fill cannot carry, so inside a
-   pastel fill the white text and borders are retinted dark. The scope stops at
-   any opaque surface drawn on top of the card (an overflow menu, a notes
-   panel), which keeps its own colours. A browser without @scope skips the
-   block and shows white text, as before. */
-@scope ([class*="bg-pastel-"]) to ([class~="bg-white"], [class*="bg-gray-"], [class*="bg-stone-"], [class*="bg-slate-"], [class*="bg-zinc-"], [class*="bg-neutral-"]) {
+/* Pastel and free task colours (bg-pastel-* from TASK_COLORS in
+   src/utils/colorUtils.js; "#rrggbb" class tokens from the colour wheel, filled
+   by the rules utils/customColors.js generates). Task cards hard-code white
+   text, which a light fill cannot carry, so inside such a fill the white text
+   and borders take the fill's ink: --fill-ink, set per free colour (dark on a
+   light one, white on a dark one), and dark for the pastels, which set none.
+   The scope stops at any opaque surface drawn on top of the card (an overflow
+   menu, a notes panel), which keeps its own colours. A browser without @scope
+   skips the block and shows white text, as before. */
+@scope ([class*="bg-pastel-"], [class^="#"], [class*=" #"]) to ([class~="bg-white"], [class*="bg-gray-"], [class*="bg-stone-"], [class*="bg-slate-"], [class*="bg-zinc-"], [class*="bg-neutral-"]) {
   :scope.text-white,
   .text-white {
-    color: rgb(31 41 55);
+    color: rgb(var(--fill-ink, 31 41 55));
   }
   :scope:is(.text-white\/60, .text-white\/70, .text-white\/75, .text-white\/80, .text-white\/85, .text-white\/90),
   :is(.text-white\/60, .text-white\/70, .text-white\/75, .text-white\/80, .text-white\/85, .text-white\/90) {
-    color: rgb(31 41 55 / 0.75);
+    color: rgb(var(--fill-ink, 31 41 55) / 0.75);
   }
   :is(.text-white\/30, .text-white\/35, .text-white\/40, .text-white\/45, .text-white\/50, .text-white\/55) {
-    color: rgb(31 41 55 / 0.5);
+    color: rgb(var(--fill-ink, 31 41 55) / 0.5);
   }
   .border-white {
-    border-color: rgb(31 41 55 / 0.6);
+    border-color: rgb(var(--fill-ink, 31 41 55) / 0.6);
   }
   :scope[class*="border-white\/"],
   [class*="border-white\/"] {
-    border-color: rgb(31 41 55 / 0.15);
+    border-color: rgb(var(--fill-ink, 31 41 55) / 0.15);
   }
 }
 
