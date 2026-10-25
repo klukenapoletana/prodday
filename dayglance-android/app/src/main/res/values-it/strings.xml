@@ -2,6 +2,12 @@
 <resources>
     <string name="widget_description">La tua agenda di oggi a colpo d\'occhio</string>
     <string name="widget_upnext_description">Vista dettagliata della tua prossima attività programmata</string>
+    <string name="widget_quickadd_description">Aggiungi in fretta una voce a In arrivo</string>
+    <string name="quickadd_widget_label">Nuova voce</string>
+    <string name="quickadd_title">Nuova voce in In arrivo</string>
+    <string name="quickadd_hint">Cosa devi fare?</string>
+    <string name="quickadd_save">Salva</string>
+    <string name="quickadd_saved">Salvato in In arrivo</string>
     <string name="widget_goal_description">Scheda di avanzamento di un obiettivo fissato e dei suoi progetti</string>
     <string name="widget_project_description">Scheda di avanzamento di un progetto fissato e delle sue attività</string>
     <string name="widget_month_description">Sei settimane del tuo programma a colpo d\'occhio</string>

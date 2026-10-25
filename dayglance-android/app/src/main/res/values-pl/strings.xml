@@ -2,6 +2,12 @@
 <resources>
     <string name="widget_description">Dzisiejszy plan w skrócie</string>
     <string name="widget_upnext_description">Szczegółowy widok następnego zaplanowanego zadania</string>
+    <string name="widget_quickadd_description">Szybko dodaj wpis do skrzynki</string>
+    <string name="quickadd_widget_label">Nowy wpis</string>
+    <string name="quickadd_title">Nowy wpis w skrzynce</string>
+    <string name="quickadd_hint">Co jest do zrobienia?</string>
+    <string name="quickadd_save">Zapisz</string>
+    <string name="quickadd_saved">Zapisano w skrzynce</string>
     <string name="widget_goal_description">Karta postępu przypiętego celu i jego projektów</string>
     <string name="widget_project_description">Karta postępu przypiętego projektu i jego zadań</string>
     <string name="widget_month_description">Sześć tygodni Twojego harmonogramu w skrócie</string>

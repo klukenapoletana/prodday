@@ -3,6 +3,12 @@
     <string name="app_name">prodday</string>
     <string name="widget_description">一览今日日程</string>
     <string name="widget_upnext_description">详细显示下一个计划任务</string>
+    <string name="widget_quickadd_description">快速向收件箱添加条目</string>
+    <string name="quickadd_widget_label">新条目</string>
+    <string name="quickadd_title">新的收件箱条目</string>
+    <string name="quickadd_hint">要做什么？</string>
+    <string name="quickadd_save">保存</string>
+    <string name="quickadd_saved">已保存到收件箱</string>
     <string name="widget_goal_description">显示固定目标及其项目进度</string>
     <string name="widget_project_description">显示固定项目及其任务进度</string>
     <string name="widget_month_description">一览六周日程</string>

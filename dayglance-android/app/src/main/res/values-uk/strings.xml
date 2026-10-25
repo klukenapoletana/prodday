@@ -2,6 +2,12 @@
 <resources>
     <string name="widget_description">Огляд плану на сьогодні</string>
     <string name="widget_upnext_description">Докладний вигляд вашого наступного запланованого завдання</string>
+    <string name="widget_quickadd_description">Швидко додати запис до «Вхідних»</string>
+    <string name="quickadd_widget_label">Новий запис</string>
+    <string name="quickadd_title">Новий запис у «Вхідних»</string>
+    <string name="quickadd_hint">Що треба зробити?</string>
+    <string name="quickadd_save">Зберегти</string>
+    <string name="quickadd_saved">Збережено у «Вхідних»</string>
     <string name="widget_goal_description">Картка прогресу закріпленої цілі та її проєктів</string>
     <string name="widget_project_description">Картка прогресу закріпленого проєкту та його завдань</string>
     <string name="widget_month_description">Огляд вашого розкладу на шість тижнів</string>

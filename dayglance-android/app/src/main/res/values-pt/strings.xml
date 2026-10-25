@@ -2,6 +2,12 @@
 <resources>
     <string name="widget_description">A sua agenda de hoje num relance</string>
     <string name="widget_upnext_description">Vista detalhada da sua próxima tarefa agendada</string>
+    <string name="widget_quickadd_description">Adicionar rapidamente uma entrada à caixa de entrada</string>
+    <string name="quickadd_widget_label">Nova entrada</string>
+    <string name="quickadd_title">Nova entrada na caixa</string>
+    <string name="quickadd_hint">O que há para fazer?</string>
+    <string name="quickadd_save">Guardar</string>
+    <string name="quickadd_saved">Guardado na caixa de entrada</string>
     <string name="widget_goal_description">Cartão de progresso de um objetivo afixado e dos seus projetos</string>
     <string name="widget_project_description">Cartão de progresso de um projeto afixado e das suas tarefas</string>
     <string name="widget_month_description">Seis semanas da sua agenda num relance</string>

@@ -922,6 +922,30 @@ export const nativeOpenFile = (filename, base64, mimeType) => {
   }
 };
 
+/**
+ * Entries typed into the Quick add widget's window while the app may not have
+ * been running (widget/QuickAddActivity): [{ id, title, createdAt }]. They
+ * stay queued on the device until acknowledged (nativeAckQuickAddEntries), so
+ * an app that dies before saving them reads them again next time.
+ */
+export const nativePeekQuickAddEntries = () => {
+  const bridge = nativeBridge();
+  if (!bridge?.peekQuickAddEntries) return [];
+  try {
+    const list = JSON.parse(bridge.peekQuickAddEntries() || '[]');
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+};
+
+/** Drop the Quick add entries with these ids from the device's queue. */
+export const nativeAckQuickAddEntries = (ids) => {
+  const bridge = nativeBridge();
+  if (!bridge?.ackQuickAddEntries || !ids?.length) return;
+  try { bridge.ackQuickAddEntries(JSON.stringify(ids)); } catch { /* read again next time */ }
+};
+
 // ── Haptics ─────────────────────────────────────────────────────────────────
 
 // Web vibration durations (ms) used only for the PWA / desktop fallback.

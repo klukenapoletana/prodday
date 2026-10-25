@@ -2,6 +2,12 @@
 <resources>
     <string name="widget_description">Tu agenda de hoy de un vistazo</string>
     <string name="widget_upnext_description">Vista detallada de tu próxima tarea programada</string>
+    <string name="widget_quickadd_description">Añade rápido una entrada a la bandeja de entrada</string>
+    <string name="quickadd_widget_label">Nueva entrada</string>
+    <string name="quickadd_title">Nueva entrada en la bandeja</string>
+    <string name="quickadd_hint">¿Qué hay que hacer?</string>
+    <string name="quickadd_save">Guardar</string>
+    <string name="quickadd_saved">Guardado en la bandeja de entrada</string>
     <string name="widget_goal_description">Tarjeta de progreso de un objetivo fijado y sus proyectos</string>
     <string name="widget_project_description">Tarjeta de progreso de un proyecto fijado y sus tareas</string>
     <string name="widget_month_description">Seis semanas de tu agenda de un vistazo</string>
