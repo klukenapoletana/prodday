@@ -3,6 +3,7 @@
 Ein persönlicher Tagesplaner für Android: Aufgaben, Zeitplan und Notizen in einer App.
 
 prodday ist ein privates Hobbyprojekt und ein Fork von **[dayGLANCE](https://github.com/krelltunez/dayGLANCE)** von krelltunez. Der größte Teil des Codes stammt aus dem Original. prodday ergänzt ihn um eigene Funktionen und passt ihn an den persönlichen Bedarf an. dayGLANCE ist aktuell die Productivity-App, welche meinen eigenen Ansprüchen und Wünschen am nächsten kommt, aber ein paar Wünsche offen lässt. Auf dieser Basis habe ich meine eigenen Anpassungen vorgenommen. 
+
 **DISCLAIMER:** Ich habe keinerlei Coding-Erfahrung. Dieser Fork ist vollständig von Claude Code programmiert, basierend auf meinen Anweisungen.
 
 > prodday ist **kein** offizielles dayGLANCE-Produkt und steht in keiner Verbindung zu dessen Autor. Fehler in prodday bitte nicht beim Original melden.
