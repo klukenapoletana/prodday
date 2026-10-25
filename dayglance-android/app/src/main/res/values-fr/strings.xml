@@ -2,6 +2,12 @@
 <resources>
     <string name="widget_description">Votre agenda du jour en un coup d\'œil</string>
     <string name="widget_upnext_description">Vue détaillée de votre prochaine tâche planifiée</string>
+    <string name="widget_quickadd_description">Ajouter vite une entrée à la boîte de réception</string>
+    <string name="quickadd_widget_label">Nouvelle entrée</string>
+    <string name="quickadd_title">Nouvelle entrée dans la boîte</string>
+    <string name="quickadd_hint">Que faut-il faire ?</string>
+    <string name="quickadd_save">Enregistrer</string>
+    <string name="quickadd_saved">Enregistré dans la boîte de réception</string>
     <string name="widget_goal_description">Carte de progression d\'un objectif épinglé et de ses projets</string>
     <string name="widget_project_description">Carte de progression d\'un projet épinglé et de ses tâches</string>
     <string name="widget_month_description">Six semaines de votre planning en un coup d\'œil</string>

@@ -632,6 +632,16 @@ class NativeBridge(
      * The JS layer calls this on every visibilitychange event to pick up actions
      * that happened while the app was backgrounded.
      */
+    /** The Quick add widget's queued lines (SharedDataStore.peekQuickAdd), not removed. */
+    @JavascriptInterface
+    fun peekQuickAddEntries(): String = dataStore.peekQuickAdd()
+
+    /** The web app has saved these Quick add lines: drop them from the queue. */
+    @JavascriptInterface
+    fun ackQuickAddEntries(idsJson: String) {
+        dataStore.ackQuickAdd(idsJson)
+    }
+
     @JavascriptInterface
     fun getPendingAction(): String {
         // Voice input shortcut takes priority — open mic immediately on launch

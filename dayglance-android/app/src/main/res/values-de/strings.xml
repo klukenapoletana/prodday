@@ -2,6 +2,12 @@
 <resources>
     <string name="widget_description">Ihre Tagesagenda auf einen Blick</string>
     <string name="widget_upnext_description">Detailansicht Ihrer nächsten geplanten Aufgabe</string>
+    <string name="widget_quickadd_description">Schnell einen Eintrag in den Posteingang legen</string>
+    <string name="quickadd_widget_label">Neuer Eintrag</string>
+    <string name="quickadd_title">Neuer Posteingangs-Eintrag</string>
+    <string name="quickadd_hint">Was steht an?</string>
+    <string name="quickadd_save">Speichern</string>
+    <string name="quickadd_saved">Im Posteingang gespeichert</string>
     <string name="widget_goal_description">Fortschrittskarte für ein angepinntes Ziel und seine Projekte</string>
     <string name="widget_project_description">Fortschrittskarte für ein angepinntes Projekt und seine Aufgaben</string>
     <string name="widget_month_description">Sechs Wochen Ihres Zeitplans auf einen Blick</string>

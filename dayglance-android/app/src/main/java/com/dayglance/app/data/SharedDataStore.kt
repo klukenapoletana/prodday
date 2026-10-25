@@ -477,7 +477,52 @@ class SharedDataStore(context: Context) {
             else remove(KEY_LAST_UP_NEXT_BODY)
         }
 
+    // ── Quick add (widget/QuickAddWidget, widget/QuickAddActivity) ─────────
+
+    /**
+     * Lines typed into the Quick add window, waiting for the web app to put
+     * them in the Inbox: a JSON array of { id, title, createdAt }. Appended by
+     * QuickAddActivity, read by NativeBridge.peekQuickAddEntries() and removed
+     * only once the app acknowledges them (ackQuickAdd), so an app that dies
+     * before saving reads them again.
+     */
+    fun appendQuickAdd(entry: org.json.JSONObject) {
+        synchronized(QUICK_ADD_LOCK) {
+            val list = runCatching { org.json.JSONArray(prefs.getString(KEY_QUICK_ADD, "[]")) }
+                .getOrDefault(org.json.JSONArray())
+            list.put(entry)
+            prefs.edit().putString(KEY_QUICK_ADD, list.toString()).commit()
+        }
+    }
+
+    fun peekQuickAdd(): String = synchronized(QUICK_ADD_LOCK) {
+        prefs.getString(KEY_QUICK_ADD, null) ?: "[]"
+    }
+
+    /** Remove the entries whose ids are in [idsJson] (a JSON array of strings). */
+    fun ackQuickAdd(idsJson: String) {
+        val ids = runCatching {
+            val arr = org.json.JSONArray(idsJson)
+            (0 until arr.length()).map { arr.getString(it) }.toSet()
+        }.getOrDefault(emptySet())
+        if (ids.isEmpty()) return
+        synchronized(QUICK_ADD_LOCK) {
+            val list = runCatching { org.json.JSONArray(prefs.getString(KEY_QUICK_ADD, "[]")) }
+                .getOrDefault(org.json.JSONArray())
+            val kept = org.json.JSONArray()
+            for (i in 0 until list.length()) {
+                val entry = list.optJSONObject(i) ?: continue
+                if (entry.optString("id") !in ids) kept.put(entry)
+            }
+            if (kept.length() == 0) prefs.edit().remove(KEY_QUICK_ADD).commit()
+            else prefs.edit().putString(KEY_QUICK_ADD, kept.toString()).commit()
+        }
+    }
+
     companion object {
+        /** Guards the Quick add queue's read-modify-write: the window appends, the web app acknowledges. */
+        private val QUICK_ADD_LOCK = Any()
+        private const val KEY_QUICK_ADD = "quick_add_queue"
         /** Guards the refresh log's read-modify-write: the receiver, the web layer and the workers each write it. */
         private val REFRESH_LOG_LOCK = Any()
         private const val PREFS_NAME = "dayglance_shared"

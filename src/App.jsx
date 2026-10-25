@@ -206,6 +206,7 @@ import useElectronBridge from './hooks/useElectronBridge.js';
 import useMcpBridge from './hooks/useMcpBridge.js';
 import useRecycleBin from './hooks/useRecycleBin.js';
 import useAttachmentSync from './hooks/useAttachmentSync.js';
+import useQuickAddInbox from './hooks/useQuickAddInbox.js';
 import useReminderEngine from './hooks/useReminderEngine.js';
 import useReminders from './hooks/useReminders.js';
 import useMobileEdit from './hooks/useMobileEdit.js';
@@ -1566,6 +1567,8 @@ const DayPlanner = () => {
   useStorageProjection({ dataLoaded, isTrayMode, setUndoToast, t });
   // Attachment files: uploads, and deleting the ones nothing refers to.
   useAttachmentSync({ tasks, unscheduledTasks, recurringTasks, recycleBin, dataLoaded, disabled: isTrayMode });
+  // Lines typed into the Quick add widget's window land in the Inbox.
+  useQuickAddInbox({ dataLoaded, setUnscheduledTasks, defaultColor: TASK_COLORS[0].class, disabled: isTrayMode });
 
   // AI configuration, voice input, and weekly review state
   const {

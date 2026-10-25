@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A plus in the brand colour, for the Quick add widget. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp"
+    android:height="22dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_brand"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M12,5v14M5,12h14" />
+</vector>

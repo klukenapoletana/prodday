@@ -18,6 +18,14 @@
         <item name="windowNoTitle">false</item>
     </style>
 
+    <!-- Quick add window (widget/QuickAddActivity) — a dialog over the home screen -->
+    <style name="Theme.DayGlance.QuickAdd" parent="Theme.MaterialComponents.DayNight.Dialog">
+        <item name="colorPrimary">#3b82f6</item>
+        <item name="colorSecondary">#3b82f6</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+    </style>
+
     <!-- Splash screen — shown while WebView loads; transitions to Theme.DayGlance -->
     <style name="Theme.DayGlance.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#0f172a</item>

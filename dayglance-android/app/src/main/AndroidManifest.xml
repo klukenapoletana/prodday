@@ -230,6 +230,28 @@
                 android:resource="@xml/widget_upnext_info" />
         </receiver>
 
+        <!-- Home screen widget: Quick add (one button; a line typed in its window lands in the Inbox) -->
+        <receiver
+            android:name=".widget.QuickAddWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quick_add_info" />
+        </receiver>
+
+        <!-- The Quick add window: a dialog of its own task, gone from Recents once closed -->
+        <activity
+            android:name=".widget.QuickAddActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.DayGlance.QuickAdd"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
+
         <!-- Home screen widget: Goal (pinned goal card + child projects) -->
         <receiver
             android:name=".widget.GoalWidget"
