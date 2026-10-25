@@ -378,6 +378,10 @@ const NotesSubtasksPanel = ({
       setSubtaskDrag({ id: subtask.id, from: idx, over: null, lower: false });
     },
     onDragEnd: (e) => { e.stopPropagation(); setSubtaskDrag(null); },
+    // A press on the grip does not take the focus, so a field being typed in
+    // keeps it and the keyboard stays up. Keyboard reordering focuses the
+    // grip on purpose (Tab, then Up/Down), which this leaves alone.
+    onMouseDown: (e) => e.preventDefault(),
     onTouchStart: (e) => {
       e.stopPropagation();
       beginLongPressReorder(e, {

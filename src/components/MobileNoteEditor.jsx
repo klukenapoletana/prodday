@@ -4,6 +4,7 @@ import { ChevronLeft, SlidersHorizontal } from 'lucide-react';
 import { useDayPlannerCtx } from '../context/DayPlannerContext.jsx';
 import NotesSubtasksPanel from './NotesSubtasksPanel.jsx';
 import useKeyboardInset from '../hooks/useKeyboardInset.js';
+import useBackClose from '../hooks/useBackClose.js';
 import { revealCaret } from '../utils/textareaCaret.js';
 
 /**
@@ -24,6 +25,8 @@ const MobileNoteEditor = ({ note, onClose }) => {
     darkMode, textPrimary, textSecondary,
   } = useDayPlannerCtx();
   const keyboard = useKeyboardInset();
+  // The phone's back closes the note and stays on the Notes tab.
+  useBackClose({ key: 'dgNoteEditor', onClose });
   const [title, setTitle] = useState(note.title || '');
   const [barTarget, setBarTarget] = useState(null);
   const bodyRef = useRef(null);
@@ -58,19 +61,35 @@ const MobileNoteEditor = ({ note, onClose }) => {
   return (
     <div
       className={`fixed inset-x-0 top-0 z-50 flex flex-col ${pageBg}`}
-      style={{ height: `calc(100% - ${keyboard}px)` }}
+      // Below the status bar: the window runs edge to edge, and the app's
+      // status-bar cover (App.jsx, z-[60]) would hide the header.
+      style={{ height: `calc(100% - ${keyboard}px)`, paddingTop: 'env(safe-area-inset-top, 0px)' }}
       data-note-editor
     >
-      <div className={`flex items-center gap-1 px-2 py-2 border-b ${darkMode ? 'border-gray-700' : 'border-stone-200'}`}>
-        <button
-          type="button"
-          onClick={onClose}
-          className={`p-2 rounded-lg ${textSecondary}`}
-          aria-label={t('common.back')}
-          data-note-back
-        >
-          <ChevronLeft size={22} />
-        </button>
+      <div className={`border-b ${darkMode ? 'border-gray-700' : 'border-stone-200'}`}>
+        <div className="flex items-center justify-between px-1 pt-1">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex items-center gap-0.5 pl-1 pr-3 py-2 rounded-lg text-blue-500 font-medium"
+            aria-label={t('common.back')}
+            data-note-back
+          >
+            <ChevronLeft size={22} />
+            {t('notes.title')}
+          </button>
+          <button
+            type="button"
+            // Closing pops this editor's back entry a tick later (useBackClose);
+            // the settings editor opens after that, or the pop would close it.
+            onClick={() => { onClose(); setTimeout(() => openMobileEditTask(note, true), 60); }}
+            className={`p-2.5 rounded-lg ${textSecondary}`}
+            aria-label={t('notes.settings')}
+            title={t('notes.settings')}
+          >
+            <SlidersHorizontal size={20} />
+          </button>
+        </div>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -78,18 +97,9 @@ const MobileNoteEditor = ({ note, onClose }) => {
           onBlur={saveTitle}
           onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
           aria-label={t('task.title')}
-          className={`flex-1 min-w-0 bg-transparent text-lg font-semibold outline-none ${textPrimary}`}
+          className={`w-full px-4 pb-2.5 bg-transparent text-xl font-semibold outline-none ${textPrimary}`}
           data-note-title
         />
-        <button
-          type="button"
-          onClick={() => { onClose(); openMobileEditTask(note, true); }}
-          className={`p-2 rounded-lg ${textSecondary}`}
-          aria-label={t('notes.settings')}
-          title={t('notes.settings')}
-        >
-          <SlidersHorizontal size={20} />
-        </button>
       </div>
 
       <div ref={bodyRef} className="note-editor-scroll flex-1 min-h-0 overflow-y-auto px-3 py-3" data-note-body>

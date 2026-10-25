@@ -135,3 +135,30 @@ describe('beginLongPressReorder', () => {
     expect(onEnd).not.toHaveBeenCalled();
   });
 });
+
+describe('beginLongPressReorder and a field being typed in', () => {
+  const withSelection = (doc, active) => {
+    const removeAllRanges = vi.fn();
+    doc.activeElement = active;
+    doc.defaultView = { getSelection: () => ({ removeAllRanges }) };
+    return removeAllRanges;
+  };
+
+  it('clears the long press\'s text selection when nothing is being typed in', () => {
+    const doc = fakeDoc();
+    const removeAllRanges = withSelection(doc, { tagName: 'BODY' });
+    start(doc, 0).fire();
+    expect(removeAllRanges).toHaveBeenCalled();
+  });
+
+  it('leaves a focused field alone, so the keyboard stays up', () => {
+    for (const active of [{ tagName: 'TEXTAREA' }, { tagName: 'INPUT' }, { tagName: 'DIV', isContentEditable: true }]) {
+      const doc = fakeDoc();
+      const removeAllRanges = withSelection(doc, active);
+      const onActivate = vi.fn();
+      start(doc, 0, { onActivate }).fire();
+      expect(onActivate).toHaveBeenCalled();
+      expect(removeAllRanges).not.toHaveBeenCalled();
+    }
+  });
+});
