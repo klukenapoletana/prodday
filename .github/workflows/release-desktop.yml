@@ -1,9 +1,8 @@
 name: Build and Release Desktop Apps
 
+# prodday: kept from the original for manual runs only. A version tag or a
+# release builds the Android APK (release-android.yml), nothing else.
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
 
 jobs:

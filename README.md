@@ -19,7 +19,15 @@ prodday ist ein privates Hobbyprojekt und ein Fork von **[dayGLANCE](https://git
 - Wiederholungen alle N Tage, Wochen, Monate oder Jahre, wahlweise „ab Erledigung“
 - Übersichtlichere Wiederholungsauswahl (Nie, Täglich, Wöchentlich, Monatlich, Jährlich, Benutzerdefiniert)
 - Erinnerungen pro Eintrag: vor Beginn, am Tag oder zu einem festen Zeitpunkt, auch für Einträge im Posteingang
+- Notizen als eigener Bereich: Vollbild-Editor mit Formatleiste, Anheften, Menü beim Gedrückthalten
+- Anhänge (Bilder, PDFs, Audio) an Einträgen und Notizen, mit Nextcloud abgeglichen
+- Dateien über das Teilen-Menü anderer Apps als Notiz anlegen
+- Widget „Schnell-Eintrag“ für den Posteingang
 - Kleinere Anpassungen, z. B. die Einfügelinie beim Verschieben
+
+## Releases
+
+Signierte APKs entstehen über GitHub Actions als private Entwurfs-Releases, siehe [RELEASING.md](RELEASING.md).
 
 ## Bauen
 
