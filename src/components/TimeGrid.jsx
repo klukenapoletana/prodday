@@ -717,39 +717,43 @@ const TimeGrid = () => {
             </div>
           )}
 
-          {/* Drag preview - hover bar style */}
+          {/* Drag preview - hover bar style, in front of the cards with an outline (see below) */}
           {dragPreviewTime && draggedTask && dragPreviewDate && dateToString(dragPreviewDate) === dateStr && (() => {
             const dragMinutes = timeToMinutes(dragPreviewTime);
             const dragTop = Math.round(minutesToPosition(dragMinutes));
             return (
               <div
-                className="absolute left-0 right-0 pointer-events-none z-20"
+                className="absolute left-0 right-0 pointer-events-none z-50"
                 style={{ top: `${dragTop}px` }}
+                data-drag-preview-line
               >
                 <div className="relative">
-                  <div className={`absolute bottom-0.5 right-0 px-1.5 py-0.5 rounded text-[10px] font-bold ${darkMode ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white'}`}>
+                  <div className={`absolute bottom-0.5 right-0 px-1.5 py-0.5 rounded text-[10px] font-bold ${darkMode ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white'}`} style={{ boxShadow: `0 0 0 1px ${darkMode ? 'rgba(17,24,39,0.9)' : 'rgba(255,255,255,0.9)'}` }}>
                     {formatTime(dragPreviewTime)}
                   </div>
-                  <div className="h-0.5 bg-blue-500"></div>
+                  <div className="h-0.5 bg-blue-500" style={{ boxShadow: `0 0 0 1px ${darkMode ? 'rgba(17,24,39,0.9)' : 'rgba(255,255,255,0.9)'}` }}></div>
                 </div>
               </div>
             );
           })()}
 
-          {/* Tablet touch drag preview - hover bar style */}
+          {/* Tablet touch drag preview - hover bar style. Like the phone's
+              (MobileTimeGrid), drawn in front of every card with an outline,
+              so the line stays readable over the dragged card, a blue one too. */}
           {isTablet && mobileDragPreviewTime && mobileDragPreviewTime !== 'all-day' && mobileDragTaskIdState && mobileDragPreviewDate === dateStr && (() => {
             const dragMinutes = timeToMinutes(mobileDragPreviewTime);
             const dragTop = Math.round(minutesToPosition(dragMinutes));
             return (
               <div
-                className="absolute left-0 right-0 pointer-events-none z-20"
+                className="absolute left-0 right-0 pointer-events-none z-50"
                 style={{ top: `${dragTop}px` }}
+                data-drag-preview-line
               >
                 <div className="relative">
-                  <div className={`absolute bottom-0.5 right-0 px-1.5 py-0.5 rounded text-[10px] font-bold ${darkMode ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white'}`}>
+                  <div className={`absolute bottom-0.5 right-0 px-1.5 py-0.5 rounded text-[10px] font-bold ${darkMode ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white'}`} style={{ boxShadow: `0 0 0 1px ${darkMode ? 'rgba(17,24,39,0.9)' : 'rgba(255,255,255,0.9)'}` }}>
                     {formatTime(mobileDragPreviewTime)}
                   </div>
-                  <div className="h-0.5 bg-blue-500"></div>
+                  <div className="h-0.5 bg-blue-500" style={{ boxShadow: `0 0 0 1px ${darkMode ? 'rgba(17,24,39,0.9)' : 'rgba(255,255,255,0.9)'}` }}></div>
                 </div>
               </div>
             );
