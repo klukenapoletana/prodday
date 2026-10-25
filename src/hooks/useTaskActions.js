@@ -730,6 +730,15 @@ export default function useTaskActions({
     setUndoToast({ message: said, actionable: true });
   };
 
+  // The full-screen note editor's title field (components/MobileNoteEditor.jsx).
+  const renameNote = (id, title) => {
+    const note = unscheduledTasks.find(t => t.id === id);
+    const next = cleanTitle(title || '');
+    if (!isNote(note) || !next.trim() || next === note.title) return;
+    pushUndo({ key: 'renamed', taskId: id });
+    setUnscheduledTasks(prev => prev.map(t => (t.id === id ? { ...t, title: next } : t)));
+  };
+
   // ── Subtask management ───────────────────────────────────────────────────
 
   const addSubtask = (taskId, title, isInbox, extraFields = {}) => {
@@ -1099,6 +1108,7 @@ export default function useTaskActions({
     moveToInbox,
     moveToNotes,
     moveNoteToInbox,
+    renameNote,
     // Subtasks
     addSubtask,
     toggleSubtask,

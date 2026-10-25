@@ -3023,6 +3023,21 @@
     "editNote": "Edytuj notatkę",
     "addNote": "Dodaj do notatek",
     "empty": "Brak notatek",
-    "emptyHint": "Pomysły, listy i wszystko bez terminu. Jednym przesunięciem notatka staje się zadaniem."
+    "emptyHint": "Pomysły, listy i wszystko bez terminu. Jednym przesunięciem notatka staje się zadaniem.",
+    "settings": "Ustawienia notatki"
+  },
+  "noteFormat": {
+    "toolbar": "Formatowanie",
+    "bold": "Pogrubienie",
+    "italic": "Kursywa",
+    "underline": "Podkreślenie",
+    "strike": "Przekreślenie",
+    "code": "Kod",
+    "heading": "Nagłówek",
+    "bullet": "Lista punktowana",
+    "checklist": "Lista kontrolna",
+    "indent": "Zwiększ wcięcie",
+    "outdent": "Zmniejsz wcięcie",
+    "codeblock": "Blok kodu"
   }
 }

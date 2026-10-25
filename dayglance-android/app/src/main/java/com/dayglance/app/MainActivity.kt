@@ -69,6 +69,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var webView: WebView
+    // The keyboard height last sent to the page (CSS px), to send only changes.
+    private var lastImeInsetCss = -1
     private lateinit var nativeBridge: NativeBridge
     private lateinit var obsidianBridge: ObsidianBridge
     private lateinit var directAccessBridge: DirectAccessBridge
@@ -330,6 +332,19 @@ class MainActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val navBottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
             v.setPadding(0, 0, 0, navBottom)
+            // The keyboard: adjustNothing keeps the WebView its full height, so
+            // the page is told how much of it the keyboard covers (CSS px above
+            // the nav-bar padding) and moves what must stay visible itself, as
+            // the full-screen note editor does (src/hooks/useKeyboardInset.js).
+            val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            val imeCss = (maxOf(0, imeBottom - navBottom) / resources.displayMetrics.density).toInt()
+            if (imeCss != lastImeInsetCss) {
+                lastImeInsetCss = imeCss
+                webView.evaluateJavascript(
+                    "window.__dgImeInset=$imeCss;window.dispatchEvent(new CustomEvent('dg-ime-inset',{detail:$imeCss}))",
+                    null
+                )
+            }
             insets
         }
 

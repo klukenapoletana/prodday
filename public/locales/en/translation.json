@@ -2870,6 +2870,21 @@
     "editNote": "Edit note",
     "addNote": "Add to notes",
     "empty": "No notes yet",
-    "emptyHint": "Ideas, lists and anything without a date. A swipe turns a note into a task."
+    "emptyHint": "Ideas, lists and anything without a date. A swipe turns a note into a task.",
+    "settings": "Note settings"
+  },
+  "noteFormat": {
+    "toolbar": "Formatting",
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "strike": "Strikethrough",
+    "code": "Code",
+    "heading": "Heading",
+    "bullet": "Bulleted list",
+    "checklist": "Checklist",
+    "indent": "Indent",
+    "outdent": "Outdent",
+    "codeblock": "Code block"
   }
 }

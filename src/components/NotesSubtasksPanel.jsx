@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { createPortal, flushSync } from 'react-dom';
 import { BookOpen, Loader, Sparkles, X, Check, Plus, ExternalLink, GripVertical } from 'lucide-react';
 import { noteTextHash } from '@glance-apps/obsidian-format';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +18,8 @@ import TaskBacklinks from './TaskBacklinks.jsx';
 import { dropIndex } from '../utils/subtaskOrder.js';
 import { beginLongPressReorder } from '../utils/longPressReorder.js';
 import { indentLines } from '../utils/noteIndent.js';
+import { applyNoteFormat } from '../utils/noteFormat.js';
+import NoteFormatBar from './NoteFormatBar.jsx';
 import { aiFeatureOn } from '../ai.js';
 
 /** Format an ISO timestamp as a human-readable relative or absolute string. */
@@ -86,6 +89,11 @@ const NotesSubtasksPanel = ({
   // Called after Shift+Enter saves a note, so the host can take the keyboard
   // back (the planner returns it to its list).
   onNoteSaved,
+  // The full-screen note editor (MobileNoteEditor): the note grows with its
+  // text, its host scrolls, and the quick-format row (NoteFormatBar) renders
+  // into `formatBarTarget` while the note is being edited.
+  fullPage = false,
+  formatBarTarget = null,
 }) => {
   const { t } = useTranslation();
   // A calendar event's `notes` are its description from the calendar, which
@@ -443,7 +451,7 @@ const NotesSubtasksPanel = ({
       const next = indentLines(localNotes, el.selectionStart, el.selectionEnd, e.shiftKey);
       if (next.text === localNotes) return;
       setLocalNotes(next.text);
-      requestAnimationFrame(() => { el.setSelectionRange(next.start, next.end); autoSizeTextarea(el); });
+      requestAnimationFrame(() => { el.setSelectionRange(next.start, next.end); sizeNote(el); });
       return;
     }
     if (e.key === 'Enter' && e.shiftKey) {
@@ -452,6 +460,25 @@ const NotesSubtasksPanel = ({
       if (localNotes) setIsEditingNotes(false);
       onNoteSaved?.();
     }
+  };
+
+  // A quick-format button (NoteFormatBar): the format at the selection, the
+  // selection kept on what it formatted, the caret announced so a scrolling
+  // host can bring it into view ('dg-caret').
+  const applyFormat = (kind) => {
+    const el = noteFieldsRef.current.get('own');
+    const start = el ? el.selectionStart : localNotes.length;
+    const end = el ? el.selectionEnd : localNotes.length;
+    const next = applyNoteFormat(localNotes, start, end, kind);
+    // Committed at once, so the selection is set on the new text before the
+    // next keystroke can land: a deferred one would pull the caret back over
+    // what was typed in between.
+    if (next.text !== localNotes) flushSync(() => setLocalNotes(next.text));
+    if (!el) return;
+    el.focus();
+    el.setSelectionRange(next.start, next.end);
+    sizeNote(el);
+    el.dispatchEvent(new CustomEvent('dg-caret', { bubbles: true }));
   };
 
   const handleNotesBlur = () => {
@@ -488,12 +515,14 @@ const NotesSubtasksPanel = ({
 
   const urlOnlyNote = isOnlyUrl(localNotes);
   const noteUrl = urlOnlyNote ? localNotes.trim() : null;
-  const noteMinH = compact ? 'min-h-[4.5rem]' : 'min-h-[12rem]';
+  const noteMinH = fullPage ? 'min-h-[40vh]' : compact ? 'min-h-[4.5rem]' : 'min-h-[12rem]';
   // One height policy for both states (#2067): the editor sizes to its content
   // (autoSizeTextarea) and the preview grows to it, both capped at the same
   // share of the viewport and scrolling past it, so clicking to edit no longer
   // collapses a long note to the min-height floor.
-  const noteMaxH = 'max-h-[60vh]';
+  const noteMaxH = fullPage ? '' : 'max-h-[60vh]';
+  // Full page: no cap, the host scrolls (its scrollbar, and it follows the caret).
+  const sizeNote = (el) => autoSizeTextarea(el, fullPage ? 0 : undefined);
   const textareaClass = `w-full text-sm px-2 py-1.5 rounded border outline-none ${th.textarea} ${noteMinH} ${noteMaxH} ${compact ? 'resize-none' : 'resize-y'}`;
 
   const showLinked = !!(wikilinks && wikilinks.length > 0 && onLoadWikiNote);
@@ -512,7 +541,7 @@ const NotesSubtasksPanel = ({
     if (el) {
       noteFieldsRef.current.set(key, el);
       // Open the editor at the note's own height, not the min-height floor.
-      autoSizeTextarea(el);
+      sizeNote(el);
     } else noteFieldsRef.current.delete(key);
   };
   useEffect(() => {
@@ -656,7 +685,7 @@ const NotesSubtasksPanel = ({
               placeholder={t('task.notesFormattingPlaceholder')}
               aria-label={t('task.notes')}
               className={textareaClass}
-              onInput={(e) => autoSizeTextarea(e.currentTarget)}
+              onInput={(e) => sizeNote(e.currentTarget)}
               autoFocus={!noAutoFocus}
             />
           ) : (
@@ -683,6 +712,10 @@ const NotesSubtasksPanel = ({
           {/* Only while the task has nothing of its own yet: a user who has
               typed notes or subtasks here has chosen this panel, and a nudge
               to move to a vault note would read as "replace what you did". */}
+          {isEditingNotes && formatBarTarget && createPortal(
+            <NoteFormatBar onFormat={applyFormat} darkMode={darkMode} />,
+            formatBarTarget,
+          )}
           {isEditingNotes && picker && (
             <TaskLinkPicker candidates={pickerCandidates} index={pickerIndex} onPick={pickTask} darkMode={darkMode} />
           )}

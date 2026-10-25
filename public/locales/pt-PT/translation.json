@@ -2889,6 +2889,21 @@
     "editNote": "Editar nota",
     "addNote": "Adicionar às notas",
     "empty": "Ainda não há notas",
-    "emptyHint": "Ideias, listas e tudo o que não tem data. Com um deslize, uma nota passa a ser uma tarefa."
+    "emptyHint": "Ideias, listas e tudo o que não tem data. Com um deslize, uma nota passa a ser uma tarefa.",
+    "settings": "Definições da nota"
+  },
+  "noteFormat": {
+    "toolbar": "Formatação",
+    "bold": "Negrito",
+    "italic": "Itálico",
+    "underline": "Sublinhado",
+    "strike": "Rasurado",
+    "code": "Código",
+    "heading": "Título",
+    "bullet": "Lista com marcas",
+    "checklist": "Lista de verificação",
+    "indent": "Aumentar avanço",
+    "outdent": "Diminuir avanço",
+    "codeblock": "Bloco de código"
   }
 }
