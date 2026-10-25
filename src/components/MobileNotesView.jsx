@@ -67,6 +67,7 @@ const MobileNotesView = () => {
     unscheduledTasks, openNewNote, showAddTask,
     handleMobileTaskTouchStart, handleMobileTaskTouchMove, handleMobileTaskTouchEnd,
     togglePinNote, openMobileEditTask, setMoveMenu, moveToRecycleBin,
+    noteToOpen, setNoteToOpen,
     textPrimary, textSecondary, darkMode,
   } = useDayPlannerCtx();
   const [menu, setMenu] = useState(null);
@@ -94,6 +95,14 @@ const MobileNotesView = () => {
   );
   const openNote = notes.find(n => n.id === openNoteId);
   const pinnedCount = notes.filter(n => n.pinned).length;
+
+  // A note made from files shared by another app opens at once
+  // (hooks/useSharedFilesToNotes.js).
+  useEffect(() => {
+    if (!noteToOpen || !notes.some(n => n.id === noteToOpen)) return;
+    setOpenNoteId(noteToOpen);
+    setNoteToOpen(null);
+  }, [noteToOpen, notes, setNoteToOpen]);
 
   // The + names a new note in the editor; once it is saved, it opens here
   // for writing. The ids known when + was pressed tell the new one apart.

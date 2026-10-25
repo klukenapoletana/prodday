@@ -14,6 +14,7 @@ import com.dayglance.app.R
 import com.dayglance.app.alarm.ClockAlarm
 import com.dayglance.app.data.HealthRepository
 import com.dayglance.app.data.SharedDataStore
+import com.dayglance.app.data.SharedFilesInbox
 import com.dayglance.app.settings.SettingsActivity
 import org.json.JSONObject
 import java.io.File
@@ -632,6 +633,21 @@ class NativeBridge(
      * The JS layer calls this on every visibilitychange event to pick up actions
      * that happened while the app was backgrounded.
      */
+    /** Files shared from other apps, waiting to become notes (SharedFilesInbox), as JSON. */
+    @JavascriptInterface
+    fun peekSharedFiles(): String = SharedFilesInbox.peek(context)
+
+    /** A piece of one shared file as base64; the web app joins the pieces. */
+    @JavascriptInterface
+    fun readSharedFileChunk(id: String, offset: Double, length: Int): String =
+        SharedFilesInbox.readChunk(context, id, offset.toLong(), length)
+
+    /** The web app has made notes of these shares: drop them and their copies. */
+    @JavascriptInterface
+    fun ackSharedFiles(batchIdsJson: String) {
+        SharedFilesInbox.ack(context, batchIdsJson)
+    }
+
     /** The Quick add widget's queued lines (SharedDataStore.peekQuickAdd), not removed. */
     @JavascriptInterface
     fun peekQuickAddEntries(): String = dataStore.peekQuickAdd()

@@ -207,6 +207,7 @@ import useMcpBridge from './hooks/useMcpBridge.js';
 import useRecycleBin from './hooks/useRecycleBin.js';
 import useAttachmentSync from './hooks/useAttachmentSync.js';
 import useQuickAddInbox from './hooks/useQuickAddInbox.js';
+import useSharedFilesToNotes from './hooks/useSharedFilesToNotes.js';
 import useReminderEngine from './hooks/useReminderEngine.js';
 import useReminders from './hooks/useReminders.js';
 import useMobileEdit from './hooks/useMobileEdit.js';
@@ -1569,6 +1570,17 @@ const DayPlanner = () => {
   useAttachmentSync({ tasks, unscheduledTasks, recurringTasks, recycleBin, dataLoaded, disabled: isTrayMode });
   // Lines typed into the Quick add widget's window land in the Inbox.
   useQuickAddInbox({ dataLoaded, setUnscheduledTasks, defaultColor: TASK_COLORS[0].class, disabled: isTrayMode });
+  // Files shared from another app become a note, which then opens in the
+  // Notes tab (MobileNotesView reads noteToOpen).
+  const [noteToOpen, setNoteToOpen] = useState(null);
+  useSharedFilesToNotes({
+    dataLoaded, unscheduledTasks, setUnscheduledTasks,
+    defaultColor: TASK_COLORS[0].class,
+    fallbackTitle: t('share.untitled'),
+    onCreated: (id) => { setMobileActiveTab('notes'); setNoteToOpen(id); },
+    onSkipped: (count) => setUndoToast({ message: t('share.skipped', { count }), kind: 'warning' }),
+    disabled: isTrayMode,
+  });
 
   // AI configuration, voice input, and weekly review state
   const {
@@ -7612,6 +7624,7 @@ const DayPlanner = () => {
     longPressTriggeredRef, longPressTimerRef,
     autoScrollInterval, frameResizingRef,
     moveMenu, setMoveMenu, scheduleUnscheduledTask,
+    noteToOpen, setNoteToOpen,
     swipeTouchStartX, swipeTouchStartY, swipeCurrentOffset, swipedTaskId,
     swipeDirection, swipeLocked, swipeIsVertical, swipeTaskElement,
     swipeSchedulingInboxTaskId,
