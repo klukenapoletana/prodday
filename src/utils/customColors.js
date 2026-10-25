@@ -6,9 +6,13 @@
 // CustomColorStyles) fills. taskColorToHex already passes a hex through, so
 // the widgets and the Day Dial need nothing.
 //
-// Up to SAVED_LIMIT colours are kept for later, newest first, on this device.
+// Up to SAVED_LIMIT colours are kept for later, newest first. They sync as one
+// list, last writer wins by SAVED_COLORS_UPDATED_KEY (the payload's
+// customColors / customColorsUpdatedAt; mergeSync.js and sync/dbAdapter.js),
+// the way the extra calendars do.
 
 export const SAVED_COLORS_KEY = 'day-planner-custom-colors';
+export const SAVED_COLORS_UPDATED_KEY = 'day-planner-custom-colors-updated-at';
 export const SAVED_LIMIT = 9;
 
 const HEX = /^#[0-9a-f]{6}$/;
