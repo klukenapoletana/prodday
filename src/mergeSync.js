@@ -136,7 +136,7 @@ export function restoreUnstampedLocalOnly(merged, local, remote, deletedIds = {}
 const ALWAYS_LOCAL_KEYS = ['obsidianConfig'];
 // syncUrl/taskCalendarUrl/icsCalendars are device-local in multi-user because
 // each user's calendar config travels per-user via the calendarConfigByUser map instead.
-const MULTIUSER_LOCAL_KEYS = ['habitsEnabled', 'routinesEnabled', 'goalsProjectsEnabled', 'syncUrl', 'taskCalendarUrl', 'icsCalendars', 'obsidianCompletionDates'];
+const MULTIUSER_LOCAL_KEYS = ['habitsEnabled', 'routinesEnabled', 'goalsProjectsEnabled', 'syncUrl', 'taskCalendarUrl', 'icsCalendars', 'obsidianCompletionDates', 'customColors'];
 
 // Per-user calendar config: {syncId → {syncUrl, taskCalendarUrl, auth?, updatedAt}}.
 // Union by syncId, keeping the newer entry per user (LWW). Each device reads only
@@ -516,6 +516,27 @@ export const mergeSyncData = (local, remote, retentionDays) => {
     const wj = JSON.stringify(winner);
     if (wj !== JSON.stringify(local?.icsCalendars ?? null)) result.localChanged = true;
     if (wj !== JSON.stringify(remote?.icsCalendars ?? null)) result.remoteChanged = true;
+  }
+
+  // Colours saved from the colour wheel (utils/customColors.js): whole-list LWW
+  // by the sibling customColorsUpdatedAt, the same rule as icsCalendars above
+  // and the vault bundle (dbAdapter.js 'customColors'), remote winning ties.
+  // Without this block the upstream merge would drop the key. In multi-user
+  // the keep-local pass below restores this device's own list (one person's
+  // colours are not the household's).
+  if (local?.customColors !== undefined || remote?.customColors !== undefined) {
+    const cts = (v) => { const t = new Date(v ?? 0).getTime(); return Number.isNaN(t) ? 0 : t; };
+    const lts = cts(local?.customColorsUpdatedAt);
+    const rts = cts(remote?.customColorsUpdatedAt);
+    const remoteWins = remote?.customColors !== undefined && rts >= lts;
+    const winner = remoteWins ? remote.customColors : (local?.customColors ?? []);
+    result.data.customColors = winner;
+    result.data.customColorsUpdatedAt = remoteWins
+      ? (remote?.customColorsUpdatedAt ?? local?.customColorsUpdatedAt ?? null)
+      : (local?.customColorsUpdatedAt ?? null);
+    const wj = JSON.stringify(winner);
+    if (wj !== JSON.stringify(local?.customColors ?? null)) result.localChanged = true;
+    if (wj !== JSON.stringify(remote?.customColors ?? null)) result.remoteChanged = true;
   }
 
   // "Write completion dates to Obsidian" (obsidianCompletionDates): scalar LWW
