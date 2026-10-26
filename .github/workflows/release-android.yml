@@ -1,9 +1,10 @@
 name: Release Android
 
 # Builds the signed Android APK (github flavor) for a version tag such as
-# v1.0.0 and attaches it to a DRAFT GitHub release. A draft is visible only to
-# the repository's owner and collaborators: prodday is not distributed
-# publicly (README). Publishing the draft is a deliberate step on GitHub.
+# v1.0.0, pushed or created by a manual run, and attaches it to a DRAFT
+# GitHub release. A draft is visible only to the repository's owner and
+# collaborators: prodday is not distributed publicly (README). Publishing
+# the draft is a deliberate step on GitHub.
 #
 # Needs four repository secrets (RELEASING.md, "Signier-Schlüssel"):
 #   ANDROID_KEYSTORE_BASE64   the release keystore, base64-encoded
@@ -17,30 +18,59 @@ on:
   push:
     tags:
       - 'v*'
+  # From the Actions tab, on main: the version in package.json names the tag.
+  # A tag that does not exist yet is created on the commit being built; one
+  # that exists is built as it is (a rerun).
   workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Existing tag to build, e.g. v1.0.0'
-        required: true
 
 permissions:
   contents: write
 
 concurrency:
-  group: release-android-${{ github.event.inputs.tag || github.ref_name }}
+  group: release-android
   cancel-in-progress: false
 
 jobs:
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 40
-    env:
-      TAG: ${{ github.event.inputs.tag || github.ref_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.TAG }}
+          fetch-depth: 0
+
+      # Before a tag is created: a run without them would leave a tag and no release.
+      - name: Check the signing secrets
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          for name in KEYSTORE STORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Signing secret missing ($name). See RELEASING.md."; exit 1
+            fi
+          done
+
+      - name: Resolve the tag
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            TAG="$GITHUB_REF_NAME"
+          else
+            TAG="v$(node -p "require('./package.json').version")"
+            if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
+              echo "Tag $TAG exists: building it as it is."
+              git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"
+              git checkout --quiet "$TAG"
+            else
+              echo "Creating tag $TAG on $(git rev-parse --short HEAD)."
+              git tag "$TAG"
+              git push origin "refs/tags/$TAG"
+            fi
+          fi
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
 
       - name: Check the tag against the version
         id: version
@@ -58,19 +88,6 @@ jobs:
           CODE=$(( ${BASH_REMATCH[1]} * 10000 + ${BASH_REMATCH[2]} * 100 + ${BASH_REMATCH[3]} ))
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "code=$CODE" >> "$GITHUB_OUTPUT"
-
-      - name: Check the signing secrets
-        env:
-          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          for name in KEYSTORE STORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
-            if [ -z "${!name}" ]; then
-              echo "::error::Signing secret missing ($name). See RELEASING.md."; exit 1
-            fi
-          done
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -119,8 +136,7 @@ jobs:
 
       - name: Remove the keystore
         if: always()
-        working-directory: dayglance-android
-        run: rm -f app/release.keystore keystore.properties
+        run: rm -f dayglance-android/app/release.keystore dayglance-android/keystore.properties
 
       - name: Create the draft release
         env:

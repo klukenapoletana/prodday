@@ -58,16 +58,14 @@ aktualisieren (die Daten kommen dann wieder über den Sync).
    `dayglance-android/app/build.gradle.kts`. Dazu die Release-Notizen
    `docs/releases/v1.1.0.md` anlegen.
 
-2. Nach dem Merge den Tag auf `main` setzen und hochladen:
+2. Nach dem Merge auf GitHub unter **Actions → Release Android → Run
+   workflow** (Zweig `main`) starten. Der Workflow liest die Version aus
+   `package.json`, legt den Tag (`v1.1.0`) selbst an und baut ihn. Läuft er
+   für einen Tag, den es schon gibt, baut er diesen noch einmal.
 
-   ```bash
-   git checkout main && git pull
-   git tag v1.1.0
-   git push origin v1.1.0
-   ```
-
-   Ein Tag, der schon existiert, lässt sich unter **Actions → Release
-   Android → Run workflow** noch einmal bauen.
+   Wer lieber lokal arbeitet, kann den Tag auch selbst hochladen
+   (`git tag v1.1.0 && git push origin v1.1.0`); das startet den Workflow
+   ebenso.
 
 3. Der Workflow prüft, dass Tag, `package.json` und `versionName`
    übereinstimmen, baut die APK und legt den Entwurf mit
