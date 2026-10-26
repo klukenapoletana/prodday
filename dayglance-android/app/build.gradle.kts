@@ -70,12 +70,13 @@ android {
         }
     }
 
-    // Name the release APK dayglance.apk
+    // Name the release APK prodday.apk (.github/workflows/release-android.yml
+    // picks it up and adds the version to the name)
     applicationVariants.all {
         outputs.all {
             this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
             if (buildType.name == "release") {
-                outputFileName = "dayglance.apk"
+                outputFileName = "prodday.apk"
             }
         }
     }

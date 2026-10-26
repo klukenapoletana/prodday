@@ -20,7 +20,8 @@ on:
       - 'v*'
   # From the Actions tab, on main: the version in package.json names the tag.
   # A tag that does not exist yet is created on the commit being built; one
-  # that exists is built as it is (a rerun).
+  # with a release is built as it is (a rerun); one without (a failed run) is
+  # moved to the commit being built.
   workflow_dispatch:
 
 permissions:
@@ -55,19 +56,22 @@ jobs:
           done
 
       - name: Resolve the tag
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [ "$GITHUB_EVENT_NAME" = "push" ]; then
             TAG="$GITHUB_REF_NAME"
           else
             TAG="v$(node -p "require('./package.json').version")"
-            if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
-              echo "Tag $TAG exists: building it as it is."
+            if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null && gh release view "$TAG" >/dev/null 2>&1; then
+              echo "Tag $TAG has a release: building it as it is."
               git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"
               git checkout --quiet "$TAG"
             else
-              echo "Creating tag $TAG on $(git rev-parse --short HEAD)."
-              git tag "$TAG"
-              git push origin "refs/tags/$TAG"
+              # New, or left without a release by a failed run: (re)set on this commit.
+              echo "Setting tag $TAG on $(git rev-parse --short HEAD)."
+              git tag --force "$TAG"
+              git push --force origin "refs/tags/$TAG"
             fi
           fi
           echo "TAG=$TAG" >> "$GITHUB_ENV"
@@ -101,7 +105,7 @@ jobs:
           npm run build:android
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
@@ -144,7 +148,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           APK="prodday-$VERSION.apk"
-          cp dayglance-android/app/build/outputs/apk/github/release/app-github-release.apk "$APK"
+          cp dayglance-android/app/build/outputs/apk/github/release/prodday.apk "$APK"
           sha256sum "$APK" > "$APK.sha256"
           NOTES="docs/releases/$TAG.md"
           if [ ! -f "$NOTES" ]; then echo "prodday $VERSION" > /tmp/notes.md; NOTES=/tmp/notes.md; fi
