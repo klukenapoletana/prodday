@@ -20,7 +20,8 @@ on:
       - 'v*'
   # From the Actions tab, on main: the version in package.json names the tag.
   # A tag that does not exist yet is created on the commit being built; one
-  # that exists is built as it is (a rerun).
+  # with a release is built as it is (a rerun); one without (a failed run) is
+  # moved to the commit being built.
   workflow_dispatch:
 
 permissions:
@@ -55,19 +56,22 @@ jobs:
           done
 
       - name: Resolve the tag
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [ "$GITHUB_EVENT_NAME" = "push" ]; then
             TAG="$GITHUB_REF_NAME"
           else
             TAG="v$(node -p "require('./package.json').version")"
-            if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
-              echo "Tag $TAG exists: building it as it is."
+            if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null && gh release view "$TAG" >/dev/null 2>&1; then
+              echo "Tag $TAG has a release: building it as it is."
               git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"
               git checkout --quiet "$TAG"
             else
-              echo "Creating tag $TAG on $(git rev-parse --short HEAD)."
-              git tag "$TAG"
-              git push origin "refs/tags/$TAG"
+              # New, or left without a release by a failed run: (re)set on this commit.
+              echo "Setting tag $TAG on $(git rev-parse --short HEAD)."
+              git tag --force "$TAG"
+              git push --force origin "refs/tags/$TAG"
             fi
           fi
           echo "TAG=$TAG" >> "$GITHUB_ENV"

@@ -61,7 +61,9 @@ aktualisieren (die Daten kommen dann wieder über den Sync).
 2. Nach dem Merge auf GitHub unter **Actions → Release Android → Run
    workflow** (Zweig `main`) starten. Der Workflow liest die Version aus
    `package.json`, legt den Tag (`v1.1.0`) selbst an und baut ihn. Läuft er
-   für einen Tag, den es schon gibt, baut er diesen noch einmal.
+   für einen Tag, zu dem es schon einen Release gibt, baut er diesen noch
+   einmal. Ein Tag ohne Release (ein fehlgeschlagener Lauf) wird auf den
+   aktuellen Stand von `main` verschoben.
 
    Wer lieber lokal arbeitet, kann den Tag auch selbst hochladen
    (`git tag v1.1.0 && git push origin v1.1.0`); das startet den Workflow
