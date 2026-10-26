@@ -101,7 +101,7 @@ jobs:
           npm run build:android
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
@@ -144,7 +144,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           APK="prodday-$VERSION.apk"
-          cp dayglance-android/app/build/outputs/apk/github/release/app-github-release.apk "$APK"
+          cp dayglance-android/app/build/outputs/apk/github/release/prodday.apk "$APK"
           sha256sum "$APK" > "$APK.sha256"
           NOTES="docs/releases/$TAG.md"
           if [ ! -f "$NOTES" ]; then echo "prodday $VERSION" > /tmp/notes.md; NOTES=/tmp/notes.md; fi

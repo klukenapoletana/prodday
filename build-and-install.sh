@@ -94,11 +94,11 @@ if $RELEASE; then
   ./gradlew -PversionCode="$VERSION_CODE" assemblePlayRelease bundlePlayRelease assembleGithubRelease
   echo "$VERSION_CODE" > "$VERSIONCODE_FILE"
 
-  cp "app/build/outputs/apk/play/release/dayglance.apk" "$OUT_DIR/dayglance.apk"
+  cp "app/build/outputs/apk/play/release/prodday.apk" "$OUT_DIR/dayglance.apk"
   echo "    APK (Play)   → outputs/dayglance.apk"
   cp "app/build/outputs/bundle/playRelease/app-play-release.aab" "$OUT_DIR/dayglance.aab"
   echo "    AAB (Play)   → outputs/dayglance.aab"
-  cp "app/build/outputs/apk/github/release/dayglance.apk" "$OUT_DIR/dayglance-github.apk"
+  cp "app/build/outputs/apk/github/release/prodday.apk" "$OUT_DIR/dayglance-github.apk"
   echo "    APK (GitHub) → outputs/dayglance-github.apk"
 
   echo ""
