@@ -10,6 +10,19 @@ describe('a share becomes a note', () => {
     expect(noteTextForShare({ files: [] }, 'Geteilt')).toEqual({ title: 'Geteilt', notes: '' });
   });
 
+  it('text shared alone: the first line is the title, the rest the text', () => {
+    expect(noteTextForShare({ text: 'Einkauf\n- Milch\n- Brot', files: [] }, 'Geteilt'))
+      .toEqual({ title: 'Einkauf', notes: '- Milch\n- Brot' });
+    expect(noteTextForShare({ text: '# Ideen\n\nmehr', files: [] }, 'Geteilt')).toEqual({ title: 'Ideen', notes: 'mehr' });
+    expect(noteTextForShare({ text: 'nur eine Zeile', files: [] }, 'Geteilt')).toEqual({ title: 'nur eine Zeile', notes: '' });
+    const long = 'x'.repeat(200);
+    expect(noteTextForShare({ text: `${long}\nb`, files: [] }, 'Geteilt')).toEqual({ title: 'Geteilt', notes: `${long}\nb` });
+  });
+
+  it('a subject stays the title of shared text', () => {
+    expect(noteTextForShare({ subject: 'Rezept', text: 'Mehl\nZucker', files: [] }, 'x')).toEqual({ title: 'Rezept', notes: 'Mehl\nZucker' });
+  });
+
   it('does not repeat the subject as text', () => {
     expect(noteTextForShare({ subject: 'Foto', text: 'Foto', files: [] }, 'x')).toEqual({ title: 'Foto', notes: '' });
   });

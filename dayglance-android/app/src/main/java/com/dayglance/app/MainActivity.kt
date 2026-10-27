@@ -208,8 +208,8 @@ class MainActivity : AppCompatActivity() {
             ACTION_ADD_TASK       -> store.pendingAddTask = true
             ACTION_ADD_INBOX_TASK -> store.pendingAddInboxTask = true
             ACTION_COMPLETE_TASK  -> storeCompleteFromNotification(intent, store)
-            // Files shared from another app become a note (SharedFilesInbox);
-            // a plain text share stays an Inbox entry, as before.
+            // Files and text shared from another app become a note
+            // (SharedFilesInbox); the old text path is the fallback only.
             Intent.ACTION_SEND    -> if (!SharedFilesInbox.store(this, intent)) storeShareIntent(intent, store)
             Intent.ACTION_SEND_MULTIPLE -> SharedFilesInbox.store(this, intent)
             // Cold start via an app.dayglance.* Activity intent (app was killed):
@@ -829,8 +829,8 @@ class MainActivity : AppCompatActivity() {
             ACTION_ADD_INBOX_TASK -> store.pendingAddInboxTask = true
             ACTION_COMPLETE_TASK  -> storeCompleteFromNotification(intent, store)
             Intent.ACTION_SEND, Intent.ACTION_SEND_MULTIPLE -> {
-                // Files become a note: the app is running, so it is told at once
-                // (src/hooks/useSharedFilesToNotes.js). Text goes the old way.
+                // Files and text become a note: the app is running, so it is told
+                // at once (src/hooks/useSharedFilesToNotes.js).
                 if (SharedFilesInbox.store(this, intent)) {
                     webView.post {
                         webView.evaluateJavascript(

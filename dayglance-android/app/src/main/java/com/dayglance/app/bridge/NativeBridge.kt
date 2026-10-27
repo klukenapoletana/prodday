@@ -676,8 +676,9 @@ class NativeBridge(
         val shareText = dataStore.pendingShareText
         if (shareText != null) {
             dataStore.pendingShareText = null
-            val escaped = shareText.replace("\\", "\\\\").replace("\"", "\\\"")
-            return """{"action":"share","text":"$escaped"}"""
+            // JSONObject escapes line breaks too: a hand-built string did not,
+            // and a multi-line share failed to parse in the web app.
+            return JSONObject().put("action", "share").put("text", shareText).toString()
         }
         // Snooze takes priority over complete (it was triggered most recently)
         val snoozeId = dataStore.pendingSnoozeTaskId
