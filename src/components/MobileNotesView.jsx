@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRightLeft, CheckSquare, FileText, Pencil, Pin, PinOff, Plus, Settings, StickyNote, Trash2 } from 'lucide-react';
 import { useDayPlannerCtx } from '../context/DayPlannerContext.jsx';
 import { useFeaturesCtx } from '../context/FeaturesContext.jsx';
-import { renderTitle } from '../utils/textFormatting.jsx';
-import { isNote, notePreview, sortNotes } from '../utils/notes.js';
+import { renderFormattedText, renderTitle } from '../utils/textFormatting.jsx';
+import { isNote, noteExcerpt, sortNotes } from '../utils/notes.js';
 import MobileNoteEditor from './MobileNoteEditor.jsx';
 import AttachmentBadge from './AttachmentBadge.jsx';
 import { attachmentsOf } from '../utils/attachments.js';
@@ -64,7 +64,7 @@ const NoteContextMenu = ({ menu, onClose, actions }) => {
 const MobileNotesView = () => {
   const { t } = useTranslation();
   const {
-    unscheduledTasks, openNewNote, showAddTask,
+    unscheduledTasks, createNote,
     handleMobileTaskTouchStart, handleMobileTaskTouchMove, handleMobileTaskTouchEnd,
     togglePinNote, openMobileEditTask, setMoveMenu, moveToRecycleBin,
     noteToOpen, setNoteToOpen,
@@ -93,7 +93,14 @@ const MobileNotesView = () => {
     () => sortNotes((unscheduledTasks || []).filter(n => isNote(n) && !n.isExample && (isVisibleForUser ? isVisibleForUser(n) : true))),
     [unscheduledTasks, isVisibleForUser],
   );
-  const openNote = notes.find(n => n.id === openNoteId);
+  // The + opens the full-screen editor on a draft, not yet a note: it becomes
+  // one with the first thing written in it (createNote), so a note opened and
+  // closed empty leaves nothing behind.
+  const [draft, setDraft] = useState(null);
+  const openNote = notes.find(n => n.id === openNoteId) || (draft && draft.id === openNoteId ? draft : undefined);
+  useEffect(() => {
+    if (draft && notes.some(n => n.id === draft.id)) setDraft(null);
+  }, [draft, notes]);
   const pinnedCount = notes.filter(n => n.pinned).length;
 
   // A note made from files shared by another app opens at once
@@ -104,20 +111,11 @@ const MobileNotesView = () => {
     setNoteToOpen(null);
   }, [noteToOpen, notes, setNoteToOpen]);
 
-  // The + names a new note in the editor; once it is saved, it opens here
-  // for writing. The ids known when + was pressed tell the new one apart.
-  const awaitingNewRef = useRef(null);
   const startNewNote = () => {
-    awaitingNewRef.current = new Set(notes.map(n => n.id));
-    openNewNote();
+    const id = crypto.randomUUID();
+    setDraft({ id, title: '', notes: '', subtasks: [], isNote: true });
+    setOpenNoteId(id);
   };
-  useEffect(() => {
-    const known = awaitingNewRef.current;
-    if (!known || showAddTask) return;
-    awaitingNewRef.current = null;
-    const created = notes.find(n => !known.has(n.id));
-    if (created) setOpenNoteId(created.id);
-  }, [notes, showAddTask]);
 
   return (
     <div className="relative flex-1 min-h-0 flex flex-col" data-notes-view>
@@ -140,7 +138,7 @@ const MobileNotesView = () => {
         ) : (
           <div className="space-y-2">
             {notes.map((note, i) => {
-              const preview = notePreview(note.notes);
+              const preview = noteExcerpt(note.notes);
               // Headings only where they tell the groups apart.
               const heading = pinnedCount > 0 && pinnedCount < notes.length && (i === 0 || i === pinnedCount)
                 ? t(i === 0 ? 'notes.pinned' : 'notes.others')
@@ -174,11 +172,15 @@ const MobileNotesView = () => {
                       className={`relative select-none ${note.color} rounded-lg px-3 py-3 shadow-sm text-white`}
                     >
                       <div className="font-medium text-sm flex items-start gap-1.5">
-                        <span className="flex-1 min-w-0">{renderTitle(note.title)}</span>
+                        <span className="flex-1 min-w-0">{note.title ? renderTitle(note.title) : t('notes.newNote')}</span>
                         {note.pinned && <Pin size={13} className="flex-shrink-0 mt-0.5 opacity-80" aria-label={t('notes.pinned')} />}
                       </div>
+                      {/* Formatted as in the editor; a tap anywhere opens the note,
+                          so links in the preview do not take it. */}
                       {preview && (
-                        <div className="text-xs opacity-90 mt-1 whitespace-pre-line line-clamp-3">{preview}</div>
+                        <div className="note-card-preview text-xs opacity-90 mt-1 max-h-28 overflow-hidden pointer-events-none break-words" data-note-preview>
+                          {renderFormattedText(preview)}
+                        </div>
                       )}
                       {(subtasks.length > 0 || attachmentsOf(note).length > 0) && (
                         <div className="text-[11px] opacity-90 mt-1.5 flex items-center gap-3">
@@ -196,7 +198,14 @@ const MobileNotesView = () => {
         )}
       </div>
 
-      {openNote && <MobileNoteEditor note={openNote} onClose={() => setOpenNoteId(null)} />}
+      {openNote && (
+        <MobileNoteEditor
+          note={openNote}
+          isDraft={openNote === draft}
+          onCreate={(fields) => createNote(openNote.id, fields)}
+          onClose={() => { setOpenNoteId(null); setDraft(null); }}
+        />
+      )}
       {menu && <NoteContextMenu menu={menu} onClose={() => setMenu(null)} actions={menuActions} />}
 
       <div className="absolute bottom-4 right-4 z-40 pointer-events-none">

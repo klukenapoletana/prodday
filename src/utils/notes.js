@@ -41,20 +41,23 @@ export const stripNote = (task) => {
   return rest;
 };
 
-/** First lines of a note's text as plain words, for its card. */
-export const notePreview = (text, maxLines = 3) => {
+/**
+ * The first lines of a note's text for its card in the Notes tab, its
+ * formatting kept for renderFormattedText (utils/textFormatting.jsx). Blank
+ * lines before the text are dropped and runs of them kept to one; a code
+ * block the cut leaves open is closed, so the card does not show a bare fence.
+ */
+export const noteExcerpt = (text, maxLines = 5) => {
   if (typeof text !== 'string' || !text.trim()) return '';
-  return text
-    .split('\n')
-    .map((line) => line
-      .replace(/^\s*(?:[-*+]\s+\[[ xX]\]\s+|[-*+]\s+|\d+[.)]\s+|>\s*|#{1,6}\s+)/, '')
-      .replace(/(\*\*|__|~~|==|`)/g, '')
-      .replace(/(^|\s)[*_](\S[^*_]*\S|\S)[*_](?=\s|$)/g, '$1$2')
-      .replace(/<\/?[a-z][^>]*>/gi, '')
-      .trim())
-    .filter(Boolean)
-    .slice(0, maxLines)
-    .join('\n');
+  const lines = [];
+  for (const line of text.split('\n')) {
+    if (!line.trim() && (!lines.length || !lines[lines.length - 1].trim())) continue;
+    lines.push(line);
+    if (lines.filter((l) => l.trim()).length >= maxLines) break;
+  }
+  while (lines.length && !lines[lines.length - 1].trim()) lines.pop();
+  const fences = lines.filter((l) => l.trim().startsWith('```')).length;
+  return fences % 2 ? `${lines.join('\n')}\n\`\`\`` : lines.join('\n');
 };
 
 /** The notes, pinned ones first, each group most recently changed first. */

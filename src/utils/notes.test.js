@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isNote, toNote, fromNote, stripNote, notePreview, sortNotes } from './notes.js';
+import { isNote, toNote, fromNote, stripNote, noteExcerpt, sortNotes } from './notes.js';
 import { notBucketed } from './bucketList.js';
 import { toInboxCopy } from './inboxMove.js';
 
@@ -32,10 +32,18 @@ describe('notes', () => {
     expect(stripNote({ id: 'a', isNote: true, title: 't' })).toEqual({ id: 'a', title: 't' });
   });
 
-  it('previews the first lines as plain words', () => {
-    expect(notePreview('**Fett** und ~~weg~~\n\n- [ ] Milch\n- Brot\n## Titel\nmehr')).toBe('Fett und weg\nMilch\nBrot');
-    expect(notePreview('')).toBe('');
-    expect(notePreview(undefined)).toBe('');
+  it('takes the first lines for the card, with their formatting', () => {
+    // The card shows the formatting, so the marks stay.
+    expect(noteExcerpt('**Fett** und ~~weg~~\n\n- [ ] Milch\n- Brot\n## Titel\nmehr\nnoch mehr'))
+      .toBe('**Fett** und ~~weg~~\n\n- [ ] Milch\n- Brot\n## Titel\nmehr');
+    expect(noteExcerpt('\n\n\na\n\n\n\nb', 5)).toBe('a\n\nb');
+    expect(noteExcerpt('')).toBe('');
+    expect(noteExcerpt(undefined)).toBe('');
+  });
+
+  it('closes a code block the cut leaves open', () => {
+    expect(noteExcerpt('Code:\n```\nx = 1\ny = 2\nz = 3\nw = 4', 3)).toBe('Code:\n```\nx = 1\n```');
+    expect(noteExcerpt('```\nx\n```\nok', 5)).toBe('```\nx\n```\nok');
   });
 
   it('sorts the most recently changed first', () => {

@@ -403,20 +403,22 @@ export default function useTaskActions({
     setShowAddTask(true);
   };
 
-  // A new note (the Notes tab's +): the Inbox form, saved as a note.
-  const openNewNote = () => {
-    setNewTask({
+  // A new note (the Notes tab's +), made once the full-screen editor has
+  // something in it (components/MobileNotesView.jsx): `id` is the draft's,
+  // `fields` what was written first. Nothing if a note has that id already.
+  const createNote = (id, fields = {}) => {
+    if (unscheduledTasks.some(t => t.id === id)) return;
+    pushUndo({ key: 'added', title: fields.title || '' });
+    setUnscheduledTasks(prev => (prev.some(t => t.id === id) ? prev : [...prev, toNote({
+      id,
       title: '',
-      startTime: getNextQuarterHour(),
       duration: 30,
-      date: dateToString(selectedDate),
-      isAllDay: false,
-      openInInbox: true,
-      isNote: true,
-      deadline: null,
-      priority: 0
-    });
-    setShowAddTask(true);
+      color: colors[0].class,
+      completed: false,
+      notes: '',
+      subtasks: [],
+      ...fields,
+    })]));
   };
 
   // ── Task update ──────────────────────────────────────────────────────────
@@ -1133,7 +1135,7 @@ export default function useTaskActions({
     openNewTaskForm,
     openNewAllDayTask,
     openNewInboxTask,
-    openNewNote,
+    createNote,
     // Update
     changeTaskColor,
     setTaskEnergy,
