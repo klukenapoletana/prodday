@@ -89,6 +89,18 @@ describe('useSharedFilesToNotes', () => {
     expect(native.acked).toEqual(['b1']);
   });
 
+  it('text shared alone (a note from a notes app) becomes a note too', async () => {
+    native.batches = [{ batchId: 't1', text: 'Einkauf\n- Milch\n- Brot', subject: '', files: [], skipped: 0 }];
+    render({ dataLoaded: true });
+    await flush();
+    const note = notes.find(n => n.id === 'share-t1');
+    expect(note).toMatchObject({ title: 'Einkauf', notes: '- Milch\n- Brot', isNote: true });
+    expect(note.attachments).toBeUndefined();
+    expect(created).toEqual(['share-t1']);
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(native.acked).toEqual(['t1']);
+  });
+
   it('registers the note, so a sync cycle in flight keeps it', async () => {
     render({ dataLoaded: true });
     await flush();

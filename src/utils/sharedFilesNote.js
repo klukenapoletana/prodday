@@ -1,5 +1,6 @@
-// Files shared to the app from another app (Android: data/SharedFilesInbox.kt)
-// become one note per share, the files its attachments (utils/attachments.js).
+// Files and text shared to the app from another app (Android:
+// data/SharedFilesInbox.kt) become one note per share, the files its
+// attachments (utils/attachments.js).
 // Pure: the hook (hooks/useSharedFilesToNotes.js) reads the files and stores
 // them; this decides what the note says.
 //
@@ -12,16 +13,30 @@ export const noteIdForShare = (batchId) => `share-${batchId}`;
 
 const withoutExtension = (name) => String(name || '').replace(/\.[^./]+$/, '');
 
+const TITLE_MAX = 120;
+
 /**
  * The note for a share: { title, notes }. The title is the shared subject, or
- * the first file's name (without extension), or `fallbackTitle`; the shared
- * text becomes the note's text.
+ * the first file's name (without extension); the shared text becomes the
+ * note's text. Text shared alone with no subject (a note from a notes app)
+ * gives its first line as the title and the rest as the text, unless that
+ * line is too long to be a title, when the whole text stays the text.
+ * `fallbackTitle` when there is nothing else.
  */
 export function noteTextForShare(batch, fallbackTitle) {
   const subject = String(batch?.subject || '').trim();
   const text = String(batch?.text || '').trim();
   const firstFile = (batch?.files || []).find((f) => f?.name);
-  const title = (subject || withoutExtension(firstFile?.name).trim() || fallbackTitle).slice(0, 120);
+  const fileTitle = withoutExtension(firstFile?.name).trim();
+  if (!subject && !fileTitle && text) {
+    const newline = text.indexOf('\n');
+    const first = (newline === -1 ? text : text.slice(0, newline)).replace(/^(#{1,6}\s+|[-*]\s+(\[[ xX]\]\s+)?)/, '').trim();
+    if (first && first.length <= TITLE_MAX) {
+      return { title: first, notes: newline === -1 ? '' : text.slice(newline + 1).trim() };
+    }
+    return { title: fallbackTitle, notes: text };
+  }
+  const title = (subject || fileTitle || fallbackTitle).slice(0, TITLE_MAX);
   return { title, notes: text && text !== subject ? text : '' };
 }
 

@@ -13,9 +13,9 @@ import java.io.RandomAccessFile
 import java.util.UUID
 
 /**
- * Files shared to the app from another app's share sheet (images, PDFs,
- * audio), on their way to becoming a note with attachments
- * (src/hooks/useSharedFilesToNotes.js).
+ * Files and text shared to the app from another app's share sheet (images,
+ * PDFs, audio, a note from a notes app), on their way to becoming a note,
+ * the files its attachments (src/hooks/useSharedFilesToNotes.js).
  *
  * The sharing app's read grant on a content:// URI lasts only as long as the
  * receiving Activity, so each file is copied into the app's own storage at
@@ -30,6 +30,8 @@ object SharedFilesInbox {
     private const val DIR = "shared_in"
     /** As src/utils/attachments.js MAX_ATTACHMENT_BYTES. */
     const val MAX_BYTES = 20L * 1024 * 1024
+    /** Shared text kept per share: far beyond a note, well within the prefs. */
+    private const val MAX_TEXT = 200_000
     private val LOCK = Any()
 
     private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -54,13 +56,16 @@ object SharedFilesInbox {
     }
 
     /**
-     * Copies the files of a share intent and queues them as one batch.
-     * Returns false when the intent carries no file (a plain text share,
-     * which the caller handles as before).
+     * Copies the files of a share intent and queues them, with its text, as
+     * one batch. Text shared alone is a batch without files. Returns false
+     * when the intent carries neither.
      */
     fun store(context: Context, intent: Intent): Boolean {
         val uris = streams(intent)
-        if (uris.isEmpty()) return false
+        val text = (intent.getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString() ?: "").take(MAX_TEXT)
+        val subject = intent.getStringExtra(Intent.EXTRA_SUBJECT)
+            ?: intent.getStringExtra(Intent.EXTRA_TITLE) ?: ""
+        if (uris.isEmpty() && text.isBlank()) return false
         val resolver = context.contentResolver
         val files = JSONArray()
         var skipped = 0
@@ -103,8 +108,8 @@ object SharedFilesInbox {
         }
         val batch = JSONObject().apply {
             put("batchId", UUID.randomUUID().toString())
-            put("text", intent.getStringExtra(Intent.EXTRA_TEXT) ?: "")
-            put("subject", intent.getStringExtra(Intent.EXTRA_SUBJECT) ?: "")
+            put("text", text)
+            put("subject", subject)
             put("files", files)
             put("skipped", skipped)
         }
