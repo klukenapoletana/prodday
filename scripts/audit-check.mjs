@@ -63,6 +63,11 @@ const ACK = {
   // Published 2026-10-06. GHSA-68fv-2mgg-jv7q (source-map-js, via postcss) is
   // FIXED by the package.json override to ^1.2.2 (postcss 8.5 asks for
   // ^1.2.1, so the pin is in-major). These two have no in-major fix:
+  'GHSA-gcqx-w48m-w2h4': {
+    disposition: 'accept', pkg: 'deepmerge (via vite-plugin-pwa: workbox-build, @rollup/plugin-node-resolve)',
+    reason: 'mergeObject() can return objects with a poisoned prototype. Only the PWA service-worker build merges its own config with it, on the build machine; nothing of it reaches the app. No patched version (4.3.1 is the latest and affected).',
+    review: '2026-12-31',
+  },
   'GHSA-rj75-hqrm-r3gf': {
     disposition: 'accept', pkg: 'postcss-selector-parser (via tailwindcss 3: postcss-nested)',
     reason: 'Quadratic selector parsing can exhaust CPU. Tailwind 3 runs at build time over our own stylesheets, never over outside input. The fix is 7.1.6, a major above the ^6 tailwindcss 3 depends on; revisit with the tailwind 4 upgrade.',
