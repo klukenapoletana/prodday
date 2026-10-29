@@ -17,14 +17,24 @@ import { createDayGlanceEngine } from '../sync/adapter.js';
 import { createDbEngine } from '../sync/dbEngine.js';
 import { registerDbEngine } from '../sync/dirtyTracker.js';
 import { isVaultEnabled } from '../sync/vaultConfig.js';
+import { editedDuringCycle, markCycleBuilt } from '../sync/editQuiet.js';
 
 const DEFAULT_RETENTION_DAYS = 90;
 
 /** The file tier's data callbacks: the payload, the backup payload, the apply, the retention. */
 export const fileEngineData = (callbacksRef) => ({
-  buildPayload:         () => callbacksRef.current.buildPayload?.(),
+  buildPayload:         () => { markCycleBuilt(); return callbacksRef.current.buildPayload?.(); },
   buildBackupPayload:   () => callbacksRef.current.buildBackupPayload?.(),
-  applyPayload:         (data, opts) => callbacksRef.current.applyPayload?.(data, opts),
+  // A cycle during which something was edited would put the old state back:
+  // its result is not applied, and the edit's own cycle follows
+  // (sync/editQuiet.js).
+  applyPayload:         (data, opts) => {
+    if (editedDuringCycle()) {
+      console.info('[prodday] sync: edited during the cycle, its result is not applied; the next cycle follows the edit');
+      return undefined;
+    }
+    return callbacksRef.current.applyPayload?.(data, opts);
+  },
   getSyncRetentionDays: () => callbacksRef.current.syncRetentionDays ?? DEFAULT_RETENTION_DAYS,
 });
 

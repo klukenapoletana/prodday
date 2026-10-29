@@ -166,6 +166,8 @@ import useCloudSync from './hooks/useCloudSync.js';
 import { useFileSyncEngine, useVaultSyncEngine, vaultEngineData } from './hooks/useSyncEngines.js';
 import { resolveSyncTarget } from './sync/syncTarget.js';
 import useCloudSyncAfterEdit from './hooks/useCloudSyncAfterEdit.js';
+import useEditActivity from './hooks/useEditActivity.js';
+import { runWhenQuiet } from './sync/editQuiet.js';
 import { createDbEngine, resetVaultSyncCursor } from './sync/dbEngine.js';
 import { deriveBlockEnergy } from './utils/energyAxis.js';
 import { isVaultEnabled } from './sync/vaultConfig.js';
@@ -990,9 +992,12 @@ const DayPlanner = () => {
       onFirstSyncReload:    () => window.location.reload(),
     },
   });
-  // Visibility/focus listeners + 60 s poll call through this ref so they
-  // always run the latest engine method without a closure refresh.
-  cloudSyncDownloadRef.current = () => cloudSyncEngineRef.current.download();
+  // Visibility/focus listeners, the 60 s poll and the cycle after an edit call
+  // through this ref so they always run the latest engine method without a
+  // closure refresh. Each waits until nothing has been edited for a minute, so
+  // a cycle does not land in the middle of someone's work (sync/editQuiet.js);
+  // "Sync now" calls the engine directly.
+  cloudSyncDownloadRef.current = () => runWhenQuiet(() => cloudSyncEngineRef.current.download());
 
   // Cloud sync: a changed sync target (server, account or folder) invalidates what
   // this device knows about the remote, so reconfiguration must not be followed by
@@ -2596,6 +2601,7 @@ const DayPlanner = () => {
 
   // Cloud sync: one sync cycle five seconds after the data last changed, never
   // a bare upload (hooks/useCloudSyncAfterEdit.js says why).
+  useEditActivity(!isTrayMode && !!cloudSyncConfig?.enabled);
   useCloudSyncAfterEdit({
     enabled: !isTrayMode && !!cloudSyncConfig?.enabled,
     dataLoaded, syncKeyReady, syncKeyReadyRef,
