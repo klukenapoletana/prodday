@@ -26,7 +26,7 @@ android {
         // the fallback for plain gradle/IDE builds. Keep versionName equal to
         // package.json's version.
         versionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull() ?: 10000
-        versionName = "1.0.0"
+        versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
