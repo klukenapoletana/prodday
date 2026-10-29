@@ -25,6 +25,7 @@ vi.mock('../sync/vaultConfig.js', () => ({ isVaultEnabled: () => vault.enabled }
 vi.mock('../sync/dirtyTracker.js', () => ({ registerDbEngine: (e) => { vault.registered.push(e); } }));
 
 import { fileEngineData, useFileSyncEngine, useVaultSyncEngine, vaultEngineData } from './useSyncEngines.js';
+import { markInteraction, noteDataChange, resetEditQuiet } from '../sync/editQuiet.js';
 
 const render = (hook, props) => { runtime.i = 0; return hook(props); };
 const unmount = () => { for (const slot of runtime.slots) slot?.cleanup?.(); };
@@ -58,6 +59,32 @@ describe('the data wiring both roots share', () => {
     expect(data.getSyncRetentionDays()).toBe(30);
     data.applyPayload({ x: 1 }, { allowEmpty: false });
     expect(ref.current.applyPayload).toHaveBeenCalledWith({ x: 1 }, { allowEmpty: false });
+  });
+
+  // A checklist reordered or a block moved while the cycle was on the network:
+  // applying its result would put the old order back (sync/editQuiet.js).
+  it('the file tier does not apply a cycle during which something was edited', () => {
+    resetEditQuiet();
+    vi.useFakeTimers({ now: 1_000_000 });
+    vi.spyOn(console, 'info').mockImplementation(() => {});
+    try {
+      const ref = callbacks();
+      const data = fileEngineData(ref);
+      data.buildPayload();
+      vi.advanceTimersByTime(2000);
+      markInteraction(); noteDataChange();
+      vi.advanceTimersByTime(2000);
+      data.applyPayload({ tasks: ['old order'] }, {});
+      expect(ref.current.applyPayload).not.toHaveBeenCalled();
+      // The next cycle builds from the edited state and applies.
+      data.buildPayload();
+      vi.advanceTimersByTime(2000);
+      data.applyPayload({ tasks: ['merged'] }, {});
+      expect(ref.current.applyPayload).toHaveBeenCalledWith({ tasks: ['merged'] }, {});
+    } finally {
+      vi.useRealTimers();
+      resetEditQuiet();
+    }
   });
 
   it('the vault tier gets the payload data, an apply that allows empty, and the multi-user flag', () => {

@@ -1,5 +1,6 @@
 // The file-tier sync that follows a local edit: five seconds after the data
-// last changed, run one sync cycle (#2065).
+// last changed, run one sync cycle (#2065), held until edits have been quiet
+// for a minute (sync/editQuiet.js, through cloudSyncDownloadRef).
 //
 // THE CYCLE, NEVER A BARE UPLOAD. A write with no read behind it cannot carry a
 // validator the server could refuse (the overwrite #2065 closed), and it also
@@ -19,6 +20,7 @@
 
 import { useEffect } from 'react';
 import { runSyncAfterEdit } from '../utils/syncNowAction.js';
+import { noteDataChange } from '../sync/editQuiet.js';
 
 export const SYNC_AFTER_EDIT_DELAY_MS = 5000;
 
@@ -39,6 +41,8 @@ export default function useCloudSyncAfterEdit({
 }) {
   useEffect(() => {
     if (!enabled || !dataLoaded || suppressCloudUploadRef.current || !syncKeyReadyRef.current) return;
+    // An edit, if someone just acted (sync/editQuiet.js, hooks/useEditActivity.js).
+    noteDataChange();
     if (cloudSyncDebounceRef.current) clearTimeout(cloudSyncDebounceRef.current);
     cloudSyncDebounceRef.current = setTimeout(() => {
       runSyncAfterEdit({ cloudSyncDownload: cloudSyncDownloadRef.current });
