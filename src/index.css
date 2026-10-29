@@ -295,6 +295,11 @@ body.using-pointer a:focus-visible {
 
 /* The full-screen note editor's body (MobileNoteEditor): a thin scrollbar
    that stays visible, so a long note shows where in it you are. */
+/* A note's card in the Notes tab (MobileNotesView): headings keep their order
+   of size, scaled down to the card's small text. */
+.note-card-preview .text-lg { font-size: 0.95rem; line-height: 1.3; }
+.note-card-preview .text-base { font-size: 0.85rem; line-height: 1.3; }
+.note-card-preview pre { font-size: 0.7rem; margin: 0.15rem 0; padding: 0.25rem 0.4rem; }
 .note-editor-scroll { scrollbar-width: thin; scrollbar-color: rgba(128, 128, 128, 0.6) transparent; }
 .note-editor-scroll::-webkit-scrollbar { width: 5px; }
 .note-editor-scroll::-webkit-scrollbar-track { background: transparent; }

@@ -62,6 +62,26 @@ describe('notes actions', () => {
   });
 });
 
+describe('a new note from the full-screen editor', () => {
+  it('is made with what was written first, once', () => {
+    const { actions, state, deps } = build();
+    actions.createNote('d1', { title: 'Reise', notes: '**Pass**' });
+    expect(state.unscheduled).toEqual([expect.objectContaining({ id: 'd1', title: 'Reise', notes: '**Pass**', isNote: true, color: 'bg-blue-500', subtasks: [] })]);
+    expect(notBucketed(state.unscheduled[0])).toBe(false);
+    expect(deps.pushUndo).toHaveBeenCalledWith({ key: 'added', title: 'Reise' });
+    // A second call in the same moment adds nothing.
+    actions.createNote('d1', { notes: 'anders' });
+    expect(state.unscheduled).toHaveLength(1);
+    expect(state.unscheduled[0].notes).toBe('**Pass**');
+  });
+
+  it('may start without a title', () => {
+    const { actions, state } = build();
+    actions.createNote('d2', { title: '', subtasks: [{ id: 's', title: 'Milch', completed: false }] });
+    expect(state.unscheduled[0]).toMatchObject({ id: 'd2', title: '', subtasks: [{ title: 'Milch' }] });
+  });
+});
+
 describe('pinning', () => {
   it('pins a note and unpins it again, with an undo step', () => {
     const { actions, state, deps } = build({ unscheduled: [{ id: 'n', title: 'Liste', isNote: true }] });

@@ -18,8 +18,13 @@ import { revealCaret } from '../utils/textareaCaret.js';
  * editor takes the keyboard's height off its own (useKeyboardInset) and the
  * format row sits on the keyboard. The text grows with what is typed; the body
  * scrolls, with a scrollbar, and follows the caret (utils/textareaCaret.js).
+ *
+ * A new note opens as a draft (`isDraft`, components/MobileNotesView.jsx),
+ * the title focused: the first thing written in it, a title, text, a
+ * subtask or an attachment, makes the note (`onCreate`), and every later
+ * change goes to it as to any note.
  */
-const MobileNoteEditor = ({ note, onClose }) => {
+const MobileNoteEditor = ({ note, onClose, isDraft = false, onCreate }) => {
   const { t } = useTranslation();
   const {
     renameNote, openMobileEditTask,
@@ -28,11 +33,26 @@ const MobileNoteEditor = ({ note, onClose }) => {
     darkMode, textPrimary, textSecondary,
   } = useDayPlannerCtx();
   const keyboard = useKeyboardInset();
-  // The phone's back closes the note and stays on the Notes tab.
-  useBackClose({ key: 'dgNoteEditor', onClose });
   const [title, setTitle] = useState(note.title || '');
   const [barTarget, setBarTarget] = useState(null);
   const bodyRef = useRef(null);
+  // Set once the draft is made, and read at the call: a second change in the
+  // same moment (the panel saving its text as the editor closes, after the
+  // title made the note) goes to the note, whose update queues behind the
+  // creation, rather than making it twice.
+  const created = useRef(false);
+  const isDraftNow = () => isDraft && !created.current;
+  const create = (fields) => {
+    created.current = true;
+    onCreate?.({ title: title.trim(), ...fields });
+  };
+  const notesFor = (id, text, isInbox) => (isDraftNow()
+    ? (text.trim() && create({ notes: text }))
+    : updateTaskNotes(id, text, isInbox));
+  const subtaskFor = (id, text, isInbox, extra) => (isDraftNow()
+    ? create({ subtasks: [{ id: crypto.randomUUID(), title: text.trim(), completed: false, ...extra }] })
+    : addSubtask(id, text, isInbox, extra));
+  const attachmentsFor = (list) => (isDraftNow() ? create({ attachments: list }) : updateTaskAttachments(note.id, list, true));
 
   // A title changed elsewhere (sync, the settings editor) shows here while
   // the field is not being typed in.
@@ -56,9 +76,15 @@ const MobileNoteEditor = ({ note, onClose }) => {
 
   const saveTitle = () => {
     titleFocused.current = false;
+    if (isDraftNow()) { if (title.trim()) create({}); return; }
     if (title.trim()) renameNote(note.id, title);
     else setTitle(note.title || '');
   };
+
+  // The phone's back closes the note and stays on the Notes tab. A title still
+  // being typed is kept, as leaving the field would.
+  const close = () => { if (titleFocused.current) saveTitle(); onClose(); };
+  useBackClose({ key: 'dgNoteEditor', onClose: close });
 
   const pageBg = darkMode ? 'bg-gray-900' : 'bg-white';
   return (
@@ -73,7 +99,7 @@ const MobileNoteEditor = ({ note, onClose }) => {
         <div className="flex items-center justify-between px-1 pt-1">
           <button
             type="button"
-            onClick={onClose}
+            onClick={close}
             className="flex items-center gap-0.5 pl-1 pr-3 py-2 rounded-lg text-blue-500 font-medium"
             aria-label={t('common.back')}
             data-note-back
@@ -81,7 +107,7 @@ const MobileNoteEditor = ({ note, onClose }) => {
             <ChevronLeft size={22} />
             {t('notes.title')}
           </button>
-          <button
+          {!isDraftNow() && <button
             type="button"
             // Closing pops this editor's back entry a tick later (useBackClose);
             // the settings editor opens after that, or the pop would close it.
@@ -91,7 +117,7 @@ const MobileNoteEditor = ({ note, onClose }) => {
             title={t('notes.settings')}
           >
             <SlidersHorizontal size={20} />
-          </button>
+          </button>}
         </div>
         <input
           value={title}
@@ -99,6 +125,9 @@ const MobileNoteEditor = ({ note, onClose }) => {
           onFocus={() => { titleFocused.current = true; }}
           onBlur={saveTitle}
           onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+          // A new note starts at its title.
+          autoFocus={isDraft}
+          placeholder={t('notes.newNote')}
           aria-label={t('task.title')}
           className={`w-full px-4 pb-2.5 bg-transparent text-xl font-semibold outline-none ${textPrimary}`}
           data-note-title
@@ -111,8 +140,8 @@ const MobileNoteEditor = ({ note, onClose }) => {
           task={note}
           isInbox={true}
           darkMode={darkMode}
-          updateTaskNotes={updateTaskNotes}
-          addSubtask={addSubtask}
+          updateTaskNotes={notesFor}
+          addSubtask={subtaskFor}
           toggleSubtask={toggleSubtask}
           deleteSubtask={deleteSubtask}
           updateSubtaskTitle={updateSubtaskTitle}
@@ -124,7 +153,7 @@ const MobileNoteEditor = ({ note, onClose }) => {
         <div className="mt-4 px-1">
           <AttachmentsField
             attachments={attachmentsOf(note)}
-            onChange={(list) => updateTaskAttachments(note.id, list, true)}
+            onChange={attachmentsFor}
             darkMode={darkMode}
             textSecondary={textSecondary}
             borderClass={darkMode ? 'border-gray-600' : 'border-stone-300'}
